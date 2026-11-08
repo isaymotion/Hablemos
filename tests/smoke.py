@@ -188,5 +188,39 @@ with sync_playwright() as p:
         if 'Admission vs discharge' not in t: bad.append('mcase compare ' + cid); print('BAD mcase compare', cid)
         if page.evaluate("document.documentElement.scrollWidth > window.innerWidth"): bad.append('mcase overflow ' + cid)
         if cid == p5['mcases'][0]: page.screenshot(path=f'{OUT}/mcase-compare-390.png', full_page=True)
+    # ---- pass 6 learn track (run only when the data exists) ----
+    p6 = page.evaluate("({dict:App.DICT.length, lessons:(window.LESSONS||[]).map(l=>[l.id,l.quiz.length]), reading:(window.READING||[]).map(r=>[r.id,r.q.length]), dialogues:(window.DIALOGUES||[]).map(d=>d.id), placement:(window.PLACEMENT||[]).length})")
+    print('learn present', {k: len(v) if isinstance(v, list) else v for k, v in p6.items()})
+    if p6['dict']:
+        t = go('#/dict'); assert 'entries' in t, 'dict list'
+        t = go('#/dict?q=triste'); assert 'triste' in t.lower() and 'No match' not in t, 'dict search'
+        t = go('#/dict?l=n'); assert 'entries' in t, 'dict letter'
+        t = go('#/search?q=nervios'); assert 'nervios' in t.lower(), 'global search'
+        t = go('#/flash'); assert 'Clinical vocabulary' in t, 'clinical decks'
+        page.screenshot(path=f'{OUT}/dict-390.png')
+    for lid, nq in p6['lessons']:
+        t = go('#/lessons/' + lid)
+        assert 'Check yourself' in t and page.locator('.opt').count() >= 2, ('lesson', lid)
+        for _ in range(nq): page.click('.opt >> nth=0'); page.wait_for_timeout(40); page.click('[data-act=next]'); page.wait_for_timeout(40)
+        assert f'/ {nq}' in page.inner_text('#view'), ('lesson quiz end', lid)
+        if page.evaluate("document.documentElement.scrollWidth > window.innerWidth"): bad.append('lesson overflow ' + lid)
+        if lid == p6['lessons'][0][0]: page.screenshot(path=f'{OUT}/lesson-390.png', full_page=True)
+    if p6['lessons']:
+        t = go('#/lessons'); assert 'Foundations' in t, 'lessons index'
+        t = go('#/psych'); assert 'Related lessons' in t, 'related lessons in hub'
+    for rid, nq in p6['reading']:
+        t = go('#/reading/' + rid)
+        if page.locator('#trbtn').count(): page.click('#trbtn'); page.wait_for_timeout(60)
+        for _ in range(nq): page.click('#rq .opt >> nth=0'); page.wait_for_timeout(40); page.click('#rq [data-act=next]'); page.wait_for_timeout(40)
+        assert f'/ {nq}' in page.inner_text('#rq'), ('reading quiz end', rid)
+        if page.evaluate("document.documentElement.scrollWidth > window.innerWidth"): bad.append('reading overflow ' + rid)
+    if p6['reading']: page.screenshot(path=f'{OUT}/reading-390.png', full_page=True)
+    for did in p6['dialogues']:
+        t = go('#/speak/' + did); assert page.locator('.line').count() >= 4, ('dialogue', did)
+    if p6['dialogues']: page.screenshot(path=f'{OUT}/dialogue-390.png')
+    if p6['placement']:
+        go('#/placement')
+        for _ in range(p6['placement']): page.click('.opt >> nth=0'); page.wait_for_timeout(40)
+        assert 'your level' in page.inner_text('#view').lower(), 'placement result'
     ctx.close(); b.close()
 print('HB CONTENT', 'OK' if not bad else 'FAIL')

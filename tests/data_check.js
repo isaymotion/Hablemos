@@ -121,6 +121,39 @@ MC.forEach((c) => {
   AM.domains.forEach((d) => { if (!c.domains[d.id]) errs.push('mcase ' + c.id + ' missing domain ' + d.id); });
   Object.entries(c.domains || {}).forEach(([id, cd]) => { const d = AM.domains.find((x) => x.id === id); if (!d) return errs.push('mcase ' + c.id + ' unknown domain ' + id); checkModel('mcase ' + c.id + '.' + id, cd, d); });
 });
+/* Pass 6 learn track: lessons, dictionary, readings, dialogues, placement. */
+const LESS = ctx.LESSONS || [], READ = ctx.READING || [], DIAL = ctx.DIALOGUES || [], PLACE = ctx.PLACEMENT || [];
+const dictLines = (ctx.DICT_RAW || []).join('\n').split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('#'));
+const dictSeen = new Set(); let dictDup = 0;
+dictLines.forEach((l, i) => { const p = l.split('|').map((s) => s.trim()); if (p.length < 4 || !p[0] || !p[1] || !p[2] || !p[3]) errs.push('dict line ' + i + ' needs spanish|english|pos|category: ' + l.slice(0, 60));
+  else { if (!['basics', 'grammar', 'pronouns', 'questions', 'numbers', 'time', 'people', 'family', 'body', 'food', 'home', 'money', 'places', 'adjectives', 'modals', 'verbs', 'emotions', 'beliefs', 'idioms', 'health', 'mind', 'risk', 'substance', 'stigma', 'clinical', 'falsefriends'].includes(p[3])) errs.push('dict unknown category ' + p[3] + ': ' + p[0]);
+    if (!['n', 'nm', 'nf', 'v', 'adj', 'adv', 'pron', 'part', 'conj', 'prep', 'interj', 'num', 'phr'].includes(p[2])) errs.push('dict unknown pos ' + p[2] + ': ' + p[0]);
+    const k = p[0].toLowerCase() + '|' + p[1].toLowerCase(); if (dictSeen.has(k)) dictDup++; dictSeen.add(k); tl(p[0], 'dict ' + p[0]); } });
+if (dictDup) warns.push(dictDup + ' duplicate dictionary lines (same Spanish and English; the parser drops them)');
+LESS.forEach((l) => {
+  if (!l.id || !l.level || !l.unit || !l.title || !l.summary || !l.body || !(l.quiz || []).length) errs.push('lesson ' + l.id + ' missing id/level/unit/title/summary/body/quiz');
+  if (!/^[a-z0-9-]+$/.test(l.id || '')) errs.push('lesson id must be a slug: ' + l.id);
+  (l.quiz || []).forEach((q, i) => { if (!Array.isArray(q) || q.length < 4 || !Array.isArray(q[1]) || q[1].length < 2 || q[2] >= q[1].length || q[2] < 0 || !q[3]) errs.push('lesson ' + l.id + ' quiz ' + i); });
+  if (!l.draft) warns.push('lesson ' + l.id + ' is not marked draft');
+  const re = /<div class="ex"><b>([^<]+)<\/b>/g; let m; while ((m = re.exec(l.body))) tl(m[1], 'lesson ' + l.id + ' ex');
+  if (/<(script|iframe)/i.test(l.body)) errs.push('lesson ' + l.id + ' has script/iframe');
+});
+if (LESS.length && !LESS.some((l) => l.id === 'interpreting')) errs.push('lessons: id "interpreting" is required');
+if (new Set(LESS.map((l) => l.id)).size !== LESS.length) errs.push('lessons: duplicate ids');
+READ.forEach((r) => {
+  if (!r.id || !r.level || !r.title || !r.titleEn || !(r.tl || []).length) errs.push('reading ' + r.id + ' incomplete');
+  if ((r.tl || []).length !== (r.en || []).length) errs.push('reading ' + r.id + ' paragraph counts differ');
+  (r.gloss || []).forEach((g, i) => { if (!Array.isArray(g) || !g[0] || !g[1]) errs.push('reading ' + r.id + ' gloss ' + i); });
+  (r.q || []).forEach((q, i) => { if (!Array.isArray(q) || q.length < 4 || q[2] >= q[1].length || !q[3]) errs.push('reading ' + r.id + ' q ' + i); });
+  if (!(r.q || []).length) errs.push('reading ' + r.id + ' has no questions');
+  (r.tl || []).forEach((p, i) => tl(p, 'reading ' + r.id + ' para ' + i));
+});
+DIAL.forEach((d) => {
+  if (!d.id || !d.level || !d.title || !(d.roles || []).length || typeof d.you !== 'number' || !(d.lines || []).length) errs.push('dialogue ' + d.id + ' incomplete');
+  (d.lines || []).forEach((l, i) => { if (!Array.isArray(l) || typeof l[0] !== 'number' || l[0] >= (d.roles || []).length || !l[1] || !l[2]) errs.push('dialogue ' + d.id + ' line ' + i); else { tl(l[1], 'dialogue ' + d.id + ' line ' + i); if (l[3]) tl(l[3], 'dialogue ' + d.id + ' tu ' + i); } });
+  if ((d.lines || []).length && !d.lines.some((l) => l[0] === d.you)) errs.push('dialogue ' + d.id + ' has no line for "you"');
+});
+PLACE.forEach((q, i) => { if (!Array.isArray(q) || q.length < 4 || !['A1', 'A2', 'B1', 'B2'].includes(q[0]) || !q[1] || !Array.isArray(q[2]) || q[2].length < 2 || q[3] >= q[2].length) errs.push('placement ' + i); });
 let audio = 0; try { const m = JSON.parse(fs.readFileSync(path.join(root, 'audio/manifest.json'), 'utf8')); audio = (m.keys || []).length; } catch (e) {}
 const texts = (() => { try { return JSON.parse(fs.readFileSync(path.join(root, 'tools/texts.json'), 'utf8')).length; } catch (e) { return 0; } })();
 if (texts && audio < texts) warns.push((texts - audio) + ' texts without audio until the audio job runs');
@@ -128,6 +161,6 @@ const vers = new Set([ctx.APP_META.version, (ctx.APP_CHANGELOG[0] || {}).version
 if (vers.size !== 1) errs.push('versions disagree: ' + [...vers].join(', '));
 warns.forEach((w) => console.log('WARN ' + w));
 errs.forEach((e) => console.log('ERROR ' + e));
-console.log(JSON.stringify({ version: ctx.APP_META.version, sections: S.length, phrases: S.reduce((n, s) => n + s.phrases.length, 0), answers: items, flow: (ctx.PSYCH_FLOW || []).length, mse: (ctx.PSYCH_MSE || []).length, mood, substances: subs, wd, deesc: de, discharge: di, cases: CASES.length, interp: INTERP.length, dcases: DC.length, mcases: MC.length, texts, audio }));
+console.log(JSON.stringify({ version: ctx.APP_META.version, sections: S.length, phrases: S.reduce((n, s) => n + s.phrases.length, 0), answers: items, flow: (ctx.PSYCH_FLOW || []).length, mse: (ctx.PSYCH_MSE || []).length, mood, substances: subs, wd, deesc: de, discharge: di, cases: CASES.length, interp: INTERP.length, dcases: DC.length, mcases: MC.length, dict: dictLines.length, lessons: LESS.length, reading: READ.length, dialogues: DIAL.length, placement: PLACE.length, texts, audio }));
 console.log(errs.length ? 'DATA FAIL' : 'DATA OK');
 process.exit(errs.length ? 1 : 0);
