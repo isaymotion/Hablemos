@@ -308,5 +308,138 @@ window.PSYCH_ANSWERS = {
       ['Sí, la verdad es que hasta más.', 'Yes, actually even more than that.', 'Gentle assumption elicited the higher true amount.'],
       ['No, eso no lo he pensado.', 'No, I haven\'t thought of that.']
     ]
+    ,
+    'sud-screen': [
+      ['Sí, siempre me paso de lo que pienso tomar.', 'Yes, I always end up drinking more than I plan.', 'Criterion 1 positive; ask for a typical amount planned versus actual.'],
+      ['Lo he querido dejar, pero a los dos días ya estoy otra vez.', 'I\'ve wanted to quit, but two days later I\'m back at it.', 'Failed attempts (criterion 2); ask what happened on the last attempt.'],
+      ['Nomás los fines de semana, pero ahí sí me paso.', 'Only on weekends, but then I really overdo it.', 'Minimizing but admits heavy episodes; quantify a typical weekend.'],
+      ['Me han corrido de dos trabajos por faltar.', 'I\'ve been fired from two jobs for missing work.', 'Role failure (criterion 5); check for other consequences and legal problems.'],
+      ['Mi esposa dice que ya no soy el mismo.', 'My wife says I\'m not the same anymore.', 'Interpersonal problems; ask what he thinks and whether he keeps using anyway.'],
+      ['Sí, ya necesito más para sentir algo.', 'Yes, I need more now to feel anything.', 'Tolerance (criterion 10); ask about the current daily amount.'],
+      ['Manejo después de unas cervezas, pero me siento bien.', 'I drive after a few beers, but I feel fine.', 'Hazardous use and minimizing; ask about arrests or accidents.'],
+      ['Me tiemblan las manos si no tomo en la mañana.', 'My hands shake if I don\'t drink in the morning.', 'Withdrawal (criterion 11); ask about seizures and last drink, consider CIWA.'],
+      ['Ya no voy a la iglesia ni veo a mis amigos.', 'I don\'t go to church or see my friends anymore.', 'Activities given up (criterion 7); also screen for depression.'],
+      ['Yo no tengo ningún problema, solo me relajo.', 'I don\'t have a problem, I just relax.', 'Denial; stay curious, ask what a typical day looks like.']
+    ],
+    'sud-alcohol-tobacco': [
+      ['Como seis caguamas al día, más los fines de semana.', 'About six caguamas a day, more on weekends.', 'Very heavy use (a caguama is roughly 2.5 to 3 drinks); ask about last drink and withdrawal.'],
+      ['Unas cervezas con los compañeros, nada más.', 'A few beers with the guys, that\'s all.', 'Possible minimizing; ask how many and how many days.'],
+      ['Ayer en la noche fue el último trago.', 'My last drink was last night.', 'Recent drinking; check withdrawal timing and risk.'],
+      ['Una vez me dio un ataque y me caí al piso.', 'Once I had a fit and fell on the floor.', 'Possible withdrawal seizure; high risk, needs medical monitoring.'],
+      ['Me tomo media botella de tequila diaria.', 'I drink half a bottle of tequila a day.', 'Severe use; do not stop abruptly, plan supervised withdrawal.'],
+      ['Fumo una cajetilla al día desde los veinte.', 'I smoke a pack a day since I was twenty.', 'Heavy tobacco use; offer nicotine replacement.'],
+      ['Prendo el primer cigarro apenas me despierto.', 'I light my first cigarette as soon as I wake up.', 'High dependence; consider patch plus short-acting nicotine.'],
+      ['Uso el vape todo el día, ya ni lo cuento.', 'I vape all day long, I don\'t even count.', 'Hard to quantify; ask about nicotine strength and how many pods.'],
+      ['Ya sé que me hace daño, pero me calma los nervios.', 'I know it\'s bad for me, but it calms my nerves.', 'Ambivalent; reflect the benefit and the worry, offer alternatives.'],
+      ['Si lo dejo de golpe, me da miedo que me pase algo.', 'If I stop suddenly, I\'m afraid something will happen to me.', 'Appropriate fear; reassure and explain safe medical withdrawal.']
+    ],
+    'sud-drugs': [
+      ['Fumo mota todos los días para dormir.', 'I smoke weed every day to sleep.', 'Daily cannabis, self-medicating; ask about amount, form and anxiety or paranoia.'],
+      ['Le doy al cristal de vez en cuando, nomás el fin de semana.', 'I do crystal now and then, only on weekends.', 'Methamphetamine use, likely minimizing; ask route, last use and psychotic symptoms.'],
+      ['Me meto una rayita de perico cuando salgo.', 'I do a line of coke when I go out.', 'Intranasal cocaine; ask frequency, chest pain, mixing with alcohol.'],
+      ['Compro las azules en la calle, no sé qué traen.', 'I buy the blues on the street, I don\'t know what\'s in them.', 'Likely fentanyl pills; ask about overdose and give naloxone.'],
+      ['Sí, una vez me desperté en el hospital y no me acordaba de nada.', 'Yes, once I woke up in the hospital and remembered nothing.', 'Possible overdose; ask about naloxone and whether it was reversed.'],
+      ['No, nunca me he inyectado. Solo las fumo en el foil.', 'No, I\'ve never injected. I only smoke them on foil.', 'Smoked fentanyl; still overdose risk, offer naloxone and treatment.'],
+      ['Los vapes de THC me dejan bien paranoico.', 'THC vapes make me really paranoid.', 'Cannabis-induced paranoia; assess for psychosis and family history.'],
+      ['No uso nada. Bueno, a veces una pastillita para los nervios que me da mi prima.', 'I don\'t use anything. Well, sometimes a little nerve pill my cousin gives me.', 'Non-prescribed benzodiazepine; ask which, how often, and warn about stopping suddenly.'],
+      ['Me da pena decirlo, pero sí, uso heroína.', 'I\'m embarrassed to say it, but yes, I use heroin.', 'Honest disclosure after a nonjudgmental preface; thank the patient and ask about route and overdose.'],
+      ['Yo no soy adicto, lo dejo cuando quiero.', 'I\'m not an addict, I can quit whenever I want.', 'Denial; ask about past attempts to stop.']
+    ],
+    'sud-gambling': [
+      ['Apuesto en la app del fútbol casi todos los días.', 'I bet on the soccer app almost every day.', 'Frequent sports betting; ask amounts and debts.'],
+      ['Perdí como dos mil dólares el mes pasado.', 'I lost about two thousand dollars last month.', 'Significant losses; ask about income and debt sources.'],
+      ['Pedí un préstamo rápido para cubrir las apuestas.', 'I took a payday loan to cover my bets.', 'Relies on others for money (criterion 9); ask total debt and who knows.'],
+      ['Si pierdo, tengo que volver a jugar para recuperarlo.', 'If I lose, I have to play again to win it back.', 'Chasing losses (criterion 6).'],
+      ['Mi esposa no sabe cuánto debemos.', 'My wife doesn\'t know how much we owe.', 'Concealment (criterion 7); ask about shame and safety at home.'],
+      ['Solo compro mis raspaditos, no es nada.', 'I just buy my scratchers, it\'s nothing.', 'Minimizing; ask weekly spending.'],
+      ['Juego cuando me siento mal o estresado, me distrae.', 'I gamble when I feel bad or stressed, it distracts me.', 'Gambling to escape distress (criterion 5); screen for depression.'],
+      ['Ya no tengo salida. Debo mucho dinero.', 'I have no way out. I owe a lot of money.', 'Possible hopelessness; ask directly about suicidal thoughts.'],
+      ['Ya borré la app, pero la volví a bajar a los dos días.', 'I deleted the app, but I downloaded it again two days later.', 'Failed control attempts; discuss blocking software and self-exclusion.'],
+      ['Mi familia me tiene los ojos encima y me da coraje.', 'My family is watching me and it makes me angry.', 'Anger at family; explore ambivalence, avoid confrontation.']
+    ],
+    'sud-screens': [
+      ['Como cuatro veces a la semana.', 'About four times a week.', 'AUDIT-C frequency answer; score with the screener.'],
+      ['Unos tres o cuatro tragos.', 'About three or four drinks.', 'Quantity answer; confirm with specific containers.'],
+      ['Seis o más, casi todos los fines de semana.', 'Six or more, almost every weekend.', 'Binge pattern; positive screen likely.'],
+      ['Nunca. No tomo.', 'Never. I don\'t drink.', 'Negative on the first item; ask about past use if relevant.'],
+      ['Como una vez al mes, en las fiestas.', 'About once a month, at parties.', 'Low frequency; confirm the amount on those days.'],
+      ['Prendo uno apenas me levanto, antes del café.', 'I light one as soon as I get up, before coffee.', 'Fagerström item: within 5 minutes of waking means high dependence.'],
+      ['Me cuesta mucho aguantarme en el hospital.', 'It\'s very hard for me to hold out in the hospital.', 'Difficulty refraining; offer nicotine replacement on the unit.'],
+      ['El primero de la mañana, ese no lo suelto.', 'The first one in the morning, I won\'t give that one up.', 'Classic dependence item.'],
+      ['Como veinte al día, una cajetilla.', 'About twenty a day, a pack.', 'Fagerström item: 11 to 20 per day scores 1, 21 to 30 scores 2.'],
+      ['Sí, aunque esté enfermo sigo fumando.', 'Yes, even when I\'m sick I keep smoking.', 'Positive dependence item.']
+    ],
+    mi: [
+      ['No tengo ningún problema con el alcohol.', 'I don\'t have any problem with alcohol.', 'Precontemplation; do not argue, explore what matters to him.'],
+      ['Mi esposa dice que debo dejarlo, pero yo no lo veo así.', 'My wife says I should quit, but I don\'t see it that way.', 'Precontemplation; ask what he thinks, reflect her concern without taking sides.'],
+      ['Me ayuda a relajarme, pero sí me preocupa el hígado.', 'It helps me relax, but I do worry about my liver.', 'Ambivalence; reflect both sides.'],
+      ['Un cinco, más o menos.', 'A five, more or less.', 'Importance or confidence of five; ask why not lower.'],
+      ['Importante, un ocho. Quiero ver crecer a mis hijos.', 'Important, an eight. I want to see my kids grow up.', 'High importance and a strong value; build on it.'],
+      ['Confianza, como un dos. Ya lo intenté y no pude.', 'Confidence, about a two. I already tried and couldn\'t.', 'Low confidence; ask what helped before and shrink the first step.'],
+      ['Quiero dejarlo, pero ¿y si me da el temblor?', 'I want to quit, but what if I get the shakes?', 'Contemplation with a safety fear; explain medically supervised withdrawal.'],
+      ['Ya decidí. Desde el lunes no pruebo ni una.', 'I\'ve decided. From Monday I won\'t touch one.', 'Preparation; ask for a plan, supports and a backup, and screen for withdrawal risk.'],
+      ['Llevo dos semanas sin tomar y me siento mejor.', 'I\'ve gone two weeks without drinking and I feel better.', 'Action stage; affirm and plan for triggers and relapse.'],
+      ['Recaí el sábado. Me siento un fracasado.', 'I relapsed on Saturday. I feel like a failure.', 'Relapse with shame; normalize, affirm the effort and revisit the plan.']
+    ],
+    'mood-screens': [
+      ['Casi todos los días.', 'Nearly every day.', 'Highest PHQ-9 frequency (3); ask about duration and impairment.'],
+      ['Varios días, nada más.', 'Several days, that\'s all.', 'PHQ-9 frequency of 1; may be minimizing, compare with collateral.'],
+      ['Más de la mitad de los días.', 'More than half the days.', 'PHQ-9 frequency of 2.'],
+      ['Ya nada me da ganas de hacer.', 'Nothing makes me want to do anything anymore.', 'Anhedonia; core depression item, ask about duration.'],
+      ['Me despierto a las tres de la mañana y ya no me duermo.', 'I wake up at three in the morning and can\'t fall back asleep.', 'Early morning awakening; typical of major depression.'],
+      ['Siento que les fallé a mis hijos.', 'I feel I failed my children.', 'Guilt; assess for worthlessness and suicidal thoughts.'],
+      ['A veces pienso que mejor no despertar.', 'Sometimes I think it would be better not to wake up.', 'Passive death wish; ask directly about suicidal thoughts, plan and means.'],
+      ['Sí, hubo una época en que casi no dormía y me sentía poderosísimo.', 'Yes, there was a time I barely slept and felt all-powerful.', 'MDQ-type positive; ask duration, impact and substance use.'],
+      ['Estaba irritable y me peleaba con todos.', 'I was irritable and fought with everybody.', 'Irritable mood; check whether other symptoms occurred in the same period.'],
+      ['Gasté mucho en cosas que no necesitaba y metí a mi familia en problemas.', 'I spent a lot on things I didn\'t need and got my family in trouble.', 'Excess spending in a possible manic period; ask amount and consequences.']
+    ],
+    'wd-alcohol': [
+      ['Tomé hace como seis horas, ya me están empezando los temblores.', 'I drank about six hours ago and the shakes are starting.', 'Early withdrawal; start CIWA monitoring and treat per protocol.'],
+      ['Desde hace cuatro días no pruebo gota y me siento muy mal.', 'I haven\'t had a drop in four days and I feel terrible.', 'Day 4 is peak DT risk; check orientation, vitals and hallucinations.'],
+      ['Estoy sudando y se me quiere salir el corazón.', 'I\'m sweating and my heart is trying to jump out.', 'Autonomic hyperactivity; check pulse, blood pressure, temperature.'],
+      ['Siento como hormigas caminándome por los brazos.', 'I feel like ants are crawling on my arms.', 'Tactile disturbance; possible severe withdrawal, score CIWA and watch for DTs.'],
+      ['Ya me dio un ataque una vez, hace dos años.', 'I had a seizure once, two years ago.', 'Prior withdrawal seizure; higher risk, treat early and monitor.'],
+      ['Me tomo una media botella diaria, desde hace años.', 'I drink half a bottle a day, for years.', 'Long heavy use; high withdrawal risk.'],
+      ['Doctora, ¿me voy a morir? Tengo mucho miedo.', 'Doctor, am I going to die? I\'m very scared.', 'Fear; reassure that treatment is available and explain the plan.'],
+      ['No sé qué día es. Creo que estoy en mi casa.', 'I don\'t know what day it is. I think I\'m at home.', 'Disorientation; possible delirium tremens, urgent medical evaluation.'],
+      ['Si no me dan algo, mejor me voy.', 'If you don\'t give me something, I\'m leaving.', 'Wants to leave against advice; explain the risks and offer treatment.'],
+      ['No quiero que mis hijos me vean así.', 'I don\'t want my children to see me like this.', 'Shame; support the motivation and ask about family involvement.']
+    ],
+    'wd-cannabis': [
+      ['Fumo mota todos los días desde hace cinco años.', 'I smoke weed every day for the past five years.', 'Heavy chronic use; risk of withdrawal symptoms on stopping.'],
+      ['Desde que la dejé estoy muy irritable.', 'Since I quit I\'ve been very irritable.', 'Withdrawal irritability; reassure it usually peaks in the first week.'],
+      ['No puedo dormir y tengo sueños muy raros.', 'I can\'t sleep and I have very strange dreams.', 'Insomnia and vivid dreams; sleep hygiene, avoid benzodiazepines if possible.'],
+      ['No me da hambre y he bajado de peso.', 'I\'m not hungry and I\'ve lost weight.', 'Decreased appetite; check weight and intake.'],
+      ['Vomito mucho y solo me alivio con regaderas calientes.', 'I vomit a lot and only hot showers help.', 'Classic cannabinoid hyperemesis; cessation is the treatment.'],
+      ['Mi último vape fue ayer en la noche.', 'My last vape was last night.', 'Recent use; expect withdrawal onset within days.'],
+      ['La uso para los nervios, sin ella me pongo peor.', 'I use it for my nerves, without it I get worse.', 'Self-medicating anxiety; offer other treatments.'],
+      ['Estoy bien nervioso y me tiemblan un poco las manos.', 'I\'m really nervous and my hands shake a little.', 'Anxiety and tremor can occur; rule out alcohol or other withdrawal.'],
+      ['Dicen que la mota no hace daño. ¿Cómo que me enferma?', 'They say weed doesn\'t hurt. How can it make me sick?', 'Disbelief; explain CHS gently and respectfully.'],
+      ['Ya quiero dejarla, pero no sé si aguanto.', 'I want to quit, but I don\'t know if I can stand it.', 'Motivated but unsure; support and teach about the time course.']
+    ],
+    'wd-opioid': [
+      ['Me duele todo el cuerpo y no paro de bostezar.', 'My whole body hurts and I can\'t stop yawning.', 'Typical opioid withdrawal signs; score COWS.'],
+      ['Tengo la malilla, doctora, necesito algo ya.', 'I\'m dope sick, doctor, I need something now.', 'Acute withdrawal and craving; address symptoms and discuss buprenorphine.'],
+      ['Me dan retortijones y diarrea desde anoche.', 'I\'ve had cramps and diarrhea since last night.', 'GI symptoms; watch hydration.'],
+      ['Fumé tres azules ayer a las diez de la noche.', 'I smoked three blues yesterday at ten at night.', 'Fentanyl, so timing matters for starting buprenorphine; ask about the last dose.'],
+      ['Ya me dieron Narcan una vez, casi me muero.', 'They already gave me Narcan once, I almost died.', 'Prior overdose; high risk, prescribe naloxone and start treatment.'],
+      ['Tengo mucho miedo de volver a sentirme así.', 'I\'m very afraid of feeling like this again.', 'Fear of withdrawal; reassure and explain the medicines.'],
+      ['No quiero metadona, es peor que el vicio.', 'I don\'t want methadone, it\'s worse than the habit.', 'Common myth; explore options, including buprenorphine.'],
+      ['¿Si me dan Suboxone ahorita, me va a caer mal?', 'If you give me Suboxone right now, will it make me sick?', 'Good question; explain waiting for moderate withdrawal to avoid precipitated withdrawal.'],
+      ['Me escurre la nariz y siento escalofríos.', 'My nose is running and I get chills.', 'Autonomic signs; COWS items.'],
+      ['No se lo diga a mi mamá, por favor.', 'Please don\'t tell my mother.', 'Fear of disclosure; discuss confidentiality and limits.']
+    ],
+    'wd-agitation': [
+      ['¡No me toque!', 'Don\'t touch me!', 'Fear or hostility; keep your distance and use a calm voice.'],
+      ['¡Déjenme salir de aquí!', 'Let me out of here!', 'Wants to leave; offer choices and explain why you are asking him to stay.'],
+      ['¿Quiénes son ustedes? ¿Me van a deportar?', 'Who are you? Are you going to deport me?', 'Fear tied to immigration; reassure the hospital is for care and not enforcement.'],
+      ['Llevo horas esperando, ¡esto es una falta de respeto!', 'I\'ve been waiting for hours, this is disrespectful!', 'Frustration; validate the wait before anything else.'],
+      ['Me están siguiendo, me quieren matar.', 'They\'re following me, they want to kill me.', 'Paranoia; do not argue, acknowledge the fear and address safety.'],
+      ['Si se me acercan, les pego.', 'If you come near me, I\'ll hit you.', 'Threat; keep distance, set a calm limit and call for support.'],
+      ['Tengo miedo, no sé dónde estoy.', 'I\'m scared, I don\'t know where I am.', 'Fear and disorientation; consider delirium or withdrawal, orient gently.'],
+      ['Está bien, ya me calmo. ¿Me pueden dar agua?', 'Okay, I\'m calming down. Can you give me some water?', 'De-escalating; give the water and thank him.'],
+      ['Yo no necesito pastillas, no estoy loco.', 'I don\'t need pills, I\'m not crazy.', 'Refuses medicine; offer a choice and avoid arguing about illness.'],
+      ['Ya no aguanto el temblor, me siento horrible.', 'I can\'t stand the shaking anymore, I feel awful.', 'Possible withdrawal; check vitals and CIWA or COWS.']
+    ]
   }
 };

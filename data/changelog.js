@@ -3,6 +3,16 @@
    For every release: add an entry here, then bump APP_META.version (data/app-meta.js) and VERSION in sw.js. */
 window.APP_CHANGELOG = [
   {
+    version: '0.5.0', date: '2026-11-08', title: 'Practice cases',
+    items: [
+      { type: 'feature', text: 'Seven case simulations in Spanish with feedback on every choice: first-episode psychosis (Mateo), depression after a suicide attempt (Lupe), mania with methamphetamine use (Brayan), delirium in an older adult (Don Chuy), alcohol withdrawal (Ramiro), the agitated patient (Jorge) and opioid use disorder with naloxone teaching and motivational interviewing (Yesenia).' },
+      { type: 'feature', text: 'Interpretation drill: 32 patient and family statements around Latino idioms of distress (nervios, ataque de nervios, susto, mal de ojo, un trabajo) and ambiguous lines that need a direct follow-up question.' },
+      { type: 'feature', text: 'Discharge practice: five patients on the day of discharge (Mateo, Lupe, Brayan, Ramiro, Yesenia), interviewed field by field and documented with the form\'s wording, with a discharge-or-defer decision checked against a model.' },
+      { type: 'feature', text: 'Admission MSE practice: Mateo and Brayan on the evening of admission, with the chief complaint in the informant\'s words, 13 domains, evidence questions and an admission vs discharge comparison.' },
+      { type: 'content', text: 'Likely patient replies for the eleven tool sections (substance use, screens, motivational interviewing, mood screens, withdrawal and agitation), so the point board and listening drill now cover every section. All new Spanish is draft for review by a native Spanish-speaking clinician.' }
+    ]
+  },
+  {
     version: '0.4.0', date: '2026-11-08', title: 'Clinical tools',
     items: [
       { type: 'feature', text: 'Mood episode checker in Spanish: SIGECAPS and DIGFAST as tap-to-count DSM-5-TR criteria, with the PHQ-9 and MDQ items as interview paraphrases and pointers to the published Spanish instruments for a documented score.' },

@@ -2,7 +2,7 @@
    All isaymotion apps share one origin (isaymotion.github.io), so this worker only ever deletes caches that
    start with its own PREFIX. 'hablemos-audio' holds the recorded clips and is kept across versions. */
 const PREFIX = 'hablemos-';
-const VERSION = PREFIX + '0.4.0';
+const VERSION = PREFIX + '0.5.0';
 const KEEP = ['hablemos-audio'];
 const FILES = [
   './', 'index.html', 'manifest.webmanifest', 'css/style.css',
