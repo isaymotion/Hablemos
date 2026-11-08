@@ -3,7 +3,7 @@ window.APP_META = {
   name: 'Hablemos',
   short: 'Hablemos',
   tagline: 'Spanish for the psychiatric interview',
-  version: '0.5.0',
+  version: '0.6.0',
   repo: 'Hablemos',
   updated: 'November 2026',
   author: 'Isabella Navarro, MD',

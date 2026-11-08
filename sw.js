@@ -2,7 +2,7 @@
    All isaymotion apps share one origin (isaymotion.github.io), so this worker only ever deletes caches that
    start with its own PREFIX. 'hablemos-audio' holds the recorded clips and is kept across versions. */
 const PREFIX = 'hablemos-';
-const VERSION = PREFIX + '0.5.0';
+const VERSION = PREFIX + '0.6.0';
 const KEEP = ['hablemos-audio'];
 const FILES = [
   './', 'index.html', 'manifest.webmanifest', 'css/style.css',
@@ -11,7 +11,7 @@ const FILES = [
   'js/data/psych-phrases.js', 'js/data/psych-shea.js', 'js/data/psych-cases.js', 'js/data/psych-flow.js', 'js/data/psych-deesc.js', 'js/deesc.js',
   'js/data/psych-discharge.js', 'js/data/psych-discharge-cases.js', 'js/discharge.js', 'js/discharge-practice.js', 'js/data/psych-admit-mse.js', 'js/data/psych-mse-cases.js', 'js/mse-practice.js',
   'js/data/psych-mse-sheet.js', 'js/mse-sheet.js', 'js/data/psych-sud.js', 'js/sud.js', 'js/data/psych-mood.js', 'js/mood.js', 'js/data/psych-withdrawal.js', 'js/withdrawal.js',
-  'js/data/psych-answers.js', 'js/point-listen.js', 'js/data/meta.js', 'js/handout.js', 'js/audio-key.js',
+  'js/data/psych-answers.js', 'js/point-listen.js', 'js/data/dict-core.js', 'js/data/dict-everyday.js', 'js/data/dict-clinical.js', 'js/data/dict-more.js', 'js/data/lessons.js', 'js/data/reading.js', 'js/data/dialogues.js', 'js/data/meta.js', 'js/handout.js', 'js/audio-key.js',
   'js/vendor/pdfmake.min.js', 'js/vendor/vfs_fonts.js',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/logo-96.png', 'icons/favicon-32.png', 'icons/favicon-64.png', 'icons/apple-touch-icon.png'
 ];

@@ -6,7 +6,7 @@
 
 **App created by Isabella Navarro, MD. Latest version November 2026. isaymotion@gmail.com**
 
-Version **0.5.0**: the Usap Tayo engine with a Spanish language pack, all 27 interview sections (opening to closing, plus Shea's techniques), patient replies for every section and every tool, the interview flow handout, the MSE interviewer sheet, the clinical tools (mood episode checker, substance use screener, withdrawal and agitation guide with an opioid tab, de-escalation checklist, discharge assessment) and the practice cases (seven case simulations, the interpretation drill, five discharge cases and two admission MSE cases), all draft for review. The learn track arrives in a later pass.
+Version **0.6.0**: the Usap Tayo engine with a Spanish language pack, all 27 interview sections (opening to closing, plus Shea's techniques), patient replies for every section and every tool, the interview flow handout, the MSE interviewer sheet, the clinical tools (mood episode checker, substance use screener, withdrawal and agitation guide with an opioid tab, de-escalation checklist, discharge assessment), the practice cases (seven case simulations, the interpretation drill, five discharge cases and two admission MSE cases) and the learn track (23 lessons, a 2,300-entry clinical dictionary, 10 readings, 8 dialogues, placement test), all draft for review.
 
 ## What it is
 
@@ -22,7 +22,7 @@ Every Spanish section is **Draft for review** until a native Spanish-speaking cl
 | 2 | Mental status exam: interviewer sheet, point-board replies, listening drill | Done in 0.3.0: MSE sections, two-page interviewer sheet, replies and listening drill for every section (draft for review) |
 | 3 | Clinical tools: mood episode checker, substance use screener, withdrawal and agitation guide, de-escalation, discharge assessment, with the PHQ-9 and MDQ as interview paraphrases pointing to the published Spanish instruments | Done in 0.4.0 (draft for review) |
 | 4 | Practice cases: case simulations, interpretation drill, discharge and admission MSE practice | Done in 0.5.0 (draft for review) |
-| 5 | Spanish learn track: dictionary, lessons, reading, dialogues | Pending |
+| 5 | Spanish learn track: dictionary, lessons, reading, dialogues, placement | Done in 0.6.0 (draft for review) |
 | 6 | Release with the audio pack | Pending |
 
 ## What's inside
@@ -44,7 +44,7 @@ The app shares its engine with Usap Tayo. The language pack `js/lang.js` sets vo
 | **Discharge assessment and practice** | Guided field-by-field discharge interview with documentation picks, and five simulated patients to practise on with a discharge-or-defer decision. | Live (draft for review) |
 | **Admission MSE practice** | Two simulated admission interviews (Mateo, Brayan) checked against a model MSE, with an admission vs discharge comparison. | Live (draft for review) |
 | **Printable handouts** | PDF or print of the interview flow, MSE, de-escalation checklist and pocket card, and discharge guide, with English shown, hidden or as an answer key. | Live (draft for review) |
-| **Dictionary, lessons, reading, dialogues** | Engines that wait for Spanish content. | Engine ready, content pending |
+| **Dictionary, lessons, reading, dialogues, placement** | Clinical Spanish dictionary (about 2,300 entries, root lookup), 23 lessons with quizzes, 10 graded readings, 8 dialogues to listen, shadow and role-play, and a 20-question placement test. | Live (draft for review) |
 
 ## Publish it with GitHub Pages
 
@@ -69,7 +69,9 @@ All content lives in plain JavaScript files under `js/data/`. No build step. The
 
 | File | Contents |
 |---|---|
-| `meta.js` | Shared metadata for the data files |
+| `meta.js` | Placement test |
+| `dict-core.js`, `dict-everyday.js`, `dict-clinical.js`, `dict-more.js` | Dictionary (`spanish | english | pos | category | root | note` lines) |
+| `lessons.js`, `reading.js`, `dialogues.js` | Lessons, readings, dialogues |
 | `psych-phrases.js` | Interview phrase sections |
 | `psych-shea.js` | Validity-technique phrases and links to the Psychiatric Interviewing Trainer |
 | `psych-answers.js` | Point-board replies per interview section |
