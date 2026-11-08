@@ -25,14 +25,13 @@
 ```bash
 git clone https://github.com/isaymotion/hablemos /home/claude/hablemos        # add the repo to the session with push access first
 git -C /home/claude/hablemos fetch origin refs/heads/dev-tools:refs/remotes/origin/dev-tools
-git -C /home/claude/hablemos worktree add /home/claude/hablemos-dev origin/dev-tools -b dev-tools
+git -C /home/claude/hablemos worktree add /home/claude/hablemos-dev dev-tools   # (-b dev-tools origin/dev-tools on a fresh clone)
 python3 -m http.server 8767 --directory /home/claude/hablemos                 # run_in_background
 python3 /home/claude/hablemos-dev/tests/smoke.py http://localhost:8767/index.html <scratch>/hb   # expect "HB SMOKE OK 34 routes x 2 viewports"
 python3 /home/claude/hablemos-dev/tests/check_design_es.py /home/claude/hablemos --browser     # expect PASS; delete _qa/ after looking
 python3 <design-skill>/scripts/check_sw.py /home/claude/hablemos               # PASS
 node tools/collect-texts.js                                                    # texts.json is committed (the job commits it too)
 gh run list -R isaymotion/hablemos -L 3
-```
 node /home/claude/hablemos-dev/tests/data_check.js /home/claude/hablemos      # expect DATA OK
 ```
 Baseline 2026-11-08 (v0.2.0): data_check prints `{"version":"0.2.0","sections":13,"phrases":193,"answers":178,"flow":11,"mse":14,"texts":565,"audio":565}` and `DATA OK` (WARNs: SHEA_LINKS for sections not yet written); smoke prints `HB SMOKE OK 34 routes x 2 viewports`, `handout pdf bytes ~98000`, `HB CONTENT OK`; check_sw PASS; check_design_es PASS (browser pass included); audio job success (565/565, 84 s).
@@ -45,17 +44,11 @@ Baseline 2026-11-08 (v0.2.0): data_check prints `{"version":"0.2.0","sections":1
 - Tests on dev-tools: `tests/data_check.js` (en/f/c present, no Tagalog markers po/kayo/ninyo/opo, flow + MSE refs resolve, answers map to sections, versions agree) and `tests/smoke.py` content checks (section quiz has 4 options, point board, listening drill, flashcards, handout PDF builds via `App.handoutDoc` + pdfmake, Shea section).
 
 ## 4. Next: pass 3 (core interview b)
-1. Remaining sections, appended after `shea-techniques` in `PSYCH_SECTIONS` order? No: keep Usap Tayo's order by inserting the new sections into the ARRAY in `psych-phrases.js` between `deescalation` and the Shea push (section order only affects the hub list; phrase ids are per section, so adding whole sections is safe): `substance` (13; alcohol, cannabis, methamphetamine, cocaine, fentanyl/opioids, vaping, gambling; no betel), `history` (11), `family-hx` (5), `social` (10; migration, work, documentation status asked only when relevant and with the reason), `collateral` (11), `mse-cog` (19; orientation/attention: months backwards, serial 7s, three words; literacy-aware), `mse-abstract` (11; Spanish refranes), `mse-describe` (18), `explain` (12), `meds` (14), `admission` (8), `child` (11), `elderly` (10), `closing` (6). Same counts as Usap Tayo so its flow refs and `PSYCH_MSE` refs resolve. Mirror the English from Usap Tayo's `psych-phrases.js` (extract with the node snippet in the pass-2 chat: run psych-phrases.js in a vm and print `en`/`n`), write Spanish f/c, add `answers` + `PSYCH_ANSWERS.sections` for each.
+1. Remaining sections. Keep Usap Tayo's order by inserting the new sections into the array in `psych-phrases.js` after `deescalation` (the Shea section is pushed afterwards by psych-shea.js) (section order only affects the hub list; phrase ids are per section, so adding whole sections is safe): `substance` (13; alcohol, cannabis, methamphetamine, cocaine, fentanyl/opioids, vaping, gambling; no betel), `history` (11), `family-hx` (5), `social` (10; migration, work, documentation status asked only when relevant and with the reason), `collateral` (11), `mse-cog` (19; orientation/attention: months backwards, serial 7s, three words; literacy-aware), `mse-abstract` (11; Spanish refranes), `mse-describe` (18), `explain` (12), `meds` (14), `admission` (8), `child` (11), `elderly` (10), `closing` (6). Same counts as Usap Tayo so its flow refs and `PSYCH_MSE` refs resolve. Mirror the English from Usap Tayo's `psych-phrases.js` (extract with the node snippet in the pass-2 chat: run psych-phrases.js in a vm and print `en`/`n`), write Spanish f/c, add `answers` + `PSYCH_ANSWERS.sections` for each.
 2. Add the remaining `PSYCH_FLOW` steps (subs, pmh, fhx, social, collat, mse, plan, close) and `PSYCH_FLOW_EXTRA` (meds, admit, child, elder) with Spanish tips; `PSYCH_MSE` refs then resolve.
 3. `js/data/psych-mse-sheet.js` (MSE interviewer sheet; US clinic/ward wording, no Mariveles form numbers) and `psych-admit-mse.js` (generic admission MSE domain order; `form: ''`). Spanish handout PDF presets already work; check A4 vs Letter default for the US (handout.js `size` options).
 4. Release 0.3.0: changelog, app-meta, sw.js; data_check + smoke + check_design_es + check_sw; push; pull after the audio job.
 5. Still open: her review of all Spanish drafts (consider a review workbook like Usap Tayo's, built from `PSYCH_SECTIONS` + `PSYCH_ANSWERS`); the `tl`-rule change in the design skill's `check_design.py`; `SHOW_OTHER_APPS` stays false.
-
-## 4. Next: pass 2 (core interview a)
-1. Fill `js/data/psych-phrases.js` sections opening → risk (ids should match Usap Tayo's section ids where the content corresponds, e.g. `hallucinations`, `suicide`, so Home tiles and later cross-links work), each phrase `{ en, f (usted), c (tú), n?, r? (regional variant), answers? }`, section `draft: true`. Then `psych-shea.js` (SHEA_LINKS keyed by section id; keep `SHEA_TRAINER` pointing at her Shea trainer), `psych-flow.js`, `psych-answers.js` replies for those sections.
-2. When `PSYCH_SECTIONS` has content the hub, Home, flashcards, point board, listening drill and handout switch on by themselves (all gated on data). Check the handout PDF renders Spanish punctuation (¿ ¡ ñ accents) in pdfmake's Roboto: `fixGlyphs()` only swaps → and ☐ today.
-3. Release bookkeeping: changelog entry above 0.1.0, `APP_META.version`, `sw.js` VERSION; add a data_check on dev-tools; smoke + check_design_es + check_sw; commit as Isabella; push main; `git pull --rebase` after the audio job commits.
-4. Also pending from pass 1: she enables GitHub Pages; decide on the `tl`-rule change in the design skill; `SHOW_OTHER_APPS` stays false.
 
 ## 5. Pitfalls learned
 - Enabling or reading Pages through `gh api` is blocked in the session (public-surface rule); she enabled it in the repo settings. The live site is not reachable from the session either (isaymotion.github.io is not an allowed host).
