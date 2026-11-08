@@ -76,6 +76,51 @@ if (di) {
   if (!(ctx.PSYCH_FLOW_EXTRA || []).some((x) => x.id === 'discharge')) errs.push('discharge: PSYCH_FLOW_EXTRA entry missing');
   if (/1553|NCMH|MMH-/.test(JSON.stringify(DI))) errs.push('discharge: Philippine references left in');
 }
+/* Pass 5 practice cases: simulations, interpretation drill, discharge and admission MSE cases (grader = App.dischargeGrade, ported). */
+const grade = (cf, picks) => { const need = cf.need || [], ok = cf.ok || [], hit = [], miss = [], wrong = [], covered = new Set();
+  need.forEach((n) => { const alts = Array.isArray(n) ? n : [n]; const found = alts.filter((a) => picks.has(a)); found.forEach((a) => covered.add(a)); if (found.length) hit.push(found[0]); else miss.push(alts[0]); });
+  picks.forEach((p) => { if (!covered.has(p) && !ok.includes(p)) wrong.push(p); }); return { score: !miss.length && !wrong.length ? 2 : hit.length ? 1 : 0 }; };
+const CASES = ctx.PSYCH_CASES || [], INTERP = ctx.PSYCH_INTERP || [];
+CASES.forEach((c) => {
+  if (!c.id || !c.title || !c.level || !c.setting || !c.summary || !c.summary.findings || !c.summary.mse) errs.push('case ' + c.id + ' missing id/title/level/setting/summary');
+  if (!(c.steps || []).length) errs.push('case ' + c.id + ' has no steps');
+  (c.steps || []).forEach((s, i) => {
+    if (!s.who || !Array.isArray(s.line) || s.line.length < 2) errs.push('case ' + c.id + ' step ' + i + ' needs who + line [es, en]');
+    if (!(s.choices || []).length || s.choices.filter((x) => x.score === 2).length !== 1) errs.push('case ' + c.id + ' step ' + i + ' needs exactly one score-2 choice');
+    (s.choices || []).forEach((x, k) => { if (!x.tl || !x.en || !x.fb || ![0, 1, 2].includes(x.score)) errs.push('case ' + c.id + ' step ' + i + ' choice ' + k + ' incomplete'); });
+  });
+});
+if (CASES.length && !CASES.some((c) => c.id === 'agitated')) errs.push('cases: id "agitated" is linked from the de-escalation and withdrawal views');
+if (new Set(CASES.map((c) => c.id)).size !== CASES.length) errs.push('cases: duplicate ids');
+INTERP.forEach((it, i) => { if (!Array.isArray(it) || it.length < 3 || !it[0] || !it[1] || !it[2]) errs.push('interp ' + i + ' needs [es, en, meaning]'); tl(it[0], 'interp ' + i); });
+if (new Set(INTERP.map((x) => x[0])).size !== INTERP.length) errs.push('interp: duplicate Spanish lines');
+const DC = ctx.PSYCH_DISCHARGE_CASES || [], MC = ctx.PSYCH_MSE_CASES || [];
+const checkModel = (tag, cf, def) => {
+  const picks = [].concat(...(cf.need || []).map((n) => (Array.isArray(n) ? n : [n])), cf.ok || [], Object.keys(cf.wrong || {}));
+  picks.forEach((p) => { if (!def.picks.includes(p)) errs.push(tag + ' pick not on form: ' + p); });
+  if (!(cf.need || []).length) errs.push(tag + ' no required picks');
+  Object.keys(cf.ans || {}).forEach((k) => { if (!/^\d+$/.test(k) || +k >= def.ask.length) errs.push(tag + ' answer index ' + k); const a = cf.ans[k]; if (!Array.isArray(a) || !a[0] || !a[1]) errs.push(tag + ' answer ' + k + ' needs [es, en]'); else tl(a[0], tag + ' ans ' + k); });
+  (cf.key || []).forEach((k) => { if (k >= def.ask.length || !(cf.ans || {})[k]) errs.push(tag + ' key question ' + k); });
+  if (!cf.doc || !cf.why) errs.push(tag + ' missing doc/why');
+  if (def.kind !== 'observe' && !Object.keys(cf.ans || {}).length) errs.push(tag + ' ask field without answers');
+  if (cf.ev && (cf.ev.opts.filter((o) => o[1]).length !== 1 || !cf.ev.find || !cf.ev.why)) errs.push(tag + ' evidence needs find, why and exactly one correct option');
+  const model = new Set((cf.need || []).map((n) => (Array.isArray(n) ? n[0] : n)));
+  if (grade(cf, model).score !== 2) errs.push(tag + ' model does not grade 2');
+};
+DC.forEach((c) => {
+  if (!c.id || !c.title || !c.level || !c.dx || !c.setting || !(c.chart || []).length) errs.push('dcase ' + c.id + ' missing id/title/level/dx/setting/chart');
+  if (!c.decision || typeof c.decision.discharge !== 'boolean' || !c.decision.why) errs.push('dcase ' + c.id + ' missing decision');
+  DI.fields.filter((f) => f.kind !== 'sign').forEach((f) => { if (!c.fields[f.id]) errs.push('dcase ' + c.id + ' missing field ' + f.id); });
+  Object.entries(c.fields || {}).forEach(([id, cf]) => { const f = DI.fields.find((x) => x.id === id); if (!f) return errs.push('dcase ' + c.id + ' unknown field ' + id); checkModel('dcase ' + c.id + '.' + id, cf, f); });
+});
+const AM = ctx.PSYCH_ADMIT_MSE || { domains: [] };
+MC.forEach((c) => {
+  if (!c.id || !c.title || !c.level || !c.dx || !c.setting || !(c.chart || []).length) errs.push('mcase ' + c.id + ' missing id/title/level/dx/setting/chart');
+  if (!c.cc || !ref(c.cc.ask, 'mcase ' + c.id + ' cc') || !Array.isArray(c.cc.ans) || c.cc.ans.length < 3 || (c.cc.opts || []).filter((o) => o[1]).length !== 1 || c.cc.opts.some((o) => !o[2])) errs.push('mcase ' + c.id + ' chief complaint needs ask ref, ans [es, en, who], opts with one correct and a why each');
+  if (!DC.some((x) => x.id === c.id)) errs.push('mcase ' + c.id + ' has no matching discharge case');
+  AM.domains.forEach((d) => { if (!c.domains[d.id]) errs.push('mcase ' + c.id + ' missing domain ' + d.id); });
+  Object.entries(c.domains || {}).forEach(([id, cd]) => { const d = AM.domains.find((x) => x.id === id); if (!d) return errs.push('mcase ' + c.id + ' unknown domain ' + id); checkModel('mcase ' + c.id + '.' + id, cd, d); });
+});
 let audio = 0; try { const m = JSON.parse(fs.readFileSync(path.join(root, 'audio/manifest.json'), 'utf8')); audio = (m.keys || []).length; } catch (e) {}
 const texts = (() => { try { return JSON.parse(fs.readFileSync(path.join(root, 'tools/texts.json'), 'utf8')).length; } catch (e) { return 0; } })();
 if (texts && audio < texts) warns.push((texts - audio) + ' texts without audio until the audio job runs');
@@ -83,6 +128,6 @@ const vers = new Set([ctx.APP_META.version, (ctx.APP_CHANGELOG[0] || {}).version
 if (vers.size !== 1) errs.push('versions disagree: ' + [...vers].join(', '));
 warns.forEach((w) => console.log('WARN ' + w));
 errs.forEach((e) => console.log('ERROR ' + e));
-console.log(JSON.stringify({ version: ctx.APP_META.version, sections: S.length, phrases: S.reduce((n, s) => n + s.phrases.length, 0), answers: items, flow: (ctx.PSYCH_FLOW || []).length, mse: (ctx.PSYCH_MSE || []).length, mood, substances: subs, wd, deesc: de, discharge: di, texts, audio }));
+console.log(JSON.stringify({ version: ctx.APP_META.version, sections: S.length, phrases: S.reduce((n, s) => n + s.phrases.length, 0), answers: items, flow: (ctx.PSYCH_FLOW || []).length, mse: (ctx.PSYCH_MSE || []).length, mood, substances: subs, wd, deesc: de, discharge: di, cases: CASES.length, interp: INTERP.length, dcases: DC.length, mcases: MC.length, texts, audio }));
 console.log(errs.length ? 'DATA FAIL' : 'DATA OK');
 process.exit(errs.length ? 1 : 0);

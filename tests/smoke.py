@@ -121,5 +121,72 @@ with sync_playwright() as p:
                 const dd = App.handoutDoc(Object.assign(o, {preset:k})); return await new Promise(res => pdfMake.createPdf(dd).getBuffer(buf => res(buf.length))); }""", preset)
             print('handout', preset, 'pdf bytes', nb)
             if not nb or nb < 5000: bad.append('handout ' + preset)
+    # ---- pass 5 practice cases (run only when their data exists) ----
+    p5 = page.evaluate("({cases:(window.PSYCH_CASES||[]).map(c=>[c.id,c.steps.length]), interp:(window.PSYCH_INTERP||[]).length, dcases:(window.PSYCH_DISCHARGE_CASES||[]).map(c=>c.id), mcases:(window.PSYCH_MSE_CASES||[]).map(c=>c.id)})")
+    print('practice present', {k: len(v) if isinstance(v, list) else v for k, v in p5.items()})
+    for cid, n in p5['cases']:
+        go('#/psych/case/' + cid)
+        for _ in range(n): page.click('.opt >> nth=0'); page.wait_for_timeout(60)
+        t = page.inner_text('#view')
+        if 'Case complete' not in t or 'Key findings' not in t: bad.append('case ' + cid); print('BAD case', cid)
+        if cid == 'mateo': page.screenshot(path=f'{OUT}/case-390.png', full_page=True)
+        go('#/speak/case-' + cid, 250)
+    if p5['interp']:
+        go('#/psych/interp'); assert page.locator('.opt').count() == 4, 'interp options'
+        for _ in range(10): page.click('.opt >> nth=0'); page.wait_for_timeout(50); page.click('[data-act=next]'); page.wait_for_timeout(50)
+        assert '/ 10' in page.inner_text('#view'), 'interp quiz end'
+        page.click('[data-m=list]'); page.wait_for_timeout(150); assert page.locator('.phrase').count() == p5['interp'], 'interp list'
+    # discharge practice: asking every question and choosing the model's picks must match the model on every field; the decision matches
+    for cid in p5['dcases']:
+        go('#/psych/dcase/' + cid)
+        nF = page.evaluate("PSYCH_DISCHARGE.fields.filter(f=>f.kind!=='sign').length")
+        for i in range(nF):
+            page.click(f'[data-go="{i}"].ds-chip'); page.wait_for_timeout(80)
+            for v in page.evaluate("[...document.querySelectorAll('[data-ask]')].map(b=>b.dataset.ask)"):
+                if page.locator(f'[data-ask="{v}"]').count(): page.click(f'[data-ask="{v}"]'); page.wait_for_timeout(30)
+            idx = page.evaluate("""([cid,i]) => { const F = PSYCH_DISCHARGE.fields.filter(f=>f.kind!=='sign'); const f = F[i]; const cf = PSYCH_DISCHARGE_CASES.find(c=>c.id===cid).fields[f.id];
+                return cf.need.map(n => f.picks.indexOf(Array.isArray(n)?n[0]:n)); }""", [cid, i])
+            for k in idx: page.click(f'[data-pick="{k}"]')
+            page.click('#dcCheck'); page.wait_for_timeout(80)
+            if 'Matches the model' not in page.inner_text('#view'): bad.append(f'dcase {cid} field {i}'); print('BAD dcase field', cid, i)
+            assert not errs, (cid, i, errs)
+        page.click('.ds-chip.sum'); page.wait_for_timeout(150)
+        dec = page.evaluate("cid => PSYCH_DISCHARGE_CASES.find(c=>c.id===cid).decision.discharge", cid)
+        page.click('[data-dec="1"]' if dec else '[data-dec="0"]'); page.wait_for_timeout(100)
+        t = page.inner_text('#view')
+        if 'Same call as the model' not in t: bad.append('dcase decision ' + cid); print('BAD dcase decision', cid)
+        if page.evaluate("document.documentElement.scrollWidth > window.innerWidth"): bad.append('dcase overflow ' + cid)
+        if cid == p5['dcases'][0]: page.screenshot(path=f'{OUT}/dcase-compare-390.png', full_page=True)
+    # a missed key finding is explained: skip the suicide field's questions and pick the wrong thing
+    if p5['dcases']:
+        go('#/psych/dcase/' + p5['dcases'][0]); page.click('[data-go="5"].ds-chip'); page.wait_for_timeout(80)
+        page.click('[data-pick="0"]'); page.click('#dcCheck'); page.wait_for_timeout(80)
+        if "you didn't ask" not in page.inner_text('#view').lower(): bad.append('dcase not-asked feedback')
+    for cid in p5['mcases']:
+        go('#/psych/mcase/' + cid)
+        page.click('[data-ccask]'); page.wait_for_timeout(60)
+        ok_idx = page.evaluate("cid => PSYCH_MSE_CASES.find(c=>c.id===cid).cc.opts.findIndex(o=>o[1])", cid)
+        page.click(f'[data-cc="{ok_idx}"]'); page.wait_for_timeout(80)
+        if 'own words' not in page.inner_text('#view'): bad.append('mcase cc ' + cid)
+        nD = page.evaluate("PSYCH_ADMIT_MSE.domains.length")
+        for i in range(1, nD + 1):
+            page.click(f'[data-go="{i}"].ds-chip'); page.wait_for_timeout(80)
+            for v in page.evaluate("[...document.querySelectorAll('[data-ask]')].map(b=>b.dataset.ask)"):
+                if page.locator(f'[data-ask="{v}"]').count(): page.click(f'[data-ask="{v}"]'); page.wait_for_timeout(30)
+            idx = page.evaluate("""([cid,i]) => { const d = PSYCH_ADMIT_MSE.domains[i-1]; const cd = PSYCH_MSE_CASES.find(c=>c.id===cid).domains[d.id];
+                return cd.need.map(n => d.picks.indexOf(Array.isArray(n)?n[0]:n)); }""", [cid, i])
+            for k in idx: page.click(f'[data-pick="{k}"]')
+            page.click('#dcCheck'); page.wait_for_timeout(80)
+            if 'Matches the model' not in page.inner_text('#view'): bad.append(f'mcase {cid} domain {i}'); print('BAD mcase domain', cid, i)
+            ev = page.locator('[data-ev]')
+            if ev.count():
+                k = page.evaluate("""([cid,i]) => { const d = PSYCH_ADMIT_MSE.domains[i-1]; return PSYCH_MSE_CASES.find(c=>c.id===cid).domains[d.id].ev.opts.findIndex(o=>o[1]); }""", [cid, i])
+                page.click(f'[data-ev="{k}"]'); page.wait_for_timeout(60)
+            assert not errs, (cid, i, errs)
+        page.click('.ds-chip.sum'); page.wait_for_timeout(150)
+        t = page.inner_text('#view')
+        if 'Admission vs discharge' not in t: bad.append('mcase compare ' + cid); print('BAD mcase compare', cid)
+        if page.evaluate("document.documentElement.scrollWidth > window.innerWidth"): bad.append('mcase overflow ' + cid)
+        if cid == p5['mcases'][0]: page.screenshot(path=f'{OUT}/mcase-compare-390.png', full_page=True)
     ctx.close(); b.close()
 print('HB CONTENT', 'OK' if not bad else 'FAIL')
