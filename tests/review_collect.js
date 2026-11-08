@@ -2,12 +2,21 @@
 /* Hablemos native-speaker review: collect every Spanish draft into JSON rows.
    Usage: node tests/review_collect.js <app dir> > rows.json
    Then: python3 tests/review_build.py rows.json  (writes hablemos-review-2026-11.xlsx)
-   Output: { "Phrases": [...], "Replies": [...], "Tools": [...], "Strings": [...] }, one object per row,
-   keys = column headers. The Where column is the key used to apply a fix back into the data files:
+   Output: { "Phrases", "Replies", "Tools", "Strings", "Cases", "Interp", "Discharge cases", "MSE cases", "Lessons",
+   "Readings", "Dialogues", "Dictionary" }, one array of row objects per sheet, keys = column headers.
+   The Where column is the key used to apply a fix back into the data files:
      p:<sectionId>:<index>  -> phrase f/c in js/data/psych-phrases.js (or the module that pushed the section)
      a:common:<groupId>:<i> / a:<sectionId>:<i> -> js/data/psych-answers.js
      pa:<sectionId>:<index>:<i> -> inline `answers` on that phrase
-     mood.* sud.* wd.* deesc.* discharge.* -> that module file (readable path into the object). */
+     mood.* sud.* wd.* deesc.* discharge.* -> that module file (readable path into the object)
+     c:<caseId>:<step>:line / c:<caseId>:<step>:<choice> -> PSYCH_CASES in js/data/psych-cases.js (0-based step and choice)
+     i:<index> -> PSYCH_INTERP in js/data/psych-cases.js
+     dc:<caseId>:<fieldId>:<qIdx> (ans) / dc:<caseId>:<fieldId>:quote -> js/data/psych-discharge-cases.js
+     mc:<caseId>:cc / mc:<caseId>:cc:opt<j> / mc:<caseId>:<domainId>:<qIdx> / mc:<caseId>:<domainId>:ev:<j> / ...:quote -> js/data/psych-mse-cases.js
+     l:<lessonId>:ex:<i> (i-th <div class="ex"> in body) / l:<lessonId>:quiz:<i> -> js/data/lessons.js; placement:<i> -> PLACEMENT in js/data/meta.js
+     r:<readingId>:title / r:<readingId>:p<i> / r:<readingId>:gloss:<i> / r:<readingId>:q:<i> -> js/data/reading.js
+     d:<dialogueId>:<i> -> line i of that dialogue in js/data/dialogues.js (Tú variant = 4th element)
+     dict:<file>:<headword> -> that line in js/data/<file>.js (headword + English identify the line; multi-sense words repeat the headword). */
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.resolve(process.argv[2] || '.');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
@@ -87,6 +96,71 @@ if (DI) {
 /* Strings */
 const ST = ctx.STRINGS || {};
 if (ST.es) Object.keys(ST.es).forEach((k) => out.Strings.push({ Key: k, English: (ST.en || {})[k] || '', 'Spanish draft': ST.es[k], Fix: '', Comment: '' }));
+
+/* Pass 5: case simulations, interpretation drill, discharge and admission MSE practice cases */
+out.Cases = []; out.Interp = []; out['Discharge cases'] = []; out['MSE cases'] = [];
+const esy = (s) => typeof s === 'string' && /[a-záéíóúñ¿¡]/i.test(s);
+(ctx.PSYCH_CASES || []).forEach((c) => c.steps.forEach((st, i) => {
+  out.Cases.push({ Where: 'c:' + c.id + ':' + i + ':line', Case: c.title, Speaker: st.who || '', Spanish: st.line[0] || '', English: st.line[1] || '', Note: '', Fix: '', Comment: '' });
+  (st.choices || []).forEach((ch, j) => out.Cases.push({ Where: 'c:' + c.id + ':' + i + ':' + j, Case: c.title, Speaker: 'You (clinician)', Spanish: ch.tl || '', English: ch.en || '', Note: 'choice scored ' + ch.score + (ch.score === 2 ? ' (best)' : '') + (ch.fb ? '. ' + ch.fb : ''), Fix: '', Comment: '' }));
+}));
+(ctx.PSYCH_INTERP || []).forEach((it, i) => out.Interp.push({ Where: 'i:' + i, Spanish: it[0] || '', English: it[1] || '', Note: it[2] || '', Fix: '', Comment: '' }));
+const DI_FIELDS = ((ctx.PSYCH_DISCHARGE || {}).fields || []);
+(ctx.PSYCH_DISCHARGE_CASES || []).forEach((c) => Object.entries(c.fields || {}).forEach(([fid, f]) => {
+  const field = DI_FIELDS.find((x) => x.id === fid);
+  Object.entries(f.ans || {}).forEach(([q, a]) => {
+    const ask = field && field.ask[+q];
+    out['Discharge cases'].push({ Where: 'dc:' + c.id + ':' + fid + ':' + q, Case: c.title, Field: field ? field.label : fid, Speaker: a[2] || 'Patient', 'Asked (English)': ask ? ask.en : '', Spanish: a[0] || '', English: a[1] || '', Fix: '', Comment: '' });
+  });
+  if (esy(f.quote)) out['Discharge cases'].push({ Where: 'dc:' + c.id + ':' + fid + ':quote', Case: c.title, Field: field ? field.label : fid, Speaker: 'Chart quote', 'Asked (English)': '', Spanish: f.quote, English: '', Fix: '', Comment: '' });
+}));
+const AD_DOMS = ((ctx.PSYCH_ADMIT_MSE || {}).domains || []);
+const refEn = (ref) => { if (typeof ref !== 'string') return ''; const [sid, idx] = ref.split(':'); const s = S.find((x) => x.id === sid); const p = s && s.phrases[+idx]; return p ? p.en : ref; };
+(ctx.PSYCH_MSE_CASES || []).forEach((c) => {
+  const M = out['MSE cases'];
+  if (c.cc) {
+    M.push({ Where: 'mc:' + c.id + ':cc', Case: c.title, Domain: 'Chief complaint', Speaker: (c.cc.ans || [])[2] || 'Patient', 'Asked (English)': refEn(c.cc.ask), Spanish: (c.cc.ans || [])[0] || '', English: (c.cc.ans || [])[1] || '', Note: '', Fix: '', Comment: '' });
+    (c.cc.opts || []).forEach((o, j) => { if (esy(o[0])) M.push({ Where: 'mc:' + c.id + ':cc:opt' + j, Case: c.title, Domain: 'Chief complaint', Speaker: 'Documentation option', 'Asked (English)': '', Spanish: o[0], English: '', Note: (o[1] ? 'correct option. ' : 'wrong option. ') + (o[2] || ''), Fix: '', Comment: '' }); });
+  }
+  Object.entries(c.domains || {}).forEach(([did, d]) => {
+    const dom = AD_DOMS.find((x) => x.id === did); const label = dom ? dom.label : did;
+    Object.entries(d.ans || {}).forEach(([q, a]) => M.push({ Where: 'mc:' + c.id + ':' + did + ':' + q, Case: c.title, Domain: label, Speaker: a[2] || 'Patient', 'Asked (English)': dom ? refEn(dom.ask[+q]) : '', Spanish: a[0] || '', English: a[1] || '', Note: '', Fix: '', Comment: '' }));
+    if (d.ev) (d.ev.opts || []).forEach((o, j) => { if (esy(o[0])) M.push({ Where: 'mc:' + c.id + ':' + did + ':ev:' + j, Case: c.title, Domain: label, Speaker: 'Evidence option', 'Asked (English)': 'Which line shows: ' + d.ev.find, Spanish: o[0], English: '', Note: o[1] ? 'correct option' : 'wrong option', Fix: '', Comment: '' }); });
+    if (esy(d.quote)) M.push({ Where: 'mc:' + c.id + ':' + did + ':quote', Case: c.title, Domain: label, Speaker: 'Chart quote', 'Asked (English)': '', Spanish: d.quote, English: '', Note: '', Fix: '', Comment: '' });
+  });
+});
+
+/* Pass 6: lessons (example lines + quiz items), placement, readings, dialogues, dictionary */
+out.Lessons = []; out.Readings = []; out.Dialogues = []; out.Dictionary = [];
+const unesc = (s) => String(s || '').replace(/<[^>]+>/g, '').replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/&nbsp;/g, ' ').trim();
+(ctx.LESSONS || []).forEach((l) => {
+  const re = /<div class="ex">([\s\S]*?)<\/div>/g; let m, i = 0;
+  while ((m = re.exec(l.body))) {
+    const b = /<b>([\s\S]*?)<\/b>/.exec(m[1]); const span = /<span>([\s\S]*?)<\/span>/.exec(m[1]);
+    out.Lessons.push({ Where: 'l:' + l.id + ':ex:' + i, Lesson: l.title, Kind: 'example', Spanish: unesc(b ? b[1] : m[1]), English: unesc(span ? span[1] : ''), Options: '', Fix: '', Comment: '' });
+    i++;
+  }
+  (l.quiz || []).forEach((q, k) => out.Lessons.push({ Where: 'l:' + l.id + ':quiz:' + k, Lesson: l.title, Kind: 'quiz', Spanish: unesc(q[0]), English: 'Answer: ' + unesc((q[1] || [])[q[2]]) + (q[3] ? '. ' + unesc(q[3]) : ''), Options: (q[1] || []).map(unesc).join(' | '), Fix: '', Comment: '' }));
+});
+(ctx.PLACEMENT || []).forEach((q, i) => out.Lessons.push({ Where: 'placement:' + i, Lesson: 'Placement test (' + q[0] + ')', Kind: 'placement', Spanish: unesc(q[1]), English: 'Answer: ' + unesc((q[2] || [])[q[3]]), Options: (q[2] || []).map(unesc).join(' | '), Fix: '', Comment: '' }));
+(ctx.READING || []).forEach((r) => {
+  const R = out.Readings;
+  R.push({ Where: 'r:' + r.id + ':title', Reading: r.titleEn || r.id, Kind: 'title', Spanish: r.title || '', English: r.titleEn || '', Note: '', Fix: '', Comment: '' });
+  (r.tl || []).forEach((p, i) => R.push({ Where: 'r:' + r.id + ':p' + i, Reading: r.titleEn || r.id, Kind: 'paragraph ' + (i + 1), Spanish: p, English: (r.en || [])[i] || '', Note: '', Fix: '', Comment: '' }));
+  (r.gloss || []).forEach((g, i) => R.push({ Where: 'r:' + r.id + ':gloss:' + i, Reading: r.titleEn || r.id, Kind: 'gloss', Spanish: g[0] || '', English: g[1] || '', Note: '', Fix: '', Comment: '' }));
+  (r.q || []).forEach((q, i) => R.push({ Where: 'r:' + r.id + ':q:' + i, Reading: r.titleEn || r.id, Kind: 'question', Spanish: q[0] || '', English: 'Answer: ' + ((q[1] || [])[q[2]] || ''), Note: 'options: ' + (q[1] || []).join(' | ') + (q[3] ? '. ' + q[3] : ''), Fix: '', Comment: '' }));
+});
+(ctx.DIALOGUES || []).forEach((d) => (d.lines || []).forEach((ln, i) => out.Dialogues.push({ Where: 'd:' + d.id + ':' + i, Dialogue: d.title, Speaker: (d.roles || [])[ln[0]] || String(ln[0]), Spanish: ln[1] || '', English: ln[2] || '', 'Tú variant': ln[3] || '', Fix: '', Comment: '' })));
+const dictFiles = [...html.matchAll(/<script src="js\/data\/(dict-[^"]+)\.js"/g)].map((m) => m[1]);
+(ctx.DICT_RAW || []).forEach((block, fi) => {
+  const file = dictFiles[fi] || ('dict-' + fi); let cat = '';
+  String(block).split('\n').forEach((line) => {
+    line = line.trim(); if (!line) return;
+    if (line.startsWith('#')) { cat = line.replace(/^#\s*/, ''); return; }
+    const f = line.split('|').map((x) => x.trim());
+    out.Dictionary.push({ Where: 'dict:' + file + ':' + f[0], Spanish: f[0] || '', English: f[1] || '', POS: f[2] || '', Category: f[3] || cat, Root: f[4] || '', Note: f[5] || '', Fix: '', Comment: '' });
+  });
+});
 
 process.stdout.write(JSON.stringify(out, null, 1));
 process.stderr.write(Object.entries(out).map(([k, v]) => k + ' ' + v.length).join(', ') + '\n');
