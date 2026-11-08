@@ -10,11 +10,11 @@
 
   // Page state (not persisted): chosen substance, criterion answers, specifiers, rulers, plan.
   let st = null;
-  const fresh = (subId) => ({ sub: subId || 'betel', ans: {}, scr: {}, female: false, rem: 'none', course: '', ctrl: false, maint: false, imp: '', conf: '', goal: '', start: '', tab: 'screen', mi: 0 });
+  const fresh = (subId) => ({ sub: subId || 'alcohol', ans: {}, scr: {}, female: false, rem: 'none', course: '', ctrl: false, maint: false, imp: '', conf: '', goal: '', start: '', tab: 'screen', mi: 0 });
 
   const line = (p, sub, showEn) => {
     const tl = D().fill(p.tl, sub);
-    return '<div class="sd-line"><div class="sd-tl">' + esc(tl) + (typeof p.n === 'string' && p.n ? '<div class="sd-n">' + esc(p.n) + '</div>' : '') + (showEn ? '<div class="sd-en">' + esc(D().fill(p.en, sub).replace(/\{w\}/g, sub.wen)) + '</div>' : '') + '</div>' + (p.tl.startsWith('(') ? '' : App.sayBtn(tl)) + '</div>';
+    return '<div class="sd-line"><div class="sd-tl">' + esc(tl) + (typeof p.n === 'string' && p.n ? '<div class="sd-n">' + esc(p.n) + '</div>' : '') + (showEn ? '<div class="sd-en">' + esc((D().fillEn ? D().fillEn(p.en, sub) : D().fill(p.en, sub)).replace(/\{w\}/g, sub.wen)) + '</div>' : '') + '</div>' + (p.tl.startsWith('(') ? '' : App.sayBtn(tl)) + '</div>';
   };
 
   function result() {
@@ -67,15 +67,15 @@
         '<div class="card"><h3>Open</h3>' + d.open.map((p) => line(p, sub, showEn)).join('') + '</div>' +
         '<div class="card"><h3>Ask about ' + esc(sub.label) + '</h3>' + sub.ask.map((p) => line(p, sub, showEn)).join('') + '</div>' +
         (r.scr ? '<div class="card"><h3>' + esc(r.scr.title) + '</h3><p class="small muted">' + esc(r.scr.note) + '</p>' +
-          (sub.id === 'alcohol' ? '<div class="seg" role="group" aria-label="Sex" style="margin-bottom:8px"><button class="' + (!st.female ? 'on' : '') + '" data-sex="m">Lalaki</button><button class="' + (st.female ? 'on' : '') + '" data-sex="f">Babae</button></div>' : '') +
+          (sub.id === 'alcohol' ? '<div class="seg" role="group" aria-label="Sex" style="margin-bottom:8px"><button class="' + (!st.female ? 'on' : '') + '" data-sex="m">Male</button><button class="' + (st.female ? 'on' : '') + '" data-sex="f">Female</button></div>' : '') +
           r.scr.items.map((it, i) => '<div class="sd-crit' + (st.scr[i] != null ? ' yes' : '') + '"><div class="sd-num">' + (i + 1) + '</div><div class="sd-body">' + line(it, sub, showEn) +
             '<div class="sd-opts">' + it.opts.map((o) => '<button class="pill' + (st['scrPick' + i] === o[0] ? ' lv' : '') + '" data-scr="' + i + '" data-pts="' + o[1] + '" data-lab="' + esc(o[0]) + '">' + esc(o[0]) + '</button>').join('') + '</div></div></div>').join('') +
           '<p><b>Score:</b> ' + r.scrScore + (r.scrAnswered < r.scr.items.length ? ' <span class="small muted">(' + (r.scr.items.length - r.scrAnswered) + ' not yet answered)</span>' : ' · ' + esc(r.scr.bands(r.scrScore, st.female))) + '</p></div>' : '') +
-        '<div class="card"><h3>The ' + r.max + ' criteria, past 12 months</h3><p class="small muted">Tap Oo or Hindi after each answer. ' + (sub.gamble ? 'Not better explained by a manic episode.' : 'Tolerance and withdrawal do not count for medicines taken as prescribed.') + '</p>' +
+        '<div class="card"><h3>The ' + r.max + ' criteria, past 12 months</h3><p class="small muted">Tap ' + LANG.yes + ' or ' + LANG.no + ' after each answer. ' + (sub.gamble ? 'Not better explained by a manic episode.' : 'Tolerance and withdrawal do not count for medicines taken as prescribed.') + '</p>' +
         Object.keys(d.groups).filter((g) => r.crit.some((c) => c.group === g)).map((g) => '<div class="sd-group">' + esc(d.groups[g]) + '</div>' + r.crit.filter((c) => c.group === g).map((c) => {
           const a = st.ans[c.n];
           return '<div class="sd-crit' + (a === true ? ' yes' : a === false ? ' no' : '') + '"><div class="sd-num">' + c.n + '</div><div class="sd-body">' + line(c, sub, showEn) +
-            '<div class="seg sd-ans" role="group" aria-label="Criterion ' + c.n + '"><button class="' + (a === true ? 'on' : '') + '" data-crit="' + c.n + '" data-v="1" aria-pressed="' + (a === true) + '">Oo</button><button class="' + (a === false ? 'on' : '') + '" data-crit="' + c.n + '" data-v="0" aria-pressed="' + (a === false) + '">Hindi</button></div></div></div>';
+            '<div class="seg sd-ans" role="group" aria-label="Criterion ' + c.n + '"><button class="' + (a === true ? 'on' : '') + '" data-crit="' + c.n + '" data-v="1" aria-pressed="' + (a === true) + '">' + LANG.yes + '</button><button class="' + (a === false ? 'on' : '') + '" data-crit="' + c.n + '" data-v="0" aria-pressed="' + (a === false) + '">' + LANG.no + '</button></div></div></div>';
         }).join('')).join('') + '</div>' +
         '<div class="card"><h3>Course and specifiers</h3>' + d.remission.map((p) => line(p, sub, showEn)).join('') +
         '<div class="sd-spec"><label class="ho-chk" style="flex-wrap:wrap"><span>Remission</span> <select class="input" id="sdRem" style="width:auto;max-width:100%;min-height:36px"><option value="none"' + (st.rem === 'none' ? ' selected' : '') + '>Current (criteria in the past 12 months)</option><option value="early"' + (st.rem === 'early' ? ' selected' : '') + '>Early remission (≥3 and <12 months)</option><option value="sustained"' + (st.rem === 'sustained' ? ' selected' : '') + '>Sustained remission (≥12 months)</option></select></label>' +
@@ -97,7 +97,7 @@
           const s = steps[st.mi];
           let extra = '';
           if (s.id === 'rulers') extra = '<div class="sd-rulers"><label>Importance <b id="impV">' + (st.imp === '' ? '–' : st.imp) + '</b>/10<input type="range" min="0" max="10" id="sdImp" value="' + (st.imp === '' ? 0 : st.imp) + '"></label><label>Confidence <b id="confV">' + (st.conf === '' ? '–' : st.conf) + '</b>/10<input type="range" min="0" max="10" id="sdConf" value="' + (st.conf === '' ? 0 : st.conf) + '"></label></div>';
-          if (s.id === 'plan') extra = '<div class="row" style="flex-wrap:wrap;gap:8px;margin-top:8px"><input class="input" id="sdGoal" placeholder="Patient\'s goal in their words (e.g. bawasan sa 3 nganga kada araw)" value="' + esc(st.goal) + '" style="flex:2;min-width:200px"><input class="input" id="sdStart" placeholder="Start date" value="' + esc(st.start) + '" style="flex:1;min-width:120px"></div>';
+          if (s.id === 'plan') extra = '<div class="row" style="flex-wrap:wrap;gap:8px;margin-top:8px"><input class="input" id="sdGoal" placeholder="Patient\'s goal in their words (e.g. bajar a 2 tragos al día)" value="' + esc(st.goal) + '" style="flex:2;min-width:200px"><input class="input" id="sdStart" placeholder="Start date" value="' + esc(st.start) + '" style="flex:1;min-width:120px"></div>';
           if (s.id === 'feedback') extra = '<details class="sd-det"><summary>Psychoeducation for ' + esc(sub.label) + '</summary>' + sub.psychoed.map((p) => line(p, sub, showEn)).join('') + '</details>';
           return '<div class="card sd-step"><h3>' + (st.mi + 1) + '. ' + esc(s.title) + '</h3><p class="small muted">' + esc(s.goal) + '</p>' + s.lines.map((p) => line(p, sub, showEn)).join('') + extra +
             '<div class="row" style="margin-top:10px"><button class="btn sm" id="miPrev"' + (st.mi === 0 ? ' disabled' : '') + '>← Back</button><button class="btn sm primary" id="miNext"' + (st.mi === steps.length - 1 ? ' disabled' : '') + '>Next →</button><a class="btn sm ghost" href="#/psych/sud" id="sdBackScreen">Back to the result</a></div></div>';
@@ -105,8 +105,8 @@
     } else if (st.tab === 'learn') {
       body = subChips + '<div class="card"><h3>Explain: ' + esc(sub.label) + '</h3>' + sub.psychoed.map((p) => line(p, sub, showEn)).join('') + '</div>' +
         '<div class="card"><h3>Study the phrases</h3><p class="small muted">The same lines as phrase sections, with flashcards, quizzes, and audio.</p><div class="row" style="flex-wrap:wrap">' +
-        [['sud-screen', 'The 11 criteria'], ['sud-betel', 'Betel nut'], ['sud-other', 'Tobacco, alcohol, shabu'], ['sud-gambling', 'Gambling'], ['sud-screens', 'AUDIT-C and Fagerström'], ['mi', 'Motivational interviewing']].map(([id, t]) => '<a class="btn sm" href="#/psych/s/' + id + '">' + esc(t) + '</a>').join('') +
-        '<a class="btn sm" href="#/psych/case/tonyo-nganga">Practice case: Mang Tonyo</a><a class="btn sm" href="#/psych/handout">Print: SUD screen + brief intervention</a></div></div>' +
+        [['sud-screen', 'The 11 criteria'], ['sud-alcohol-tobacco', 'Alcohol and tobacco'], ['sud-drugs', 'Cannabis, meth, cocaine, opioids'], ['sud-gambling', 'Gambling'], ['sud-screens', 'AUDIT-C and Fagerström'], ['mi', 'Motivational interviewing']].map(([id, t]) => '<a class="btn sm" href="#/psych/s/' + id + '">' + esc(t) + '</a>').join('') +
+        '<a class="btn sm" href="#/psych/handout">Print: SUD screen + brief intervention</a></div></div>' +
         '<div class="notice info">Criteria paraphrased from DSM-5-TR (substance-related and addictive disorders). ' + LANG.name + ' lines are practice phrasings for training, not validated translations.</div>';
     }
 

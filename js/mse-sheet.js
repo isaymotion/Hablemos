@@ -17,49 +17,53 @@
   }
   const UT = '<span class="ms-ut" title="Phrase from the app">HB</span>';
 
-  /* Page 3: substance use screening and brief intervention, built from PSYCH_SUD so the wording stays in one place. */
+  /* Pages 3 and 4: substance use screening and brief intervention, built from PSYCH_SUD so the wording stays in one place.
+     Alcohol is the worked example; titles and notes are Spanish with English glosses, like the MSE pages. */
   function sudSections() {
-    const d = window.PSYCH_SUD; if (!d || !(d.substances || []).length) return [];   // rebuilt in a later release (US substances); Usap Tayo's structure below is kept as the template
+    const d = window.PSYCH_SUD; if (!d || !(d.substances || []).length) return [];
     const sub = (id) => d.substances.find((x) => x.id === id);
-    const betel = sub('betel'), alc = sub('alcohol'), tob = sub('tobacco'), gam = sub('gambling'), shabu = sub('shabu'), oth = sub('other');
-    const fill = (p, sb) => ({ tl: d.fill(p.tl, sb), en: String(p.en).replace(/\{s\}/g, sb.en).replace(/\{u\}/g, sb.unit), ut: true });
+    const alc = sub('alcohol'), tob = sub('tobacco'), can = sub('cannabis'), meth = sub('meth'), coc = sub('cocaine'), opi = sub('opioids'), oth = sub('other'), gam = sub('gambling');
+    const fillEn = (t, sb) => (d.fillEn ? d.fillEn(t, sb) : String(t).replace(/\{sa\}|\{s\}/g, sb.en).replace(/\{u\}/g, sb.unit));
+    const fill = (p, sb) => ({ tl: d.fill(p.tl, sb), en: fillEn(p.en, sb), ut: true });
     const scr = (items) => items.map((it) => ({ tl: it.tl, en: it.en, ut: true, sub: it.opts.map((o) => o[1] + ' ' + o[0]).join(' · ') }));
-    const mi = (stepId, idx) => idx.map((i) => fill(d.mi.find((x) => x.id === stepId).lines[i], betel));
+    const mi = (stepId, idx) => idx.map((i) => fill(d.mi.find((x) => x.id === stepId).lines[i], alc));
+    const psy = (sb) => sb.psychoed.map((p) => fill(p, sb));
     return [
-      { id: 'sud-open', title: 'Alak, droga, sugal: pagsisimula', en: 'Substance use screen', ut: true, blocks: [
-        { items: d.open.slice(0, 3).map((p) => fill(p, betel)) },
-        { h: 'Iba pang droga', items: [fill(shabu.ask[0], shabu), fill(oth.ask[0], oth)] } ],
-        note: 'Isulat: substance, severity, specifier, code. Betel nut = other (or unknown) substance use disorder (F19.1x / F19.2x). Ang screener sa app (Psychiatry → Substance use) ang nagbibilang.' },
-      { id: 'sud-crit', title: 'Ang 11 criteria (DSM-5-TR)', en: 'Past 12 months · 2+ = disorder', ut: true, blocks: [
-        { items: d.criteria.map((c) => Object.assign(fill(c, betel), { b: String(c.n) })) } ],
-        note: d.rule(betel) + '. Palitan ang "nganga" ng alak, sigarilyo, shabu, o pangalan ng droga. Hindi binibilang ang tolerance at withdrawal sa gamot na iniinom ayon sa reseta. Remission: walang criteria maliban sa craving nang ≥3 buwan (early) o ≥12 buwan (sustained).' },
-      { id: 'sud-betel', title: 'Nganga / bunga / mama / buyo / hitso', en: 'Betel nut', ut: true, blocks: [
-        { items: betel.ask.map((p) => fill(p, betel)) } ],
-        note: 'Tingnan ang bibig: puti o pulang bahagi, sugat na hindi gumagaling, hirap ibuka ang bibig (trismus) → i-refer. May tabako sa nganga = dagdag na tobacco use disorder.' },
-      { id: 'sud-alcohol', title: 'Alak', en: 'Alcohol · AUDIT-C', ut: true, blocks: [
+      { id: 'sud-open', title: 'Alcohol, drogas, apuestas: apertura', en: 'Substance use screen', ut: true, blocks: [
+        { items: d.open.slice(0, 3).map((p) => fill(p, alc)) },
+        { h: 'Otras drogas', items: [fill(meth.ask[0], meth), fill(opi.ask[0], opi), fill(oth.ask[0], oth)] } ],
+        note: 'Anote: sustancia, gravedad, especificador, código. Confidencial y para el tratamiento; no prometa que nunca se comparte con la policía o inmigración. El screener de la app (Psychiatry → Substance use) hace el conteo.' },
+      { id: 'sud-crit', title: 'Los 11 criterios (DSM-5-TR)', en: 'Past 12 months · 2+ = disorder', ut: true, blocks: [
+        { items: d.criteria.map((c) => Object.assign(fill(c, alc), { b: String(c.n) })) } ],
+        note: d.rule(alc) + '. Cambie "alcohol" por tabaco, marihuana, metanfetamina, cocaína, opioides o el nombre de la droga. La tolerancia y la abstinencia no cuentan para medicamentos tomados según la receta. Remisión: ningún criterio salvo las ganas de consumir durante ≥3 meses (temprana) o ≥12 meses (sostenida).' },
+      { id: 'sud-alcohol', title: 'Alcohol', en: 'Alcohol · AUDIT-C', ut: true, blocks: [
         { items: alc.ask.map((p) => fill(p, alc)) },
-        { h: 'AUDIT-C (0–12; positive ≥4 lalaki, ≥3 babae)', items: scr(d.screens.alcohol.items) } ],
-        note: 'Araw-araw at marami ang inom, huling inom 6–48 oras → bantayan ang withdrawal (panginginig, pawis, mabilis na pulso, lituhin, kombulsyon).' },
-      { id: 'sud-tobacco', title: 'Sigarilyo', en: 'Tobacco · Fagerström', ut: true, blocks: [
+        { h: 'AUDIT-C (0–12; positivo ≥4 hombres, ≥3 mujeres)', items: scr(d.screens.alcohol.items) } ],
+        note: 'Trago estándar (EE. UU.) = 12 oz de cerveza, 5 oz de vino, 1.5 oz de licor; una caguama (32 oz) ≈ 2.5–3 tragos. Consumo diario y abundante, último trago hace 6–48 h → vigilar la abstinencia (temblor, sudor, pulso rápido, confusión, convulsiones).' },
+      { id: 'sud-tobacco', title: 'Tabaco y vape', en: 'Tobacco · Fagerström', ut: true, blocks: [
         { items: [fill(tob.ask[0], tob), fill(tob.ask[1], tob)] },
-        { h: 'Fagerström (0–10: 0–2 low, 3–4 low–mod, 5–7 mod, 8–10 high)', items: scr(d.screens.tobacco.items) } ] },
-      { id: 'sud-gambling', title: 'Sugal', en: 'Gambling disorder · 9 criteria, 4+', ut: true, blocks: [
+        { h: 'Fagerström (0–10: 0–2 baja, 3–4 baja–moderada, 5–7 moderada, 8–10 alta)', items: scr(d.screens.tobacco.items) } ] },
+      { id: 'sud-opioids', title: 'Opioides y fentanilo', en: 'Opioids · overdose · naloxone', ut: true, blocks: [
+        { items: opi.ask.slice(1).map((p) => fill(p, opi)) },
+        { h: 'Naloxona y tratamiento', items: [fill(opi.psychoed[0], opi), fill(opi.psychoed[2], opi), fill(opi.psychoed[3], opi)] } ],
+        note: 'El fentanilo está en casi todas las pastillas y polvos de la calle. Dé o recete naloxona (Narcan) antes de que el paciente se vaya. La buprenorfina (Suboxone) o la metadona reducen las muertes por sobredosis a menos de la mitad; ofrézcalas el mismo día. COWS: Psychiatry → Withdrawal.' },
+      { id: 'sud-gambling', title: 'Apuestas', en: 'Gambling disorder · 9 criteria, 4+', ut: true, blocks: [
         { items: [fill(gam.ask[0], gam), fill(gam.ask[2], gam)] },
         { items: d.gambling.map((c) => Object.assign(fill(c, gam), { b: String(c.n) })) } ],
-        note: 'Mild 4–5, moderate 6–7, severe 8–9; episodic o persistent; F63.0. Malaking utang → itanong ang suicide.' },
-      { id: 'sud-mi', title: 'Motivational interviewing', en: 'Brief intervention · OARS', ut: true, blocks: [['permission', [0, 1, 3]], ['reflect', [0, 1, 3]], ['rulers', [0, 1, 3, 4]], ['feedback', [0, 1, 3]], ['plan', [0, 1, 2, 3, 5]], ['notready', [0, 2, 3]], ['close', [0, 1, 2]]].map(([id, idx]) => ({ h: d.mi.find((x) => x.id === id).title, items: mi(id, idx) })),
-        note: 'Huwag sabihing "adik". Kayo ang nakikinig; ang pasyente ang nagbibigay ng dahilan. Rulers: itanong "bakit hindi mas mababa", hindi "bakit hindi mas mataas".' },
-      { id: 'sud-psy1', title: 'Psychoeducation: nganga, alak', en: 'Elicit–provide–elicit', ut: true, blocks: [
-        { h: 'Nganga', items: betel.psychoed.map((p) => fill(p, betel)) },
-        { h: 'Alak', items: alc.psychoed.map((p) => fill(p, alc)) },
-        { h: 'Marijuana', items: sub('cannabis').psychoed.map((p) => fill(p, sub('cannabis'))) } ],
-        note: 'Magbigay ng isa o dalawa lang, na akma sa pasyente, pagkatapos humingi ng permiso.' },
-      { id: 'sud-psy2', title: 'Psychoeducation: sigarilyo, shabu, sugal', en: '', ut: true, blocks: [
-        { h: 'Sigarilyo', items: tob.psychoed.map((p) => fill(p, tob)) },
-        { h: 'Shabu', items: shabu.psychoed.map((p) => fill(p, shabu)) },
-        { h: 'Sugal', items: gam.psychoed.map((p) => fill(p, gam)) } ] },
-      { id: 'sud-nurse', title: 'Nurse: screen at brief advice', en: 'Nurse script', ut: true, blocks: d.nurse.steps.map((st) => ({ h: st.title, items: st.lines.map((p) => fill(p, betel)) })),
-        note: 'Escalate: ' + d.nurse.escalate + ' (Pending Nursing Service review.)' }
+        note: 'Leve 4–5, moderado 6–7, grave 8–9; episódico o persistente; F63.0. Deuda grande → pregunte por suicidio. Autoexclusión, bloqueo de apps y sitios, que alguien de confianza maneje las tarjetas.' },
+      { id: 'sud-mi', title: 'Entrevista motivacional', en: 'Brief intervention · OARS', ut: true, blocks: [['permission', [0, 1, 3]], ['reflect', [0, 1, 3]], ['rulers', [0, 1, 3, 4]], ['feedback', [0, 1, 3]], ['plan', [0, 1, 2, 3, 5]], ['notready', [0, 2, 3]], ['close', [0, 1, 2]]].map(([id, idx]) => ({ h: d.mi.find((x) => x.id === id).title, items: mi(id, idx) })),
+        note: 'No diga "adicto". Usted escucha; el paciente da las razones. Reglas: pregunte "¿por qué no más bajo?", nunca "¿por qué no más alto?".' },
+      { id: 'sud-psy1', title: 'Psicoeducación: alcohol, marihuana, metanfetamina', en: 'Elicit–provide–elicit', ut: true, blocks: [
+        { h: 'Alcohol', items: psy(alc) },
+        { h: 'Marihuana', items: psy(can) },
+        { h: 'Metanfetamina (cristal)', items: psy(meth) } ],
+        note: 'Dé solo uno o dos datos, los que apliquen a este paciente, después de pedir permiso.' },
+      { id: 'sud-psy2', title: 'Psicoeducación: tabaco, cocaína, apuestas', en: '', ut: true, blocks: [
+        { h: 'Tabaco', items: psy(tob) },
+        { h: 'Cocaína y crack', items: psy(coc) },
+        { h: 'Apuestas', items: psy(gam) } ] },
+      { id: 'sud-nurse', title: 'Enfermería: tamizaje y consejo breve', en: 'Nurse script', ut: true, blocks: d.nurse.steps.map((st) => ({ h: st.title, items: st.lines.map((p) => fill(p, alc)) })),
+        note: 'Escalate: ' + d.nurse.escalate + ' (Pending nursing review.)' }
     ];
   }
 
@@ -82,8 +86,8 @@
     const showEn = !!S().settings.mseSheetEn;
     const byId = {}; d.sections.concat(sudSections()).forEach((s) => (byId[s.id] = s));
     const hasSud = sudSections().length > 0;
-    const allPages = hasSud ? d.pages.concat([[['sud-open', 'sud-crit'], ['sud-betel', 'sud-alcohol'], ['sud-tobacco', 'sud-gambling']], [['sud-mi'], ['sud-psy1'], ['sud-psy2', 'sud-nurse']]]) : d.pages;
-    const subs = d.pageSubtitles || [d.subtitle, d.reminder, 'Substance use screening: DSM-5-TR criteria, AUDIT-C, Fagerström, gambling', 'Brief intervention: motivational interviewing, psychoeducation, nurse script'];
+    const allPages = hasSud ? d.pages.concat([[['sud-open', 'sud-crit'], ['sud-alcohol', 'sud-tobacco'], ['sud-opioids', 'sud-gambling']], [['sud-mi'], ['sud-psy1'], ['sud-psy2', 'sud-nurse']]]) : d.pages;
+    const subs = d.pageSubtitles || [d.subtitle, d.reminder, 'Consumo de sustancias: criterios DSM-5-TR, AUDIT-C, Fagerström, opioides y naloxona, apuestas', 'Intervención breve: entrevista motivacional, psicoeducación, guion de enfermería'];
     const H = window.HOSPITAL || {};
     const pages = allPages.map((cols, pi) =>
       '<div class="ms-page">' +
@@ -94,7 +98,7 @@
 
     el.innerHTML = crumb([['Psychiatry', '#/psych'], ['MSE interviewer sheet']]) +
       '<span class="eyebrow">Print · clinic and wards</span><h1>MSE interviewer sheet</h1>' +
-      '<p class="muted">Every screening question for the ' + LANG.name + ' MSE on two pages: opening, mood, depression, suicide, mania, hallucinations, delusions, violence, substance use, anxiety, cognition, insight and judgment. Formal register (usted); the HB mark shows phrases that are also in the app with audio. The substance use pages follow when the screener is rebuilt.</p>' +
+      '<p class="muted">Every screening question for the ' + LANG.name + ' MSE on two pages: opening, mood, depression, suicide, mania, hallucinations, delusions, violence, substance use, anxiety, cognition, insight and judgment. Formal register (usted); the HB mark shows phrases that are also in the app with audio.</p>' +
       '<div class="ho-controls row" style="margin-bottom:14px">' +
       '<button class="btn sm primary" id="msPrint">Print</button>' +
       '<label class="ho-chk"><input type="checkbox" id="msEn"' + (showEn ? ' checked' : '') + '> Show English</label>' +

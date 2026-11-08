@@ -6,7 +6,7 @@
 
 **App created by Isabella Navarro, MD. Latest version November 2026. isaymotion@gmail.com**
 
-Version **0.3.0**: the Usap Tayo engine with a Spanish language pack and all 27 interview sections (opening to closing, plus Shea's techniques), patient replies for every section, the interview flow handout and the MSE interviewer sheet, all draft for review. Clinical tools, practice cases and the learn track arrive in later passes.
+Version **0.4.0**: the Usap Tayo engine with a Spanish language pack, all 27 interview sections (opening to closing, plus Shea's techniques), patient replies for every section, the interview flow handout, the MSE interviewer sheet, and the clinical tools (mood episode checker, substance use screener, withdrawal and agitation guide with an opioid tab, de-escalation checklist, discharge assessment), all draft for review. Practice cases and the learn track arrive in later passes.
 
 ## What it is
 
@@ -20,7 +20,7 @@ Every Spanish section is **Draft for review** until a native Spanish-speaking cl
 |---|---|---|
 | 1 | Core interview phrases (opening and consent, HPI, mood, anxiety, psychosis, suicide and violence risk, substances, history, closing) | Done in 0.3.0: all 27 sections (draft for review) |
 | 2 | Mental status exam: interviewer sheet, point-board replies, listening drill | Done in 0.3.0: MSE sections, two-page interviewer sheet, replies and listening drill for every section (draft for review) |
-| 3 | Clinical tools: mood episode checker, substance use screener, withdrawal and agitation guide, with published validated Spanish versions of the PHQ-9 and MDQ rather than fresh translations | Pending |
+| 3 | Clinical tools: mood episode checker, substance use screener, withdrawal and agitation guide, de-escalation, discharge assessment, with the PHQ-9 and MDQ as interview paraphrases pointing to the published Spanish instruments | Done in 0.4.0 (draft for review) |
 | 4 | Practice cases: case simulations, discharge and admission MSE practice | Pending |
 | 5 | Spanish learn track: dictionary, lessons, reading, dialogues | Pending |
 | 6 | Release with the audio pack | Pending |
@@ -37,13 +37,13 @@ The app shares its engine with Usap Tayo. The language pack `js/lang.js` sets vo
 | **Listening drill** | Hear a patient or family reply, choose its meaning from four, then see the Spanish. | Live (draft for review) |
 | **Case simulations** | Interactive interviews with feedback and an MSE summary. | Engine ready, content pending |
 | **MSE interviewer sheet** | Printable pages of screening questions for the OPD and wards. | Live (draft for review) |
-| **Substance use screener** | Criteria-based screening with severity, a copyable chart line and brief intervention. | Engine ready, content pending |
-| **Mood episode checker** | Tap-to-count DSM-5-TR checker for depressive and manic episodes, with PHQ-9 and MDQ. | Engine ready, content pending |
-| **Withdrawal and agitation guide** | Bedside reference with PAWSS, CIWA-Ar and an agitation guide. | Engine ready, content pending |
-| **De-escalation checklist** | Bedside checklist with Spanish phrases, a drill and a chart note. | Engine ready, content pending |
-| **Discharge assessment and practice** | Guided discharge interview and simulated practice. | Engine ready, content pending |
+| **Substance use screener** | Alcohol, tobacco and vaping, cannabis, methamphetamine, cocaine, opioids and fentanyl, other substances and gambling: the DSM-5-TR criteria with severity and codes, AUDIT-C and Fagerström, a copyable chart line, motivational interviewing and a nurse script. | Live (draft for review) |
+| **Mood episode checker** | Tap-to-count DSM-5-TR checker for depressive and manic episodes, with the PHQ-9 and MDQ items as interview paraphrases (use the published Spanish instruments for a documented score). | Live (draft for review) |
+| **Withdrawal and agitation guide** | Alcohol (PAWSS, CIWA-Ar), cannabis, opioids (COWS, buprenorphine and methadone starts, naloxone) and the agitated patient, with Spanish patient-facing lines. | Live (draft for review) |
+| **De-escalation checklist** | Twelve steps with Spanish phrases, a rapid drill, what to do if it fails, a chart note and an A6 pocket card. | Live (draft for review) |
+| **Discharge assessment and practice** | Guided field-by-field discharge interview with documentation picks (live, draft for review); simulated practice cases pending. | Partly live |
 | **Admission MSE practice** | Simulated admission interviews checked against a model MSE. | Engine ready, content pending |
-| **Printable handouts** | PDF or print of the interview flow and MSE, with English shown, hidden or as an answer key. | Engine ready, content pending |
+| **Printable handouts** | PDF or print of the interview flow, MSE, de-escalation checklist and pocket card, and discharge guide, with English shown, hidden or as an answer key. | Live (draft for review) |
 | **Dictionary, lessons, reading, dialogues** | Engines that wait for Spanish content. | Engine ready, content pending |
 
 ## Publish it with GitHub Pages

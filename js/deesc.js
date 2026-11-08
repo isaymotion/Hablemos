@@ -20,14 +20,14 @@
     let tab = q.tab || 'check';
     const run = { behaviors: new Set(), other: '', done: new Set(), outcome: '', start: new Date() };
     let drill = null; // active rapid-drill state
-    const time = (d) => d.toLocaleTimeString('en-PH', { hour: 'numeric', minute: '2-digit' });
+    const time = (d) => d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
     const summary = () => {
       const b = D.behaviors.filter((_, i) => run.behaviors.has(i)).map((x) => (x.en.startsWith('Others') ? 'Others: ' + (run.other || 'unspecified') : x.en));
       const steps = D.steps.map((s, i) => (run.done.has(i) ? '[x] ' : '[ ] ') + (i + 1) + '. ' + s.en.split('. ')[0].replace(/\.$/, ''));
       const out = (D.outcomes.find((o) => o[0] === run.outcome) || ['', 'Not recorded'])[1];
-      return 'DE-ESCALATION NOTE' + (inst.deescForm ? ' (per ' + inst.deescForm + ')' : '') + '\nDate/time: ' + new Date().toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' }) + ', started ' + time(run.start) +
+      return 'DE-ESCALATION NOTE' + (inst.deescForm ? ' (per ' + inst.deescForm + ')' : '') + '\nDate/time: ' + new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) + ', started ' + time(run.start) +
         '\nBehavior observed: ' + (b.join(', ') || 'none ticked') + '\nInterventions:\n' + steps.join('\n') + '\nRemarks: ' + out +
-        (run.outcome === 'failed' ? '\nReferred to NOD for further intervention.' : '') + '\nPOD notified: ____\nStaff: ____';
+        (run.outcome === 'failed' ? '\nEscalated: ' + (D.escLine || '') : '') + '\n' + (D.signatures || ['Staff', 'Charge nurse', 'Physician notified']).map((x) => x + ': ____').join('\n');
     };
 
     const head = () => '<div class="breadcrumb"><a href="#/psych">Psychiatry</a> / <a href="#/psych/s/deescalation">De-escalation</a> / Checklist</div>' +
@@ -39,7 +39,7 @@
       check: () => {
         const doneN = run.done.size;
         return '<p class="muted">Work through the steps with an agitated patient. Each step has ' + LANG.name + ' phrases you can say or play aloud. Nothing here is saved, and no patient details are needed.</p>' +
-          '<div class="notice" style="margin-bottom:14px"><b>Safety first.</b> Keep two arms\' length, an open exit, and other staff nearby. If de-escalation fails, the NAOD refers to the NOD. <b>Notify the POD at all times.</b></div>' +
+          '<div class="notice" style="margin-bottom:14px"><b>Safety first.</b> Keep two arms\' length, an open exit, and other staff nearby. ' + esc(D.escLine || '') + '</div>' +
           '<div class="card stack"><div class="spread"><h2 style="margin:0">1. Behavior observed</h2><span class="muted small">Tap all that apply</span></div><div class="dz-beh">' +
           D.behaviors.map((b, i) => '<button class="dz-chip' + (run.behaviors.has(i) ? ' on' : '') + '" data-b="' + i + '" aria-pressed="' + run.behaviors.has(i) + '"><b>' + esc(b.en) + '</b><span class="tl">' + esc(b.tl) + '</span></button>').join('') + '</div>' +
           (run.behaviors.has(D.behaviors.length - 1) ? '<input class="input" id="dzOther" placeholder="Specify (e.g., lifting the bed)" value="' + esc(run.other) + '">' : '') + '</div>' +
@@ -139,7 +139,7 @@
             if (result) hit++;
             App.recordAnswer(!!result, 'p:' + refs[i]);
           }
-          if (!me.stop) box.innerHTML = '<div class="feedback ' + (hit >= 8 ? 'ok' : hit >= 5 ? 'mid' : 'no') + '"><b>' + hit + ' / ' + refs.length + '</b> said in time. ' + (hit < refs.length ? 'Missed lines are in <a href="#/flash/mistakes">My mistakes</a>.' : 'Handa ka na!') + '</div>';
+          if (!me.stop) box.innerHTML = '<div class="feedback ' + (hit >= 8 ? 'ok' : hit >= 5 ? 'mid' : 'no') + '"><b>' + hit + ' / ' + refs.length + '</b> said in time. ' + (hit < refs.length ? 'Missed lines are in <a href="#/flash/mistakes">My mistakes</a>.' : esc(LANG.quiz.done)) + '</div>';
         };
       }
     };

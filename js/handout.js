@@ -18,6 +18,8 @@
   };
   const CARD_LABELS = ['Keep two arms\' length', 'Approach calmly', 'Introduce, orient, reassure', 'Short, simple words', 'Let them talk', 'Listen and reflect', 'Agree, or agree to disagree', 'Set clear limits', 'Reassure: we\'ll help you', 'Coach to stay in control', 'Offer choices', 'Offer medication'];
   const INST = () => (window.APP_META && APP_META.institution) || {};
+  const ESC_LINE = () => (window.PSYCH_DEESC && PSYCH_DEESC.escLine) || 'If de-escalation fails, the charge nurse takes over and the physician on duty is notified at all times.';
+  const SIGNS = () => (window.PSYCH_DEESC && PSYCH_DEESC.signatures) || ['Staff member', 'Charge nurse', 'Physician notified (date/shift/time)'];
   const CRISIS = () => { const c = (window.HOSPITAL && HOSPITAL.crisis) || {}; return c.number ? c.name + ' ' + c.number : 'Local crisis line'; };
   const DEFAULTS = { preset: 'full', english: 'show', register: 'f', notes: true, answers: false, title: 'Psychiatric Interview in ' + LANG.name + '', preparedFor: '' };
 
@@ -65,15 +67,15 @@
       title: o.title || DEFAULTS.title, preparedFor: o.preparedFor, date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
       overview: o.overview ? (flowOrder.length ? flowOrder : steps).map((s) => ({ n: body.find((b) => b.id === s.id).n, title: s.title, goal: s.goal, branch: s.branch || '' })) : null,
       body, mse, idioms: o.idioms ? idiomRows() : null, form: o.form, deesc: o.deescList && window.PSYCH_DEESC ? {
-        behaviors: PSYCH_DEESC.behaviors, escalation: PSYCH_DEESC.escalation,
+        behaviors: PSYCH_DEESC.behaviors, escalation: PSYCH_DEESC.escalation, escLine: ESC_LINE(), signatures: SIGNS(),
         steps: PSYCH_DEESC.steps.map((st, i) => ({ n: i + 1, en: st.en, tip: o.notes ? st.tip : '', say: st.say.map(ref).filter(Boolean).map((p) => phraseModel(p, o)) }))
       } : null,
       discharge: o.dischargeGuide && window.PSYCH_DISCHARGE ? PSYCH_DISCHARGE.fields.filter((f) => f.kind !== 'sign').map((f) => ({ label: f.label, group: f.group, assess: o.notes ? f.assess : '', ask: f.refs.map(ref).filter(Boolean).map((p) => phraseModel(p, o)), picks: f.picks })) : null,
       deescAfter: o.deescAfter && window.PSYCH_DEESC ? PSYCH_DEESC.after.map((a) => ({ title: a.title, who: a.who, points: a.points, say: a.say.map(ref).filter(Boolean).map((p) => phraseModel(p, o)) })) : null,
       card: o.deescCard && window.PSYCH_DEESC ? {
         steps: PSYCH_DEESC.steps.map((st, i) => ({ n: i + 1, label: CARD_LABELS[i], say: phraseModel(ref(st.say[0]), o) })),
-        behaviors: PSYCH_DEESC.behaviors.map((b) => b.en.replace(/ \(specify\).*$/, '')), escalation: PSYCH_DEESC.escalation,
-        debrief: ['deescalation:36', 'deescalation:38'].map(ref).filter(Boolean).map((p) => phraseModel(p, o))
+        behaviors: PSYCH_DEESC.behaviors.map((b) => b.en.replace(/ \(specify\).*$/, '')), escalation: PSYCH_DEESC.escalation, escLine: ESC_LINE(),
+        debrief: (PSYCH_DEESC.debrief || []).map(ref).filter(Boolean).map((p) => phraseModel(p, o))
       } : null,
       key: o.english === 'key' ? key : null, o
     };
@@ -85,8 +87,8 @@
     const line = (st) => '<div class="hc-step"><span class="hc-n">' + st.n + '</span><div><b>' + esc(st.label) + '</b><div class="hc-tl">' + esc(st.say.tl) + '</div>' + (showEn ? '<div class="hc-en">' + esc(st.say.en) + '</div>' : '') + '</div></div>';
     const top = '<div class="hc-top"><b>DE-ESCALATION</b><span>' + esc(INST().short || '') + (INST().deescForm ? ' · ' + esc(INST().deescForm) : '') + '</span></div>';
     return '<div class="hc-wrap"><div class="hc-card">' + top + '<div class="hc-sub">Watch for: ' + esc(c.behaviors.join(', ')) + '</div>' + c.steps.slice(0, 6).map(line).join('') + '</div>' +
-      '<div class="hc-card">' + top + c.steps.slice(6).map(line).join('') + '<div class="hc-esc"><b>If it fails:</b> NAOD → NOD. <b>Notify POD at all times.</b></div>' +
-      '<div class="hc-sub"><b>Debrief later:</b> ' + c.debrief.map((p) => esc(p.tl) + (showEn ? ' (' + esc(p.en) + ')' : '')).join(' · ') + '</div><div class="hc-foot">Crisis line ' + CRISIS() + ' · Hablemayo</div></div></div>';
+      '<div class="hc-card">' + top + c.steps.slice(6).map(line).join('') + '<div class="hc-esc"><b>If it fails:</b> ' + esc(c.escLine) + '</div>' +
+      '<div class="hc-sub"><b>Debrief later:</b> ' + c.debrief.map((p) => esc(p.tl) + (showEn ? ' (' + esc(p.en) + ')' : '')).join(' · ') + '</div><div class="hc-foot">Crisis line ' + CRISIS() + ' · ' + esc(APP_META.name) + '</div></div></div>';
   }
   function cardDoc(m, logo) {
     const c = m.card, showEn = m.o.english === 'show';
@@ -100,7 +102,7 @@
     const b2 = JSON.parse(JSON.stringify(banner)); b2.pageBreak = 'before';
     content.push(b2);
     content.push.apply(content, c.steps.slice(6).map(step));
-    content.push({ table: { widths: ['*'], body: [[{ text: [{ text: 'If it fails: ', bold: true }, 'NAOD » NOD for further intervention. ', { text: 'Notify POD at all times.', bold: true }], fillColor: '#fdf1dc', fontSize: fs }]] }, layout: { hLineWidth: () => 0, vLineWidth: () => 0, paddingTop: () => 3, paddingBottom: () => 3, paddingLeft: () => 5 }, margin: [0, 2, 0, 4] });
+    content.push({ table: { widths: ['*'], body: [[{ text: [{ text: 'If it fails: ', bold: true }, c.escLine], fillColor: '#fdf1dc', fontSize: fs }]] }, layout: { hLineWidth: () => 0, vLineWidth: () => 0, paddingTop: () => 3, paddingBottom: () => 3, paddingLeft: () => 5 }, margin: [0, 2, 0, 4] });
     content.push({ text: [{ text: 'Debrief later: ', bold: true }].concat(c.debrief.map((p, i) => ({ text: (i ? ' · ' : '') + p.tl + (showEn ? ' (' + p.en + ')' : '') }))), fontSize: fs - 0.6, color: '#333a52' });
     [content[0], b2].forEach((b) => { b.layout = banner.layout; });
     return {
@@ -145,8 +147,8 @@
         '<p class="ho-goal"><b>Tick the behavior presented by the patient.</b></p><div class="ho-beh">' + d.behaviors.map((b) => '<div><span class="ho-box"></span><b>' + esc(b.en) + '</b>' + (showEn ? '' : '') + '<small>' + esc(b.tl) + '</small></div>').join('') + '</div>' +
         '<div class="ho-steps">' + d.steps.map((st) => '<div class="ho-step"><span class="ho-box"></span><div><b>' + st.n + '. ' + esc(st.en) + '</b>' + (st.tip ? '<small>' + esc(st.tip) + '</small>' : '') +
           st.say.map((p) => '<div class="ho-say"><b>' + esc(p.tl) + '</b>' + (p.alt ? ' <i>' + esc(p.alt) + '</i>' : '') + (showEn ? '<span> ' + esc(p.en) + '</span>' : '') + '</div>').join('') + '</div></div>').join('') + '</div>' +
-        '<p class="ho-branch">If de-escalation fails, NAOD refers to NOD for further intervention. Notify POD at all times. (' + d.escalation.map((e) => e[0] + ' = ' + e[1]).join('; ') + ')</p>' +
-        '<p class="ho-goal">Remarks: ☐ Successful ☐ Partly successful ☐ Not successful, escalated ________________________</p><p class="ho-goal">NAOD: ______________ NOD: ______________ POD notified: ☐ Date/shift/time: ______________</p>' + (INST().deescForm ? '<p class="ho-form-no">' + esc(INST().deescForm) + '</p>' : '') + '</section>';
+        '<p class="ho-branch">' + esc(d.escLine) + ' (' + d.escalation.map((e) => e[0] + ' = ' + e[1]).join('; ') + ')</p>' +
+        '<p class="ho-goal">Remarks: ☐ Successful ☐ Partly successful ☐ Not successful, escalated ________________________</p><p class="ho-goal">' + d.signatures.map((x) => esc(x) + ': ______________').join(' ') + '</p>' + (INST().deescForm ? '<p class="ho-form-no">' + esc(INST().deescForm) + '</p>' : '') + '</section>';
     }
     if (m.discharge) {
       h += '<section class="ho-sec">' + (INST().name ? '<div class="ho-inst"><b>' + esc(INST().name.toUpperCase()) + '</b><br>' + esc(INST().address) + '</div>' : '') + '<h2>Discharge summary: interview guide</h2>' +
@@ -266,9 +268,9 @@
         st.say.forEach((p) => stack.push({ text: [{ text: '“' + p.tl + '”', color: NAVY }].concat(p.alt ? [{ text: '  ' + p.alt, italics: true, color: MUTED }] : []).concat(showEn ? [{ text: '  ' + p.en, color: MUTED, fontSize: base - 1.5 }] : []), margin: [8, 1, 0, 0] }));
         content.push(Object.assign(boxed(stack), { unbreakable: true }));
       });
-      content.push({ table: { widths: ['*'], body: [[{ text: [{ text: 'If de-escalation fails, NAOD refers to NOD for further intervention. Notify POD at all times.', bold: true }, { text: '\n' + d.escalation.map((e) => e[0] + ' = ' + e[1]).join(';   '), color: MUTED, fontSize: base - 1.5 }], fillColor: '#fdf1dc' }]] }, layout: { hLineWidth: () => 0, vLineWidth: () => 0, paddingTop: () => 5, paddingBottom: () => 5, paddingLeft: () => 8 }, margin: [0, 6, 0, 8] });
+      content.push({ table: { widths: ['*'], body: [[{ text: [{ text: d.escLine, bold: true }, { text: '\n' + d.escalation.map((e) => e[0] + ' = ' + e[1]).join(';   '), color: MUTED, fontSize: base - 1.5 }], fillColor: '#fdf1dc' }]] }, layout: { hLineWidth: () => 0, vLineWidth: () => 0, paddingTop: () => 5, paddingBottom: () => 5, paddingLeft: () => 8 }, margin: [0, 6, 0, 8] });
       content.push({ columns: [{ text: 'Remarks:', bold: true, width: 'auto' }, inline('Successful'), inline('Partly successful'), inline('Not successful, escalated'), { text: '________________', width: '*' }], columnGap: 12, margin: [0, 0, 0, 14] });
-      content.push({ columns: [{ text: '______________________\nNursing Attendant on Duty', alignment: 'center', fontSize: base - 1 }, { text: '______________________\nNurse on Duty', alignment: 'center', fontSize: base - 1 }, { text: '______________________\nPOD notified (date/shift/time)', alignment: 'center', fontSize: base - 1 }], unbreakable: true });
+      content.push({ columns: d.signatures.map((x) => ({ text: '______________________\n' + x, alignment: 'center', fontSize: base - 1 })), unbreakable: true });
       if (INST().deescForm) content.push({ text: INST().deescForm, alignment: 'right', fontSize: base - 1, margin: [0, 12, 0, 0] });
     }
     if (m.discharge) {

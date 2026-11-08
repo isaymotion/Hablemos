@@ -3,6 +3,16 @@
    For every release: add an entry here, then bump APP_META.version (data/app-meta.js) and VERSION in sw.js. */
 window.APP_CHANGELOG = [
   {
+    version: '0.4.0', date: '2026-11-08', title: 'Clinical tools',
+    items: [
+      { type: 'feature', text: 'Mood episode checker in Spanish: SIGECAPS and DIGFAST as tap-to-count DSM-5-TR criteria, with the PHQ-9 and MDQ items as interview paraphrases and pointers to the published Spanish instruments for a documented score.' },
+      { type: 'feature', text: 'Substance use screener rebuilt for the US context: alcohol, tobacco and vaping, cannabis, methamphetamine, cocaine, opioids and fentanyl (with naloxone and overdose lines), other substances and gambling; the 11 criteria, AUDIT-C and Fagerström question lines, motivational interviewing, psychoeducation and a nurse script. Two substance use pages added to the MSE interviewer sheet.' },
+      { type: 'feature', text: 'Withdrawal and agitation guide: alcohol (PAWSS, CIWA-Ar), cannabis, a new opioid tab with the COWS, buprenorphine and methadone starts, adjuncts and naloxone teaching, and the agitated patient, all with Spanish patient-facing lines.' },
+      { type: 'feature', text: 'De-escalation checklist (12 steps, pocket card, rapid drill, what to do if it fails) and the guided discharge assessment, both generic: roles, forms and the crisis line come from data/hospital.js.' },
+      { type: 'content', text: 'New phrase sections for every tool (mood screens, substance use, withdrawal, discharge) with flashcards, search and audio. Everything is draft for review by a native Spanish-speaking clinician.' }
+    ]
+  },
+  {
     version: '0.3.0', date: '2026-11-08', title: 'Core interview, part two',
     items: [
       { type: 'content', text: 'All 27 interview sections are now in Spanish, in usted and tú: substances, past history, family history, personal and social history (including migration), collateral from family, the MSE (orientation, attention and memory; abstraction with Spanish refranes; describing observations), explaining the diagnosis, medication side effects, admission and discharge, children and adolescents, elderly patients, closing. Draft for review.' },
