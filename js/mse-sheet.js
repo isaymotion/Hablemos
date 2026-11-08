@@ -19,7 +19,7 @@
 
   /* Page 3: substance use screening and brief intervention, built from PSYCH_SUD so the wording stays in one place. */
   function sudSections() {
-    const d = window.PSYCH_SUD; if (!d) return [];
+    const d = window.PSYCH_SUD; if (!d || !(d.substances || []).length) return [];   // rebuilt in a later release (US substances); Usap Tayo's structure below is kept as the template
     const sub = (id) => d.substances.find((x) => x.id === id);
     const betel = sub('betel'), alc = sub('alcohol'), tob = sub('tobacco'), gam = sub('gambling'), shabu = sub('shabu'), oth = sub('other');
     const fill = (p, sb) => ({ tl: d.fill(p.tl, sb), en: String(p.en).replace(/\{s\}/g, sb.en).replace(/\{u\}/g, sb.unit), ut: true });
@@ -81,21 +81,22 @@
     const inst = (window.APP_META && APP_META.institution) || {};
     const showEn = !!S().settings.mseSheetEn;
     const byId = {}; d.sections.concat(sudSections()).forEach((s) => (byId[s.id] = s));
-    const allPages = window.PSYCH_SUD ? d.pages.concat([[['sud-open', 'sud-crit'], ['sud-betel', 'sud-alcohol'], ['sud-tobacco', 'sud-gambling']], [['sud-mi'], ['sud-psy1'], ['sud-psy2', 'sud-nurse']]]) : d.pages;
-    const subs = [d.subtitle, d.reminder, 'Substance use screening: DSM-5-TR criteria, AUDIT-C, Fagerström, sugal · Resident at Nurse', 'Brief intervention: motivational interviewing, psychoeducation, nurse script · Resident at Nurse'];
+    const hasSud = sudSections().length > 0;
+    const allPages = hasSud ? d.pages.concat([[['sud-open', 'sud-crit'], ['sud-betel', 'sud-alcohol'], ['sud-tobacco', 'sud-gambling']], [['sud-mi'], ['sud-psy1'], ['sud-psy2', 'sud-nurse']]]) : d.pages;
+    const subs = d.pageSubtitles || [d.subtitle, d.reminder, 'Substance use screening: DSM-5-TR criteria, AUDIT-C, Fagerström, gambling', 'Brief intervention: motivational interviewing, psychoeducation, nurse script'];
+    const H = window.HOSPITAL || {};
     const pages = allPages.map((cols, pi) =>
       '<div class="ms-page">' +
       '<div class="ms-head"><div><div class="ms-title">' + esc(d.title) + '</div><div class="ms-sub">' + esc(subs[pi] || '') + '</div></div>' +
-      '<div class="ms-right"><b>' + esc(inst.name || '') + '</b><br>Psychiatry and Public Mental Health Residency Training Program</div></div>' +
+      '<div class="ms-right"><b>' + esc(inst.name || '') + '</b>' + (H.program ? '<br>' + esc(H.program) : '') + '</div></div>' +
       '<div class="ms-cols">' + cols.map((c) => '<div class="ms-col">' + c.map((id) => renderSection(byId[id], showEn)).join('') + '</div>').join('') + '</div>' +
-      '<div class="ms-foot"><span>' + esc(d.disclaimer) + '</span><span>Pahina ' + (pi + 1) + ' / ' + allPages.length + '</span></div></div>').join('');
+      '<div class="ms-foot"><span>' + esc(d.disclaimer) + '</span><span>' + esc(d.pageWord || 'Page') + ' ' + (pi + 1) + ' / ' + allPages.length + '</span></div></div>').join('');
 
     el.innerHTML = crumb([['Psychiatry', '#/psych'], ['MSE interviewer sheet']]) +
-      '<span class="eyebrow">Print · OPD and wards</span><h1>MSE interviewer sheet</h1>' +
-      '<p class="muted">Every screening question for the ' + LANG.name + ' MSE on four pages: mood, depression, suicide, mania, hallucinations, delusions, violence, cognition, insight and judgment, then substance use (DSM-5-TR criteria, AUDIT-C, Fagerström, gambling) and the brief intervention with psychoeducation and the nurse script. Phrases marked <span class="ms-ut">HB</span> are the same ones you drill elsewhere in the app; the rest are ward questions written for this sheet. Tap a line to hear it.</p>' +
+      '<span class="eyebrow">Print · clinic and wards</span><h1>MSE interviewer sheet</h1>' +
+      '<p class="muted">Every screening question for the ' + LANG.name + ' MSE on two pages: opening, mood, depression, suicide, mania, hallucinations, delusions, violence, substance use, anxiety, cognition, insight and judgment. Formal register (usted); the HB mark shows phrases that are also in the app with audio. The substance use pages follow when the screener is rebuilt.</p>' +
       '<div class="ho-controls row" style="margin-bottom:14px">' +
       '<button class="btn sm primary" id="msPrint">Print</button>' +
-      '<a class="btn sm" href="handouts/Spanish_MSE_Interviewer_Guide.pdf" download>Download PDF</a>' +
       '<label class="ho-chk"><input type="checkbox" id="msEn"' + (showEn ? ' checked' : '') + '> Show English</label>' +
       '<a class="btn sm ghost" href="#/psych/handout">Other handouts</a></div>' +
       '<style>@media print { @page { margin: 9mm; } }</style><div class="ms-sheet' + (showEn ? ' ms-en-on' : '') + '">' + pages + '</div>';

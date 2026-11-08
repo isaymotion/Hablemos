@@ -154,6 +154,148 @@ window.PSYCH_ANSWERS = {
       ['No quiero inyección.', 'I don\'t want an injection.', 'Refusal of IM medication; offer the oral option.'],
       ['Me voy, usted no me puede detener.', 'I\'m leaving, you can\'t stop me.', 'Elopement risk; assess capacity and safety.']
     ],
+    substance: [
+      ['No tomo.', 'I don\'t drink.'], ['Tomo los fines de semana.', 'I drink on weekends.'],
+      ['Tomo todos los días.', 'I drink every day.', 'Daily use; screen for dependence and withdrawal.'],
+      ['Como cinco cervezas.', 'About five beers.'],
+      ['Una botella de tequila cada noche.', 'A bottle of tequila every night.', 'Heavy use; risk of alcohol withdrawal.'],
+      ['Me tiemblan las manos cuando no tomo.', 'My hands shake when I can\'t drink.', 'Withdrawal tremor; assess for severe withdrawal.'],
+      ['Uso cristal.', 'I use meth.', 'Methamphetamine ("cristal"); assess psychosis and risk.'],
+      ['Solo fumo mota de vez en cuando.', 'I only smoke weed once in a while.', '"Mota" = marijuana (Mexico).'],
+      ['Tomo pastillas que compro en la calle.', 'I take pills I buy on the street.', 'Counterfeit pills often contain fentanyl; overdose risk, offer naloxone.'],
+      ['Apuesto, y estoy lleno de deudas.', 'I gamble, and I\'m deep in debt.', 'Gambling disorder; assess financial stress and suicide risk.'],
+      ['Es poquito, no es problema.', 'That\'s just a little, it\'s not a problem.', 'Minimisation; use Shea-style specific quantity questions.'],
+      ['No puedo parar.', 'I can\'t stop.', 'Loss of control.']
+    ],
+    history: [
+      ['Sí, ya me han atendido antes.', 'Yes, I\'ve had a check-up before.'], ['Nunca he visto a un psiquiatra.', 'I\'ve never seen a psychiatrist.'],
+      ['Me internaron en un hospital psiquiátrico en mi país.', 'I was admitted to a psychiatric hospital in my country.', 'Prior psychiatric hospitalisation; ask for records or the diagnosis as told to the family.'],
+      ['No me acuerdo del nombre del medicamento.', 'I can\'t remember the name of the medicine.'],
+      ['Dejé de tomar el medicamento.', 'I stopped taking the medicine.', 'Non-adherence; ask why.'],
+      ['Ya no teníamos dinero para comprarlos.', 'We had no more money to buy it.', 'Cost barrier; ask about insurance and assistance programs.'],
+      ['Porque ya me sentía mejor.', 'Because I got better already.', 'Common reason for stopping meds; psychoeducation on relapse.'],
+      ['Me daban mucho sueño.', 'It made me sleepy.', 'Side-effect-driven non-adherence.'],
+      ['Tengo la presión alta.', 'I have high blood pressure.'], ['Tengo diabetes.', 'I have diabetes.'], ['Soy alérgico a un medicamento.', 'I\'m allergic to a medicine.']
+    ],
+    'family-hx': [
+      ['Nadie en mi familia.', 'No one in our family.'],
+      ['Sí, mi papá tenía lo mismo.', 'Yes, my father had the same illness.', 'Family history of mental illness.'],
+      ['A mi tía la internaron en un psiquiátrico.', 'My aunt was admitted to a psychiatric hospital.'],
+      ['Mi abuelo se quitó la vida.', 'My grandfather took his own life.', 'Family history of suicide; raises risk.'],
+      ['Mi hermano mayor es adicto.', 'My older brother is addicted to drugs.', 'Family history of substance use (patient\'s own word).'],
+      ['Mi papá siempre andaba borracho.', 'My father was always drunk.', 'Family history of alcohol use.'],
+      ['No sé, de eso no se habla en mi familia.', 'I\'m not sure, they don\'t talk about it.', 'Stigma; collateral may be needed.'],
+      ['Dicen que mi tío estaba loco.', 'They say my uncle was crazy.', 'Lay label for possible psychosis; clarify details.']
+    ],
+    social: [
+      ['Crecí en un rancho.', 'I grew up in a village.', '"Rancho" / "pueblo" = rural home town.'],
+      ['Me crió mi abuela.', 'My grandmother raised me.'], ['Solo terminé la primaria.', 'I only finished elementary school.', 'Schooling guides the cognitive exam.'],
+      ['Ahora no tengo trabajo.', 'I have no job now.'],
+      ['Llegué hace cinco años; mis hijos se quedaron allá.', 'I came five years ago; my children stayed back home.', 'Migration separation; common source of grief and guilt.'],
+      ['Ahora vivo solo.', 'I live alone now.', 'Social isolation; risk factor.'],
+      ['Mi esposa y yo estamos separados.', 'My wife and I are separated.'],
+      ['Mi pareja me pega.', 'My partner hits me.', 'Intimate partner violence; ask privately about safety and children.'],
+      ['La vida está dura, no nos alcanza el dinero.', 'Life is hard, we don\'t have enough money.'],
+      ['Tuve una infancia feliz.', 'My childhood was happy.']
+    ],
+    collateral: [
+      ['Soy su esposa.', 'I\'m his wife.'], ['Soy su hijo.', 'I\'m his/her son.'], ['Soy su mamá.', 'I\'m his/her mother.'],
+      ['Ha cambiado mucho estos meses.', 'He/she has changed a lot these past months.'],
+      ['Habla y se ríe solo.', 'He talks and laughs alone.', 'Observed responding to internal stimuli; possible psychosis.'],
+      ['Ya no duerme y se la pasa en la calle.', 'He/she no longer sleeps and is always out.', 'Possible manic episode.'],
+      ['No quiere comer y llora todo el tiempo.', 'He/she doesn\'t want to eat and cries all the time.'],
+      ['Dijo que se quería morir.', 'He/she said he/she wanted to die.', 'Family-reported suicidal statement; take it seriously.'],
+      ['Le pega a la gente y rompe cosas.', 'He/she hits people and breaks things.', 'Aggression; assess risk to family.'],
+      ['Dicen que le hicieron un trabajo, por eso lo llevamos con un curandero.', 'They say someone put a hex on him, so we took him to a healer.', 'Explanatory model of sorcery; ask about prior healer consultation and remedies given.']
+    ],
+    'mse-cog': [
+      ['Me llamo ______.', 'My name is ______.'], ['Tengo treinta y cinco años.', 'I\'m thirty-five years old.'],
+      ['No sé qué fecha es hoy.', 'I don\'t know today\'s date.', 'Disorientation to time.'],
+      ['Estoy en un hospital.', 'I\'m in a hospital.'],
+      ['No sé dónde estoy.', 'I don\'t know where I am.', 'Disorientation to place; consider delirium or dementia.'],
+      ['Noventa y tres, ochenta y seis, setenta y nueve…', 'Ninety-three, eighty-six, seventy-nine…'],
+      ['Espere, ya se me olvidó.', 'Wait, I forgot already.', 'Impaired recall.'],
+      ['No puedo, está muy difícil.', 'I can\'t do it, it\'s hard.', 'Effort refusal vs true deficit; assess attention and schooling.'],
+      ['Me equivoqué, perdón.', 'I made a mistake, sorry.']
+    ],
+    'mse-abstract': [
+      ['Los dos son frutas.', 'They are both fruits.', 'Abstract answer.'], ['Los dos sirven para transportarse.', 'They are both for transportation.', 'Abstract answer.'],
+      ['Los dos son amarillos.', 'They are both yellow.', 'Concrete answer.'],
+      ['Que es mejor lo seguro que lo que no se sabe.', 'That a sure thing beats an uncertain one.', 'Abstract interpretation of the proverb.'],
+      ['Que es más fácil agarrar un pájaro que cien.', 'That it\'s easier to catch one bird than a hundred.', 'Concrete interpretation of the proverb.'],
+      ['No sé qué quiere decir.', 'I don\'t know what it means.'],
+      ['Lo echaría al buzón.', 'I would put it in the mailbox.', 'Reasonable judgment.'],
+      ['Me lo quedaría.', 'I would keep it.', 'Poor judgment on the found-letter question.'],
+      ['Yo no estoy enfermo, no necesito tratamiento.', 'I\'m not sick, I don\'t need treatment.', 'Absent insight.'],
+      ['A lo mejor es solo estrés, pero sí necesito ayuda.', 'Maybe it\'s just stress, but I do need help.', 'Partial insight.']
+    ],
+    'mse-describe': [
+      ['Estoy bien.', 'I\'m okay.'], ['No me he bañado estos días.', 'I haven\'t bathed these past days.', 'Poor self-care.'],
+      ['No me puedo estar quieto.', 'I can\'t settle, I can\'t sit still.', 'Psychomotor agitation or akathisia.'],
+      ['Ando muy lento.', 'I\'m moving slowly now.', 'Psychomotor retardation.'],
+      ['Me da pena mirarlo a los ojos.', 'I\'m shy to look at you.', 'Poor eye contact may be respeto, not pathology. "Pena" = embarrassment (Latin America).'],
+      ['No tengo nada que decir.', 'I have nothing I want to say.', 'Poverty of speech or guardedness.'],
+      ['Me tiemblan las manos.', 'My hands are trembling.', 'Tremor; consider medication effect, anxiety, withdrawal.'],
+      ['¿Usted también oye eso?', 'Can you hear that too?', 'Responding to internal stimuli.'],
+      ['Solo estoy cansado, no dormí.', 'I\'m just tired, I didn\'t sleep.']
+    ],
+    explain: [
+      ['Sí, entiendo.', 'Yes, I understand.'],
+      ['¿Eso quiere decir que estoy loco?', 'Does that mean I\'m crazy?', 'Stigma concern; address directly.'],
+      ['¿Me voy a curar?', 'Will I get better?'],
+      ['Yo no creo que esté enfermo.', 'I don\'t believe I\'m sick.', 'Poor insight; explore the explanatory model.'],
+      ['Yo creo que esto es un mal que me hicieron.', 'I think someone did this to me (a hex).', 'Cultural explanatory model; respect and incorporate, do not dismiss.'],
+      ['Prefiero ir primero con un curandero.', 'I would rather see a traditional healer first.'],
+      ['No quiero tomar medicinas toda la vida.', 'I don\'t want to take medicine forever.', 'Adherence concern; discuss duration and options.'],
+      ['Me da vergüenza tener esto.', 'I\'m ashamed to have this.'],
+      ['Gracias, me siento más tranquilo.', 'Thank you, I feel calmer.']
+    ],
+    meds: [
+      ['Sí, lo tomo todos los días.', 'Yes, I take it every day.'], ['A veces se me olvida.', 'I forget sometimes.'], ['Se me olvidó dos veces esta semana.', 'I missed it twice this week.'],
+      ['No tenemos dinero para la medicina.', 'We have no money to buy the medicine.', 'Cost barrier; ask about coverage and assistance.'],
+      ['Tengo sueño todo el día.', 'I\'m sleepy all day.', 'Sedation side effect.'],
+      ['Me tiemblan las manos desde que empecé esto.', 'My hands have trembled since I started this.', 'Possible extrapyramidal side effect.'],
+      ['Siento el cuello y la quijada tiesos.', 'My neck and jaw feel stiff.', 'Possible acute dystonia; urgent.'],
+      ['No me puedo quedar quieto, siempre quiero levantarme.', 'I can\'t stay still, I always want to get up.', 'Possible akathisia.'],
+      ['Subí de peso y perdí el deseo sexual.', 'I gained weight and lost my sex drive.', 'Side effects causing non-adherence; ask sensitively.'],
+      ['Lo dejé porque ya me sentía mejor.', 'I stopped because I got better.'],
+      ['Me mareo cuando me levanto.', 'I get dizzy when I stand up.', 'Orthostatic hypotension; check blood pressure.']
+    ],
+    admission: [
+      ['No quiero que me internen.', 'I don\'t want to be admitted.', 'Refusal; assess capacity and risk.'],
+      ['Está bien, acepto.', 'Okay, I agree.'], ['¿Cuánto tiempo voy a estar aquí?', 'How long will I be here?'], ['¿Me puede visitar mi familia?', 'Can my family visit me?'],
+      ['¿Quién va a cuidar a mis hijos?', 'Who will take care of my children?'], ['Voy a perder mi trabajo.', 'I will lose my job.'],
+      ['No podemos pagar.', 'We can\'t afford to pay.', 'Cost fear; involve the social worker or financial counselor early.'],
+      ['Tengo miedo aquí.', 'I\'m scared here.'], ['¿Cuándo me puedo ir a mi casa?', 'When can I go home?']
+    ],
+    child: [
+      ['Me llamo ______ y tengo ocho años.', 'I\'m ______, I\'m eight years old.'], ['Voy en quinto.', 'I\'m in fifth grade.'],
+      ['Me gusta jugar videojuegos en el celular.', 'I like playing mobile games.'],
+      ['No tengo amigos.', 'I have no friends.', 'Social isolation; ask about bullying.'],
+      ['Me hacen bullying en la escuela.', 'I get bullied at school.', 'Bullying; assess safety and mood.'],
+      ['No quiero ir a la escuela.', 'I don\'t want to go to school.', 'School refusal; explore anxiety, bullying, mood.'],
+      ['Mi mamá y mi papá se pelean.', 'Mom and Dad fight.'],
+      ['Siempre me duele la panza.', 'My stomach always hurts.', 'Somatic complaint in children; consider anxiety.'],
+      ['No me puedo quedar sentado mucho tiempo.', 'I can\'t sit for long.'],
+      ['Alguien me hace daño.', 'Someone hurts me.', 'Possible abuse; follow mandatory reporting and child protection procedures.']
+    ],
+    elderly: [
+      ['Buenos días, doctora.', 'Good morning to you too.'],
+      ['¿Qué? No oigo bien.', 'What? I can\'t hear.', 'Hearing impairment; adjust approach before cognitive testing.'],
+      ['Ya se me olvidan las cosas.', 'I forget things now.', 'Subjective memory decline.'],
+      ['Me pierdo hasta en mi colonia.', 'I get lost even in our neighborhood.', 'Disorientation; dementia concern. "Colonia" (Mexico) / "barrio" = neighborhood.'],
+      ['No sé qué día es.', 'I don\'t know what day it is.'],
+      ['En las noches ando inquieta y confundida.', 'Every night I\'m restless and confused.', 'Sundowning or delirium.'],
+      ['Veo gente que no está.', 'I see people who aren\'t there.', 'Visual hallucinations; consider delirium or Lewy body disease.'],
+      ['Estoy sola, ya nadie me visita.', 'I\'m alone now, no one visits.', 'Isolation; screen for depression.'],
+      ['No duermo y me duele todo el cuerpo.', 'I can\'t sleep and my body always hurts.']
+    ],
+    closing: [
+      ['Gracias, doctora.', 'Thank you, Doctor.'], ['Sí, así es, lo resumió bien.', 'Yes, your summary is correct.'], ['No, le faltó algo.', 'No, you missed something.'],
+      ['Hay algo más que quiero decirle.', 'There\'s something else I want to say.'], ['Quiero preguntarle si me voy a curar.', 'I want to ask if I will get better.'],
+      ['¿Cuándo es mi próxima cita?', 'When is my next visit?'], ['No tengo más preguntas.', 'I have no more questions.'],
+      ['Todavía estoy nervioso, pero me siento un poco más tranquilo.', 'I\'m still nervous but I feel a bit calmer.'], ['Espero que me pueda ayudar.', 'I hope you can help me.']
+    ],
     'shea-techniques': [
       ['Como diez cervezas de una sentada.', 'About ten beers in one sitting.', 'Large quantity; shows the value of normalising and specific numbers.'],
       ['No las cuento, nada más me emborracho.', 'I can\'t count, I just get drunk.', 'Heavy use; possible minimisation or blackouts.'],

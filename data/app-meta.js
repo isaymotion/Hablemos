@@ -3,7 +3,7 @@ window.APP_META = {
   name: 'Hablemos',
   short: 'Hablemos',
   tagline: 'Spanish for the psychiatric interview',
-  version: '0.2.0',
+  version: '0.3.0',
   repo: 'Hablemos',
   updated: 'November 2026',
   author: 'Isabella Navarro, MD',
@@ -11,7 +11,7 @@ window.APP_META = {
   // Institution shown on handouts and in the ward tools. Hablemos is not tied to one hospital: the forms it
   // follows are generic, and the name, address and form labels are read from data/hospital.js (edit that file
   // for your own service). Form numbers stay empty unless your hospital has them.
-  institution: { name: (window.HOSPITAL && HOSPITAL.name) || 'Your hospital', address: (window.HOSPITAL && HOSPITAL.address) || '', short: (window.HOSPITAL && HOSPITAL.shortName) || '', deescForm: (window.HOSPITAL && HOSPITAL.forms && HOSPITAL.forms.deesc) || '', dischargeForm: (window.HOSPITAL && HOSPITAL.forms && HOSPITAL.forms.discharge) || '' },
+  institution: { name: (window.HOSPITAL && HOSPITAL.name) || '', address: (window.HOSPITAL && HOSPITAL.address) || '', short: (window.HOSPITAL && HOSPITAL.shortName) || '', deescForm: (window.HOSPITAL && HOSPITAL.forms && HOSPITAL.forms.deesc) || '', dischargeForm: (window.HOSPITAL && HOSPITAL.forms && HOSPITAL.forms.discharge) || '' },
   attribution: 'App created by Isabella Navarro, MD. Latest version November 2026. isaymotion@gmail.com'
 };
 

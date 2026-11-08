@@ -6,7 +6,7 @@
 
 **App created by Isabella Navarro, MD. Latest version November 2026. isaymotion@gmail.com**
 
-Version **0.2.0**: the Usap Tayo engine with a Spanish language pack and the first twelve interview sections (opening to de-escalation), Shea's techniques and patient replies, all draft for review. The remaining content arrives in passes.
+Version **0.3.0**: the Usap Tayo engine with a Spanish language pack and all 27 interview sections (opening to closing, plus Shea's techniques), patient replies for every section, the interview flow handout and the MSE interviewer sheet, all draft for review. Clinical tools, practice cases and the learn track arrive in later passes.
 
 ## What it is
 
@@ -18,8 +18,8 @@ Every Spanish section is **Draft for review** until a native Spanish-speaking cl
 
 | Pass | Content | State |
 |---|---|---|
-| 1 | Core interview phrases (opening and consent, HPI, mood, anxiety, psychosis, suicide and violence risk, substances, history, closing) | Part one done in 0.2.0 (opening to de-escalation, 12 sections + Shea's techniques, draft for review); substances, history, family, social, collateral, closing next |
-| 2 | Mental status exam: interviewer sheet, point-board replies, listening drill | Point-board replies and listening drill live for the 0.2.0 sections; MSE sections and sheet pending |
+| 1 | Core interview phrases (opening and consent, HPI, mood, anxiety, psychosis, suicide and violence risk, substances, history, closing) | Done in 0.3.0: all 27 sections (draft for review) |
+| 2 | Mental status exam: interviewer sheet, point-board replies, listening drill | Done in 0.3.0: MSE sections, two-page interviewer sheet, replies and listening drill for every section (draft for review) |
 | 3 | Clinical tools: mood episode checker, substance use screener, withdrawal and agitation guide, with published validated Spanish versions of the PHQ-9 and MDQ rather than fresh translations | Pending |
 | 4 | Practice cases: case simulations, discharge and admission MSE practice | Pending |
 | 5 | Spanish learn track: dictionary, lessons, reading, dialogues | Pending |
@@ -36,7 +36,7 @@ The app shares its engine with Usap Tayo. The language pack `js/lang.js` sets vo
 | **Point board** | The patient taps a reply, the phone speaks it and the interviewer reads the English. General replies, a 0 to 10 scale and likely replies for each interview section. | Live (draft for review) |
 | **Listening drill** | Hear a patient or family reply, choose its meaning from four, then see the Spanish. | Live (draft for review) |
 | **Case simulations** | Interactive interviews with feedback and an MSE summary. | Engine ready, content pending |
-| **MSE interviewer sheet** | Printable pages of screening questions for the OPD and wards. | Engine ready, content pending |
+| **MSE interviewer sheet** | Printable pages of screening questions for the OPD and wards. | Live (draft for review) |
 | **Substance use screener** | Criteria-based screening with severity, a copyable chart line and brief intervention. | Engine ready, content pending |
 | **Mood episode checker** | Tap-to-count DSM-5-TR checker for depressive and manic episodes, with PHQ-9 and MDQ. | Engine ready, content pending |
 | **Withdrawal and agitation guide** | Bedside reference with PAWSS, CIWA-Ar and an agitation guide. | Engine ready, content pending |
