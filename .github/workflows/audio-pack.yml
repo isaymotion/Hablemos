@@ -1,0 +1,61 @@
+# Records the Spanish audio pack with a natural Spanish voice and commits it to the repo.
+# Runs automatically when app content changes, or by hand: Actions tab → "Build Spanish audio pack" → Run workflow.
+name: Build Spanish audio pack
+
+on:
+  workflow_dispatch:
+    inputs:
+      voice:
+        description: 'Voice'
+        type: choice
+        default: es-MX-DaliaNeural
+        options: [es-MX-DaliaNeural, es-MX-JorgeNeural, es-US-PalomaNeural, es-US-AlonsoNeural]
+      rate:
+        description: 'Speaking rate (e.g. -5%, -15% for slower)'
+        default: '-5%'
+      rebuild:
+        description: 'Re-record every clip (use after changing voice or rate)'
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths: ['js/data/**', 'js/lang.js', 'tools/**', '.github/workflows/audio-pack.yml']
+
+permissions:
+  contents: write
+
+concurrency:
+  group: audio-pack
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version: 20 }
+      - uses: actions/setup-python@v6
+        with: { python-version: '3.12' }
+      - name: Install voice tool
+        run: pip install --upgrade edge-tts
+      - name: Collect phrases
+        run: node tools/collect-texts.js
+      - name: Record audio
+        run: |
+          python tools/make_audio_pack.py \
+            --voice="${{ inputs.voice || 'es-MX-DaliaNeural' }}" \
+            --rate="${{ inputs.rate || '-5%' }}" \
+            ${{ inputs.rebuild && '--rebuild' || '' }}
+      - name: Commit audio pack
+        if: always()
+        run: |
+          [ -d audio ] || exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add audio tools/texts.json
+          if git diff --cached --quiet; then echo "No audio changes"; exit 0; fi
+          git commit -m "Update Spanish audio pack"
+          git pull --rebase origin main
+          git push
