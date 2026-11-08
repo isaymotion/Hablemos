@@ -1,14 +1,42 @@
-/* Interview flow and MSE structure used by the handout generator (EMPTY SHELL).
-   Hablemos (Spanish). Field names stay `tl`, `f`, `c` for engine compatibility: `tl` = the Spanish text; registers are
-   f = usted (formal), c = tú (informal). Shell: no content yet. Once populated, mark this file
-   "Draft for review by a native Spanish-speaking clinician" until it has been reviewed.
-   Phrases are referenced as "sectionId:index" into PSYCH_SECTIONS.
-   PSYCH_FLOW:       [ { id, title, goal, sections: [sectionId], key: ['sectionId:index'], tip } ]
+/* Interview flow and MSE structure used by the handout generator and the psychiatry hub.
+   Phrases are referenced as "sectionId:index" into PSYCH_SECTIONS (indexes mirror Usap Tayo's sections).
+   PSYCH_FLOW:       [ { id, title, goal, sections: [sectionId], key: ['sectionId:index'], tip?, branch? } ]
    PSYCH_FLOW_EXTRA: same shape, optional add-on sections (handout.js concatenates it after PSYCH_FLOW).
-   PSYCH_MSE:        [ { domain, assess, ask: ['sectionId:index'], terms: ['sectionId:index'] } ]
-   Example PSYCH_FLOW element:
-     { id: 'open', title: 'Opening and rapport', goal: 'Introduce yourself and set a respectful tone.', sections: ['opening'],
-       key: ['opening:0', 'opening:1'], tip: 'Start with usted; follow the patient\'s lead if they prefer tú.' } */
-window.PSYCH_FLOW = [];
-window.PSYCH_FLOW_EXTRA = [];
-window.PSYCH_MSE = [];
+   PSYCH_MSE:        [ { domain, assess, ask: ['sectionId:index'], terms: ['sectionId:index'], note? } ]
+   Every `sections` entry must exist in PSYCH_SECTIONS (the handout builder reads them directly); `ask`/`terms`
+   refs to sections that are not written yet are skipped, so the MSE table can already name them.
+   Steps for the sections that arrive in later releases (substance, history, family, social, collateral, MSE,
+   explaining, closing) are added when those sections land. Field names: f = usted, c = tú.
+   STATUS: DRAFT FOR REVIEW by a native Spanish-speaking clinician (tips only; the phrases live in psych-phrases.js). */
+window.PSYCH_FLOW = [
+  { id: 'open', title: 'Opening and rapport', goal: 'Introduce yourself, agree on language, and set a respectful tone.', sections: ['opening'], key: ['opening:0', 'opening:1', 'opening:3', 'opening:4', 'opening:9'], tip: 'Start with usted. Follow the patient\'s lead if they offer tú. A minute of personal conversation (personalismo) before the questions is time well spent.' },
+  { id: 'consent', title: 'Confidentiality and consent', goal: 'Explain privacy and its limits; ask permission to involve family; offer an interpreter.', sections: ['consent'], key: ['consent:0', 'consent:1', 'consent:2'] },
+  { id: 'hpi', title: 'Chief complaint and history of present illness', goal: 'Open questions first, then onset, course, triggers, impact, and the patient\'s own explanation.', sections: ['cc-hpi'], key: ['cc-hpi:0', 'cc-hpi:2', 'cc-hpi:4', 'cc-hpi:5', 'cc-hpi:6', 'cc-hpi:9', 'cc-hpi:10', 'cc-hpi:13'], tip: 'Ask "¿Qué quiere decir con eso?" whenever the patient uses an idiom such as "nervios", "ataque de nervios", "susto" or "me siento pesado".' },
+  { id: 'mood', title: 'Mood: depressed mood and SIGECAPS', goal: 'Gate (depressed mood or anhedonia for two weeks), then SIGECAPS; one gate symptom plus five of nine. Screen for past elevated mood before any antidepressant.', sections: ['depression'], key: ['depression:1', 'depression:2', 'depression:5', 'depression:7', 'depression:8', 'depression:9', 'depression:10', 'depression:11', 'depression:12', 'depression:13', 'depression:18'], branch: 'Hopelessness, "ya no aguanto", "estoy cansado de vivir" → go to suicide risk now.' },
+  { id: 'mania', title: 'Mood: elevated, expansive or irritable mood and DIGFAST', goal: 'Gate (a distinct period of elevated, expansive, or irritable mood with increased energy), then DIGFAST; three of seven (four if only irritable), one week for mania, four days for hypomania.', sections: ['mania'], key: ['mania:0', 'mania:1', 'mania:3', 'mania:4', 'mania:5', 'mania:6', 'mania:7', 'mania:8', 'mania:9', 'mania:10'] },
+  { id: 'anx', title: 'Anxiety, panic, and OCD', goal: 'Worry, panic attacks, avoidance, obsessions, and compulsions.', sections: ['anxiety'], key: ['anxiety:0', 'anxiety:2', 'anxiety:3', 'anxiety:5', 'anxiety:6'], tip: 'An "ataque de nervios" may be a panic attack, a dissociative episode or a culturally shaped reaction to a family crisis; ask what happened step by step.' },
+  { id: 'trauma', title: 'Trauma', goal: 'Ask gently; details are optional. Check current safety.', sections: ['trauma'], key: ['trauma:0', 'trauma:1', 'trauma:2', 'trauma:6', 'trauma:7'] },
+  { id: 'percept', title: 'Psychosis: perception', goal: 'Normalize, then ask each modality. Content, frequency, command type, and response.', sections: ['hallucinations'], key: ['hallucinations:0', 'hallucinations:1', 'hallucinations:2', 'hallucinations:3', 'hallucinations:4', 'hallucinations:10', 'hallucinations:11', 'hallucinations:13', 'hallucinations:14', 'hallucinations:22'], branch: 'Command hallucinations to harm → suicide and violence risk now.', tip: 'Hearing or seeing a deceased relative, presencias, or visions during prayer may be culturally shared. Ask whether family members experience or believe the same.' },
+  { id: 'thought', title: 'Psychosis: thought content', goal: 'Persecution, reference, grandiosity, passivity phenomena; check conviction and actions taken.', sections: ['delusions'], key: ['delusions:0', 'delusions:1', 'delusions:3', 'delusions:5', 'delusions:6', 'delusions:7', 'delusions:10', 'delusions:13', 'delusions:17', 'delusions:19'], tip: 'Fear of being watched or deported can be realistic; check the facts before calling it persecutory.' },
+  { id: 'suicide', title: 'Suicide and self-harm risk', goal: 'Passive → active ideation → plan → means → preparation → intent → past attempts → protective factors.', sections: ['suicide'], key: ['suicide:0', 'suicide:1', 'suicide:3', 'suicide:5', 'suicide:7', 'suicide:8', 'suicide:9', 'suicide:11', 'suicide:12', 'suicide:15', 'suicide:18', 'suicide:19'], tip: 'Asking directly does not increase risk. Use "suicidarse" and "quitarse la vida". Always ask about firearms in the home.' },
+  { id: 'violence', title: 'Violence risk', goal: 'Thoughts of harming others, target, history, weapons.', sections: ['violence'], key: ['violence:0', 'violence:1', 'violence:2', 'violence:3'] }
+];
+window.PSYCH_FLOW_EXTRA = [
+  { id: 'deesc', title: 'De-escalation with an agitated patient', goal: 'Calm voice, simple words, choices; keep yourself and the staff safe.', sections: ['deescalation'], key: ['deescalation:0', 'deescalation:1', 'deescalation:4', 'deescalation:5', 'deescalation:6', 'deescalation:10'] }
+];
+window.PSYCH_MSE = [
+  { domain: 'Appearance', assess: 'Grooming, hygiene, dress, apparent age, distinguishing features', ask: [], terms: ['mse-describe:0', 'mse-describe:1'] },
+  { domain: 'Behavior', assess: 'Eye contact, cooperation, psychomotor activity, abnormal movements', ask: [], terms: ['mse-describe:2', 'mse-describe:3', 'mse-describe:4', 'mse-describe:12', 'mse-describe:13'], note: 'Lowered eyes or deference to the doctor can be respeto, not avoidance.' },
+  { domain: 'Speech', assess: 'Rate, volume, amount, fluency, language used (Spanish, English, code-switching, regional variety)', ask: [], terms: ['mse-describe:5', 'mse-describe:6'] },
+  { domain: 'Mood', assess: 'Patient\'s own words, quoted in Spanish with translation', ask: ['opening:9', 'depression:0', 'depression:4'], terms: ['mse-describe:16', 'mse-describe:17'] },
+  { domain: 'Affect', assess: 'Range, intensity, stability, congruence with mood', ask: [], terms: ['mse-describe:7', 'mse-describe:8'] },
+  { domain: 'Thought process', assess: 'Goal-directed, circumstantial, tangential, loose, flight of ideas', ask: ['cc-hpi:12'], terms: ['mse-describe:9', 'mse-describe:10'] },
+  { domain: 'Thought content', assess: 'Delusions, obsessions, preoccupations, suicidal and homicidal ideation', ask: ['delusions:0', 'delusions:6', 'suicide:3', 'violence:0'], terms: [] },
+  { domain: 'Perception', assess: 'Hallucinations by modality, illusions, depersonalization', ask: ['hallucinations:1', 'hallucinations:2', 'hallucinations:4'], terms: ['mse-describe:11'] },
+  { domain: 'Orientation', assess: 'Person, place, time', ask: ['mse-cog:3', 'mse-cog:5', 'mse-cog:7'], terms: ['mse-describe:14'] },
+  { domain: 'Attention', assess: 'Serial 7s, months of the year backwards, digit span', ask: ['mse-cog:11', 'mse-cog:12', 'mse-cog:13'], terms: [] },
+  { domain: 'Memory', assess: 'Registration, recall at 5 minutes, recent and remote memory', ask: ['mse-cog:10', 'mse-cog:14', 'mse-cog:15'], terms: [] },
+  { domain: 'Abstraction', assess: 'Similarities and Spanish proverbs (refranes); note schooling and literacy', ask: ['mse-abstract:0', 'mse-abstract:2'], terms: [] },
+  { domain: 'Insight', assess: 'Awareness of illness and need for treatment', ask: ['mse-abstract:7', 'mse-abstract:8', 'mse-abstract:9'], terms: ['mse-describe:15'] },
+  { domain: 'Judgment', assess: 'Hypothetical scenarios and recent real decisions', ask: ['mse-abstract:5', 'mse-abstract:6', 'mse-abstract:10'], terms: [] }
+];

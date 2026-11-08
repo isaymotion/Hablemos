@@ -1,10 +1,158 @@
-/* Shea's validity techniques and the links to the Psychiatric Interviewing Trainer (EMPTY SHELL).
-   Hablemos (Spanish). Field names stay `tl`, `f`, `c` for engine compatibility: `tl` = the Spanish text; registers are
-   f = usted (formal), c = tú (informal). Shell: no content yet. Once populated, mark this file
-   "Draft for review by a native Spanish-speaking clinician" until it has been reviewed.
-   The original appended a "shea-techniques" section to PSYCH_SECTIONS; that side effect is dropped here.
-   Shape: window.SHEA_TRAINER = { name, base, root, reviewed (bool), draftNotice }
-          window.SHEA_LINKS   = { <PSYCH_SECTIONS id>: [ { ch, sec, label } ] | { ch, sec, label } | { href, label } }
-   Example SHEA_LINKS entry:  'wd-agitation': { ch: 'ch12', sec: 'thought-and-gates', label: 'Chapter 12: The agitated psychotic patient' } */
-window.SHEA_TRAINER = { name: '', base: '', root: '', reviewed: false, draftNotice: '' };
-window.SHEA_LINKS = {};
+/* Shea's validity techniques in Spanish, and the links between Hablemos and the Psychiatric Interviewing Trainer
+   (https://isaymotion.github.io/sheatrainer/), the companion study app built on Shea's Psychiatric Interviewing (3rd ed.).
+
+   1. One phrase section, appended to PSYCH_SECTIONS (so the core section indexes are unchanged).
+      Every phrase is an original, conversational Spanish wording written for training (US / Mexican baseline, f = usted,
+      c = tú). The English describes the technique; the Spanish is not a translation from the book and is not attributed to it.
+      STATUS: DRAFT FOR REVIEW by a native Spanish-speaking clinician. Set REVIEWED to true once approved to hide the notice.
+   2. SHEA_LINKS: for each psych section, the trainer chapter and section that teach the technique behind the phrases.
+      A value may be one link or an array of links (most relevant first). Rendered as "Technique notes" at the top of the section.
+      A link is { ch, sec, label } for a study-guide section, or { href: '#/drills/<id>' | '#/simulate/<id>' | '#/practice/<chN>', label }.
+      The trainer's Tagalog drills and simulations are not linked here; Spanish ones can be added when they exist. */
+(function () {
+  const REVIEWED = false;
+  window.SHEA_TRAINER = {
+    name: 'Psychiatric Interviewing Trainer', base: 'https://isaymotion.github.io/sheatrainer/#/learn/', root: 'https://isaymotion.github.io/sheatrainer/', reviewed: REVIEWED,
+    draftNotice: 'Draft wording. These Spanish phrasings are new and have not yet been reviewed by a native Spanish-speaking clinician. Check them with your seniors or a certified interpreter before using them with patients.'
+  };
+
+  const T = (en, f, c, n) => ({ en, f, c, n });
+  window.PSYCH_SECTIONS.push({
+    id: 'shea-techniques', group: 'Interview', title: 'Asking so the truth can come out (Shea\'s techniques)',
+    draft: !REVIEWED,
+    intro: 'Shea\'s validity techniques, phrased in Spanish: gentle assumption, symptom amplification, denial of the specific, behavioral incidents, shame attenuation, normalization, anchor questions, and the mood questions that trip up most interviews. Each note names the technique; the trainer app explains it.',
+    phrases: [
+      T('What other ways have you thought of ending your life?',
+        '¿De qué otras maneras ha pensado en quitarse la vida?',
+        '¿De qué otras maneras has pensado en quitarte la vida?',
+        'Gentle assumption: assumes other methods exist and asks which, instead of whether. Use only when the behavior is likely; never with a patient who has denied all ideation.'),
+      T('How much do you drink on a typical day?',
+        '¿Cuánto toma en un día normal?',
+        '¿Cuánto tomas en un día normal?',
+        'Gentle assumption for drinking, once drinking is established. "¿Usted toma?" invites a no. "Tomar" = to drink alcohol in Latin America; "beber" in Spain.'),
+      T('On the days you drink the most, how many beers do you finish? Ten? Fifteen?',
+        'Los días que más toma, ¿cuántas cervezas se termina? ¿Diez? ¿Quince?',
+        'Los días que más tomas, ¿cuántas cervezas te terminas? ¿Diez? ¿Quince?',
+        'Symptom amplification: set the anchor high so that minimizing still lands near the truth. Adjust to the local drink (cervezas, caguamas, tragos, shots de tequila, una botella).'),
+      T('Have you ever thought of overdosing on your medicines?',
+        '¿Alguna vez ha pensado en tomarse una sobredosis de sus medicamentos?',
+        '¿Alguna vez has pensado en tomarte una sobredosis de tus medicinas?',
+        'Denial of the specific: after a general denial, name one concrete method at a time (pills, hanging, jumping, cutting, a gun).'),
+      T('Have you ever thought of hanging yourself?',
+        '¿Alguna vez ha pensado en ahorcarse?',
+        '¿Alguna vez has pensado en ahorcarte?',
+        'Denial of the specific, continued. Ask each method as its own question and pause for the answer. In the US always add: "¿Ha pensado en usar un arma de fuego?"'),
+      T('What happened next? What did you do then?',
+        '¿Qué pasó después? ¿Qué hizo entonces?',
+        '¿Qué pasó después? ¿Qué hiciste entonces?',
+        'Behavioral incident (sequencing): asks for the next concrete action, not for motives or feelings.'),
+      T('Did you take the pills out of the bottle? How many were in your hand?',
+        '¿Sacó las pastillas del frasco? ¿Cuántas tenía en la mano?',
+        '¿Sacaste las pastillas del frasco? ¿Cuántas tenías en la mano?',
+        'Behavioral incident (fact): builds the "verbal video" of the event one detail at a time.'),
+      T('Where was the rope? Did you put it around your neck?',
+        '¿Dónde estaba la cuerda? ¿Se la puso alrededor del cuello?',
+        '¿Dónde estaba la cuerda? ¿Te la pusiste alrededor del cuello?',
+        'Behavioral incident (fact) for a hanging attempt. Concrete facts separate rehearsal from an aborted attempt.'),
+      T('With everything you\'ve been carrying, have you ever felt like hitting someone?',
+        'Con todo lo que ha estado cargando, ¿alguna vez ha sentido ganas de golpear a alguien?',
+        'Con todo lo que has estado cargando, ¿alguna vez has sentido ganas de golpear a alguien?',
+        'Shame attenuation: frames the behavior as an understandable response to the patient\'s burden before asking about it.'),
+      T('Many people who are this stressed have thoughts of hurting themselves. Has that happened to you?',
+        'Muchas personas con tanto estrés tienen pensamientos de hacerse daño. ¿Le ha pasado a usted?',
+        'Mucha gente con tanto estrés tiene pensamientos de hacerse daño. ¿Te ha pasado a ti?',
+        'Normalization: says that others in the same situation have had the thought, then asks. A good first question about self-harm.'),
+      T('Is there anything else you\'ve thought of doing, even once?',
+        '¿Hay algo más que haya pensado hacer, aunque sea una sola vez?',
+        '¿Hay algo más que hayas pensado hacer, aunque sea una sola vez?',
+        'Catch-all question: finishes a list of methods or behaviors gently. "Aunque sea una sola vez" lowers the bar for admitting.'),
+      T('Around Christmas, were you already feeling this way, or did it start after?',
+        'Por la Navidad, ¿ya se sentía así, o empezó después?',
+        'Por la Navidad, ¿ya te sentías así, o empezó después?',
+        'Anchor question: ties recall to a memorable event (Navidad, Año Nuevo, Día de las Madres, a quinceañera, the start of school, a move). Patients first give the date things got bad, so ask a second time and push earlier.'),
+      T('Just the past two weeks now: how has your sleep been?',
+        'Solo las últimas dos semanas: ¿cómo ha dormido?',
+        'Solo las últimas dos semanas: ¿cómo has dormido?',
+        'Framing the window for the recent history. Repeat the frame every few questions; pain pulls patients back to earlier symptoms.'),
+      T('Lately, do you still enjoy the things you used to enjoy, or has that changed?',
+        'Últimamente, ¿todavía disfruta de las cosas que antes le gustaban, o eso ha cambiado?',
+        'Últimamente, ¿todavía disfrutas de las cosas que antes te gustaban, o eso ha cambiado?',
+        'Anhedonia, asked after you have learned what the patient enjoys (novelas, fútbol, music, church, cooking for the family, the grandchildren).'),
+      T('Do you wake up too early with worries already running, and can\'t get back to sleep?',
+        '¿Se despierta demasiado temprano, ya con las preocupaciones dando vueltas, y no puede volver a dormirse?',
+        '¿Te despiertas demasiado temprano, ya con las preocupaciones dando vueltas, y no puedes volver a dormirte?',
+        'Early morning awakening, asked by describing how it feels rather than only asking the time.'),
+      T('Depression often lowers appetite and sexual interest too. Has it affected your interest in sex? I mean interest, not whether you are having it.',
+        'La depresión muchas veces también baja el apetito y el interés sexual. ¿Ha afectado su interés en el sexo? Me refiero al interés, no a si tiene relaciones.',
+        'La depresión muchas veces también baja el apetito y el interés sexual. ¿Ha afectado tu interés en el sexo? Me refiero al interés, no a si tienes relaciones.',
+        'Libido, asked matter-of-factly with the normalizing reason attached, and clarified as interest rather than activity.'),
+      T('Has there ever been a stretch of days when you felt the opposite: full of energy, hardly needing sleep, ready to take on anything?',
+        '¿Alguna vez hubo una racha de días en que se sintió lo contrario: lleno de energía, casi sin necesidad de dormir, capaz de cualquier cosa?',
+        '¿Alguna vez hubo una racha de días en que te sentiste lo contrario: lleno de energía, casi sin necesidad de dormir, capaz de cualquier cosa?',
+        'The mania screen every depressed patient should hear. Add that it may have come right after a low period.'),
+      T('Do you get spells, even just hours, when you suddenly feel unusually up and energized for no reason, and it strikes you as odd?',
+        '¿Tiene ratos, aunque sean solo horas, en que de repente se siente inusualmente animado y con energía sin motivo, y a usted mismo le parece raro?',
+        '¿Tienes ratos, aunque sean solo horas, en que de repente te sientes inusualmente animado y con energía sin motivo, y a ti mismo te parece raro?',
+        'Euphoric hypomania screen. The "le parece raro" clause screens out ordinary good days.'),
+      T('And spells when your thoughts suddenly race in an unpleasant way, everything feels angrier and darker, and you can\'t explain why?',
+        '¿Y ratos en que de repente los pensamientos se le aceleran de una forma desagradable, todo se siente más oscuro y con más rabia, y no sabe explicar por qué?',
+        '¿Y ratos en que de repente los pensamientos se te aceleran de una forma desagradable, todo se siente más oscuro y con más rabia, y no sabes explicar por qué?',
+        'Dysphoric hypomania screen, asked right after the euphoric one.'),
+      T('Do you feel you have to do something about this right now, even if part of you knows it isn\'t wise?',
+        '¿Siente que tiene que hacer algo al respecto ahora mismo, aunque una parte de usted sepa que no es prudente?',
+        '¿Sientes que tienes que hacer algo al respecto ahora mismo, aunque una parte de ti sepa que no es prudente?',
+        'Drivenness: a patient in a dysphoric mania feels pushed to act; a patient in an agitated depression feels helpless.'),
+      T('Would you say you\'ve been feeling sad, or unhappy? Have you been feeling like yourself lately?',
+        '¿Diría que se ha sentido triste, o infeliz? ¿Se ha sentido usted mismo últimamente?',
+        '¿Dirías que te has sentido triste, o infeliz? ¿Te has sentido tú mismo últimamente?',
+        'When "deprimido" is denied: switch words. About a third of depressed patients deny being depressed and admit to sadness or to not being themselves. Use "usted misma" / "tú misma" for a woman.'),
+      T('When was the last time you felt like crying?',
+        '¿Cuándo fue la última vez que sintió ganas de llorar?',
+        '¿Cuándo fue la última vez que sentiste ganas de llorar?',
+        'Gentle assumption for tearfulness: asks only about the urge, so a patient who will not admit to crying can still answer.'),
+      T('For some people the low mood stays day after day; for others it comes and goes. Which is more like you?',
+        'Para algunas personas el desánimo se queda día tras día; para otras va y viene. ¿Cuál se parece más a usted?',
+        'Para algunas personas el desánimo se queda día tras día; para otras va y viene. ¿Cuál se parece más a ti?',
+        'Persistence: "deprimido por años" often means fluctuating mood, not a major depressive episode. Two weeks, nearly every day, is the bar.'),
+      T('Has anyone in your family, including grandparents, aunts, uncles, and cousins, had problems like yours, or been admitted for their nerves?',
+        '¿Alguien de su familia, incluyendo abuelos, tíos y primos, ha tenido problemas como los suyos, o ha estado internado por los nervios?',
+        '¿Alguien de tu familia, incluyendo abuelos, tíos y primos, ha tenido problemas como los tuyos, o ha estado internado por los nervios?',
+        'Family history: name the relatives, cue off the patient\'s own symptoms, and use lay words ("de los nervios", "le dio una crisis"). Ask about drinking separately; many do not count it as an illness.'),
+      T('Has anyone in your family ever tried to take their own life, or died that way?',
+        '¿Alguien de su familia ha intentado quitarse la vida, o ha muerto así?',
+        '¿Alguien de tu familia ha intentado quitarse la vida, o ha muerto así?',
+        'Family suicide, asked as its own question. Patients who have just denied any family illness often remember a suicide here.')
+    ]
+  });
+
+  window.SHEA_LINKS = {
+    opening: [{ ch: 'ch3', sec: 'introduction', label: 'Chapter 3: The introduction' }, { ch: 'ch12', sec: 'culture-language', label: 'Chapter 12: Culture and language (ask which language the patient thinks in)' }],
+    consent: { ch: 'ch3', sec: 'confidentiality', label: 'Chapter 3: Addressing confidentiality' },
+    'cc-hpi': { ch: 'ch9', sec: 'persistence', label: 'Chapter 9: The history of the present illness' },
+    depression: [{ ch: 'ch9', sec: 'exploring', label: 'Chapter 9: Exploring anhedonia and the neurovegetative symptoms' }, { ch: 'ch10', sec: 'biological', label: 'Chapter 10: The body as first messenger' }, { ch: 'ch10', sec: 'window-shade', label: 'Chapter 10: The window shade response' }],
+    mania: { ch: 'ch9', sec: 'bipolar-trap', label: 'Chapter 9: The bipolar trap' },
+    anxiety: { ch: 'ch2', sec: 'ocd', label: 'Chapter 2: The normalizing OCD screen' },
+    trauma: { ch: 'ch5', sec: 'raising', label: 'Chapter 5: Raising a sensitive topic' },
+    hallucinations: [{ ch: 'ch12', sec: 'raising-voices', label: 'Chapter 12: Raising voices and exploring them' }, { ch: 'ch12', sec: 'commands', label: 'Chapter 12: Command hallucinations' }, { ch: 'ch16', sec: 'perception', label: 'Chapter 16: Perception' }],
+    delusions: [{ ch: 'ch11', sec: 'life-cycle', label: 'Chapter 11: Soft signs and exploring a delusion' }, { ch: 'ch11', sec: 'delusional-disorders', label: 'Chapter 11: Delusional disorders and dangerousness' }, { ch: 'ch12', sec: 'porous-ego', label: 'Chapter 12: First-rank symptoms' }, { ch: 'ch16', sec: 'content', label: 'Chapter 16: Thought content' }],
+    suicide: [{ ch: 'ch17', sec: 'case-approach', label: 'Chapter 17: The CASE Approach' }, { ch: 'ch10', sec: 'themes', label: 'Chapter 10: Burdensomeness and hopelessness' }, { ch: 'ch12', sec: 'commands', label: 'Chapter 12: Command hallucinations' }],
+    violence: { ch: 'ch18', sec: 'presenting-recent', label: 'Chapter 18: Presenting and recent violent events' },
+    deescalation: [{ ch: 'ch8', sec: 'violence', label: 'Chapter 8: Calming a potentially violent patient' }, { ch: 'ch15', sec: 'complementary', label: 'Chapter 15: Complementary shifts with an angry patient' }],
+    substance: [{ ch: 'ch5', sec: 'finishing-lists', label: 'Chapter 5: Gentle assumption and symptom amplification' }, { ch: 'ch11', sec: 'visual-withdrawal', label: 'Chapter 11: Asking about withdrawal' }],
+    history: { ch: 'ch9', sec: 'melancholia-anxiety', label: 'Chapter 9: The past psychiatric history' },
+    'family-hx': { ch: 'ch9', sec: 'family-history', label: 'Chapter 9: The family history' },
+    social: [{ ch: 'ch6', sec: 'wellness', label: 'Chapter 6: The wellness triad' }, { ch: 'ch13', sec: 'social-history', label: 'Chapter 13: Reading the social history for personality patterns' }, { ch: 'ch14', sec: 'probes', label: 'Chapter 14: Probe questions for personality disorders' }],
+    collateral: [{ ch: 'ch18', sec: 'corroboration', label: 'Chapter 18: Corroboration' }, { ch: 'ch12', sec: 'families', label: 'Chapter 12: Families of patients with psychosis' }, { ch: 'ch10', sec: 'family', label: 'Chapter 10: The whole family has the depression' }],
+    'mse-cog': [{ ch: 'ch16', sec: 'cognition', label: 'Chapter 16: Sensorium, cognition, and insight' }, { ch: 'ch11', sec: 'delirium', label: 'Chapter 11: Delirium and the bedside attention tests' }],
+    'mse-abstract': { ch: 'ch16', sec: 'cognition', label: 'Chapter 16: Sensorium, cognition, and insight' },
+    'mse-describe': { ch: 'ch16', sec: 'documenting', label: 'Chapter 16: Documenting the mental status' },
+    explain: [{ ch: 'ch2', sec: 'collab', label: 'Chapter 2: Collaborative interviewing' }, { ch: 'ch13', sec: 'benefits', label: 'Chapter 13: Fitting the treatment discussion to the personality' }, { ch: 'ch15', sec: 'splitting', label: 'Chapter 15: Collaborative planning when a patient splits' }],
+    admission: { ch: 'ch3', sec: 'closing', label: 'Chapter 3: The closing' },
+    closing: [{ ch: 'ch3', sec: 'closing', label: 'Chapter 3: The closing' }, { ch: 'ch15', sec: 'merger', label: 'Chapter 15: Setting boundaries with a patient who fears abandonment' }],
+    meds: { ch: 'ch12', sec: 'akathisia-catatonia', label: 'Chapter 12: Akathisia and catatonia' },
+    elderly: { ch: 'ch11', sec: 'delirium', label: 'Chapter 11: Delirium and the bedside attention tests' },
+    'shea-techniques': [{ ch: 'ch5', sec: 'challenge', label: 'Chapter 5: Validity techniques' }, { ch: 'ch14', sec: 'expand', label: 'Chapter 14: Anchoring traits to adolescence and ruling out state dependency' }],
+    'wd-alcohol': { ch: 'ch11', sec: 'visual-withdrawal', label: 'Chapter 11: Visual hallucinations and the withdrawal that kills' },
+    'wd-agitation': { ch: 'ch12', sec: 'thought-and-gates', label: 'Chapter 12: The agitated psychotic patient' }
+  };
+})();

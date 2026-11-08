@@ -6,7 +6,7 @@
 
 **App created by Isabella Navarro, MD. Latest version November 2026. isaymotion@gmail.com**
 
-Version **0.1.0** (scaffold): the engine from Usap Tayo with a Spanish language pack. Content arrives in passes.
+Version **0.2.0**: the Usap Tayo engine with a Spanish language pack and the first twelve interview sections (opening to de-escalation), Shea's techniques and patient replies, all draft for review. The remaining content arrives in passes.
 
 ## What it is
 
@@ -18,8 +18,8 @@ Every Spanish section is **Draft for review** until a native Spanish-speaking cl
 
 | Pass | Content | State |
 |---|---|---|
-| 1 | Core interview phrases (opening and consent, HPI, mood, anxiety, psychosis, suicide and violence risk, substances, history, closing) | Pending |
-| 2 | Mental status exam: interviewer sheet, point-board replies, listening drill | Pending |
+| 1 | Core interview phrases (opening and consent, HPI, mood, anxiety, psychosis, suicide and violence risk, substances, history, closing) | Part one done in 0.2.0 (opening to de-escalation, 12 sections + Shea's techniques, draft for review); substances, history, family, social, collateral, closing next |
+| 2 | Mental status exam: interviewer sheet, point-board replies, listening drill | Point-board replies and listening drill live for the 0.2.0 sections; MSE sections and sheet pending |
 | 3 | Clinical tools: mood episode checker, substance use screener, withdrawal and agitation guide, with published validated Spanish versions of the PHQ-9 and MDQ rather than fresh translations | Pending |
 | 4 | Practice cases: case simulations, discharge and admission MSE practice | Pending |
 | 5 | Spanish learn track: dictionary, lessons, reading, dialogues | Pending |
@@ -31,10 +31,10 @@ The app shares its engine with Usap Tayo. The language pack `js/lang.js` sets vo
 
 | Section | What it does | Status |
 |---|---|---|
-| **Flashcards** | Spaced repetition with topic and psychiatry decks and an automatic "My mistakes" deck. | Engine ready, content pending |
-| **Psychiatry phrase sections** | Interview phrases by topic, each with usted and tú forms, a note and audio. | Engine ready, content pending |
-| **Point board** | The patient taps a reply, the phone speaks it and the interviewer reads the English. General replies, a 0 to 10 scale and likely replies for each interview section. | Engine ready, content pending |
-| **Listening drill** | Hear a patient or family reply, choose its meaning from four, then see the Spanish. | Engine ready, content pending |
+| **Flashcards** | Spaced repetition with topic and psychiatry decks and an automatic "My mistakes" deck. | Live (draft for review) |
+| **Psychiatry phrase sections** | Interview phrases by topic, each with usted and tú forms, a note and audio. | Live (draft for review) |
+| **Point board** | The patient taps a reply, the phone speaks it and the interviewer reads the English. General replies, a 0 to 10 scale and likely replies for each interview section. | Live (draft for review) |
+| **Listening drill** | Hear a patient or family reply, choose its meaning from four, then see the Spanish. | Live (draft for review) |
 | **Case simulations** | Interactive interviews with feedback and an MSE summary. | Engine ready, content pending |
 | **MSE interviewer sheet** | Printable pages of screening questions for the OPD and wards. | Engine ready, content pending |
 | **Substance use screener** | Criteria-based screening with severity, a copyable chart line and brief intervention. | Engine ready, content pending |

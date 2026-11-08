@@ -62,7 +62,7 @@
       terms: d.terms.map(ref).filter(Boolean).map((p) => ({ en: p.en, tl: o.register === 'c' ? p.c || p.f : p.f }))
     })) : null;
     return {
-      title: o.title || DEFAULTS.title, preparedFor: o.preparedFor, date: new Date().toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' }),
+      title: o.title || DEFAULTS.title, preparedFor: o.preparedFor, date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
       overview: o.overview ? (flowOrder.length ? flowOrder : steps).map((s) => ({ n: body.find((b) => b.id === s.id).n, title: s.title, goal: s.goal, branch: s.branch || '' })) : null,
       body, mse, idioms: o.idioms ? idiomRows() : null, form: o.form, deesc: o.deescList && window.PSYCH_DEESC ? {
         behaviors: PSYCH_DEESC.behaviors, escalation: PSYCH_DEESC.escalation,

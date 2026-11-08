@@ -3,6 +3,14 @@
    For every release: add an entry here, then bump APP_META.version (data/app-meta.js) and VERSION in sw.js. */
 window.APP_CHANGELOG = [
   {
+    version: '0.2.0', date: '2026-11-08', title: 'Core interview, part one',
+    items: [
+      { type: 'content', text: 'Twelve interview sections in Spanish, each phrase in usted and tú: opening and rapport, confidentiality and consent, chief complaint and history, depressed mood and SIGECAPS, elevated mood and DIGFAST, anxiety and panic, trauma, hallucinations, delusions, suicide risk, violence risk, de-escalation. Plus Shea\'s validity techniques phrased in Spanish, with links to the Psychiatric Interviewing Trainer.' },
+      { type: 'content', text: 'Likely patient replies for every section and the general groups (yes/no, how often, since when, how much, how I feel, I need…), so the point board, the listening drill and the flashcards work from today. All of it is draft for review by a native Spanish-speaking clinician.' },
+      { type: 'feature', text: 'Interview flow and MSE table for the printable handout. Audio for the new lines is recorded by the Spanish audio job.' }
+    ]
+  },
+  {
     version: '0.1.0', date: '2026-11-08', title: 'Scaffold',
     items: [
       { type: 'feature', text: 'Hablemos starts here: the Usap Tayo engine (flashcards, phrase sections with two registers, point board, listening drill, case simulations, ward tools, printable handouts) set up for Spanish, with usted and tú as the two registers and a US / Mexican Spanish baseline.' },
