@@ -1,4 +1,6 @@
-# Hablemos — handoff (passes 1 to 3 done)
+# Hablemos — handoff (passes 1 to 3 done; next: pass 4, clinical tools)
+
+Start here. Usap Tayo's own handoff (`claude/handoff.md`, also `HANDOFF.md` on the Tagalog repo's dev-tools branch) holds the shared engine documentation (section 3 data formats, section 8 pitfalls); this doc holds what differs in Hablemos.
 
 ## 1. Project
 - **What:** Hablemos ("let's talk"), the Spanish/English sister of Usap Tayo: for English-speaking clinicians interviewing Spanish-speaking psychiatry patients. Same engine, Spanish content.
@@ -51,6 +53,30 @@ Baseline 2026-11-08 (v0.3.0): data_check prints `{"version":"0.3.0","sections":2
 - `psych-admit-mse.js`: Usap Tayo's 13 domains with `form: ''`, title "Admission MSE", Spanish-context notes (brujería, respeto, Spanish/English switching).
 - `handout.js`: presets default to Letter paper; `APP_META.institution.name` falls back to '' (hidden) rather than "Your hospital".
 
+## 3d. Per-unit recipe (one data module or release)
+1. Pull the English and structure from Usap Tayo: `git clone --depth 1 https://github.com/isaymotion/tagalog /home/claude/tagalog` (read-only), then run the data file in a vm and print `en`/`n`/keys (as in passes 2–3). Keep Usap Tayo's ids, order and counts wherever the engine references them (phrase refs, flow ids, domain ids).
+2. Write the Spanish in `js/data/<file>.js`: f = usted, c = tú, `n` for clinical/gender notes, `r` for regional variants; US/Mexican baseline; adapt content (substances, crisis line, institutions, idioms), never translate Tagalog literally. Mark `draft: true` / `REVIEWED = false`.
+3. If a module view (`js/sud.js`, `js/mood.js`, …) has Usap Tayo-specific logic, rewrite it; the empty-data guard at the top of each view can stay.
+4. `node tools/collect-texts.js` (texts.json is committed), `node /home/claude/hablemos-dev/tests/data_check.js .`, extend `tests/data_check.js` for the new module's refs.
+5. Release bookkeeping: changelog entry at the top of `data/changelog.js`, `APP_META.version`, `sw.js` VERSION (`hablemos-X.Y.Z`), README version line + status/features tables.
+6. Serve (`python3 -m http.server 8767 --directory /home/claude/hablemos`, run_in_background), run `tests/smoke.py`, `tests/check_design_es.py --browser` (delete `_qa/`), the design skill's `check_sw.py`; add the new route to smoke's content checks and look at one phone screenshot.
+7. Commit as Isabella (co-author trailer), `git fetch origin main && git rebase origin/main`, push main; after ~2 min `gh run list -R isaymotion/hablemos -L 1` → success, `git pull --rebase` to get `audio/`. Push tests + this doc to dev-tools; `project_write` this doc to `claude/hablemos-handoff.md`.
+
+## 3e. Status
+| Area | State |
+|---|---|
+| Engine, shell, design, icon, audio job | Done (0.1.0) |
+| Interview sections | 27 / 27 written (352 phrases), all draft for review |
+| Patient replies (point board, listening drill) | 6 general groups + 27 sections = 314, draft |
+| Interview flow + MSE table, printable handout | Done (19 steps, 5 add-ons, Letter default) |
+| MSE interviewer sheet | Done, 2 pages (SUD pages wait for pass 4) |
+| Admission MSE domains | Done (13); practice cases pending (pass 5) |
+| Mood checker, SUD screener, withdrawal/agitation, de-escalation checklist, discharge assessment | Shells only; pages show "arrives in a later release" (pass 4) |
+| Case simulations, interpretation drill, admission/discharge practice cases | Shells only (pass 5) |
+| Dictionary, lessons, reading, dialogues, placement | Engines in place, no data (pass 6) |
+| Native-speaker review | Not started; everything is draft |
+| Audio | 1,021 clips, es-MX-DaliaNeural |
+
 ## 4. Next: pass 4 (clinical tools)
 1. **Mood episode checker** (`psych-mood.js` + `js/mood.js`): copy Usap Tayo's structure (`mde`, `manic`, `manicGate`, `extra`, `phq9`, `mdq` with `bands`), Spanish criterion lines as refs into `depression`/`mania` where they exist. PHQ-9 and MDQ: do NOT translate; point to the published validated Spanish versions (PHQ-9 Spanish is public domain via Pfizer/phqscreeners.com; MDQ Spanish validations exist) and keep the app's lines as interview paraphrases, as Usap Tayo 3.1.0 does with its source notes.
 2. **Substance use screener** (`psych-sud.js` + rewrite `js/sud.js` and the `sudSections()` block in `js/mse-sheet.js`): substances alcohol, tobacco/vaping, cannabis, methamphetamine, cocaine, opioids/fentanyl (add naloxone and overdose lines), other, gambling; DSM-5-TR 11 criteria with `fill()` placeholders; AUDIT-C and Fagerström question lines in Spanish (score tables are not copyrighted text; keep the wording as paraphrase and cite the instruments); MI/OARS lines; nurse script generic. Drop betel entirely.
@@ -60,6 +86,7 @@ Baseline 2026-11-08 (v0.3.0): data_check prints `{"version":"0.3.0","sections":2
 6. Still open: her review of all Spanish drafts (consider a review workbook like Usap Tayo's, built from `PSYCH_SECTIONS` + `PSYCH_ANSWERS`); the `tl`-rule change in the design skill's `check_design.py`; `SHOW_OTHER_APPS` stays false.
 
 ## 5. Pitfalls learned
+- Files to re-attach: none. Everything the next chat needs is in the two repos (Hablemos main + dev-tools, Usap Tayo for reference). Scratch extracts of Usap Tayo's English lines are regenerated with the vm snippet in step 1 of the recipe.
 - Enabling or reading Pages through `gh api` is blocked in the session (public-surface rule); she enabled it in the repo settings. The live site is not reachable from the session either (isaymotion.github.io is not an allowed host).
 - `check_design.py` runs its browser pass only when the static checks pass, so the `tl` FAIL also hides the browser results; use the dev-tools variant.
 - The Usap Tayo audio workflow triggers on `js/data/**`; Hablemos also lists `js/lang.js` (the test line lives there).
