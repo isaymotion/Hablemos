@@ -38,3 +38,32 @@ with sync_playwright() as p:
     b.close()
 for x in bad: print('BAD', x)
 print('HB SMOKE', 'OK' if not bad else 'FAIL', len(ROUTES), 'routes x 2 viewports')
+
+# ---- content checks (run only when sections exist) ----
+with sync_playwright() as p:
+    b = p.chromium.launch()
+    ctx = b.new_context(viewport={'width': 390, 'height': 844})
+    page = ctx.new_page(); errs = []
+    page.on('pageerror', lambda e: errs.append(str(e)))
+    page.goto(BASE); page.wait_for_selector('#view h1')
+    n = page.evaluate("(window.PSYCH_SECTIONS||[]).length")
+    if n:
+        for r in ['#/psych/s/suicide', '#/psych/s/depression?p=5', '#/psych/point?s=suicide', '#/psych/listen?s=depression', '#/flash/psych', '#/psych/handout', '#/psych/s/shea-techniques']:
+            page.evaluate("h => { location.hash = h; }", r); page.wait_for_timeout(300)
+            txt = page.inner_text('#view')
+            if 'Something went wrong' in txt or errs: print('BAD', r, errs[:2]); bad.append(r)
+        page.evaluate("location.hash='#/psych/s/suicide'"); page.wait_for_timeout(300)
+        page.click('[data-m=quiz]'); page.wait_for_timeout(200)
+        assert page.locator('.opt').count() == 4, 'quiz options'
+        page.screenshot(path=f'{OUT}/section-390.png')
+        page.evaluate("location.hash='#/psych/point?s=hallucinations'"); page.wait_for_timeout(300)
+        page.screenshot(path=f'{OUT}/point-390.png')
+        # handout PDF
+        page.evaluate("location.hash='#/psych/handout'"); page.wait_for_timeout(500)
+        pages = page.evaluate("""async () => { const o = Object.assign({}, App.handoutDoc ? {} : {}); 
+            await App.pdfKit.load(); const dd = App.handoutDoc(Object.assign({preset:'full', english:'show', register:'f', notes:true, answers:false, title:'Entrevista psiquiátrica en español', preparedFor:''}, {steps: PSYCH_FLOW.map(s=>s.id), depth:'key', overview:true, mse:true, idioms:false, form:false}));
+            return await new Promise(res => pdfMake.createPdf(dd).getBuffer(buf => res(buf.length))); }""")
+        print('handout pdf bytes', pages)
+        if not pages or pages < 10000: bad.append('handout pdf')
+    ctx.close(); b.close()
+print('HB CONTENT', 'OK' if not bad else 'FAIL')
