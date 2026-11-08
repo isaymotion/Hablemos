@@ -69,5 +69,57 @@ with sync_playwright() as p:
             return await new Promise(res => pdfMake.createPdf(dd).getBuffer(buf => res(buf.length))); }""")
         print('handout pdf bytes', pages)
         if not pages or pages < 10000: bad.append('handout pdf')
+    # ---- pass 4 clinical tools (run only when their data exists) ----
+    def go(h, ms=350):
+        errs.clear(); page.evaluate("h => { location.hash = h; }", h); page.wait_for_timeout(ms)
+        t = page.inner_text('#view')
+        if 'Something went wrong' in t or errs: print('BAD', h, errs[:2]); bad.append(h)
+        return t
+    tools = page.evaluate("({mood:!!(window.PSYCH_MOOD&&PSYCH_MOOD.mde.length), sud:!!(window.PSYCH_SUD&&PSYCH_SUD.substances.length), wd:!!(window.PSYCH_WD&&PSYCH_WD.ALC_ASK.length), de:!!(window.PSYCH_DEESC&&PSYCH_DEESC.steps.length), di:!!(window.PSYCH_DISCHARGE&&PSYCH_DISCHARGE.fields.length)})")
+    print('tools present', tools)
+    if tools['mood']:
+        go('#/psych/mood'); page.click('[data-yn=mde][data-n="1"][data-v="1"]'); page.wait_for_timeout(150)
+        assert 'gate' in page.inner_text('.sd-result').lower(), 'mood gate'
+        for t in ['man', 'mdq', 'phq']: page.click(f'[data-tab={t}]'); page.wait_for_timeout(200); assert not errs, errs
+        page.click('[data-phq="8"][data-pts="1"]'); page.wait_for_timeout(150); assert 'Item 9' in page.inner_text('#view'), 'phq item 9 notice'
+        page.screenshot(path=f'{OUT}/mood-tool-390.png')
+    if tools['sud']:
+        go('#/psych/sud'); assert page.locator('[data-sub]').count() >= 6, 'sud substances'
+        for sid in ['opioids', 'gambling', 'alcohol']:
+            page.click(f'[data-sub={sid}]'); page.wait_for_timeout(200); assert not errs, errs
+        page.click('[data-crit="1"][data-v="1"]'); page.click('[data-crit="2"][data-v="1"]'); page.wait_for_timeout(150)
+        assert 'mild' in page.inner_text('.sd-result').lower(), 'sud severity'
+        page.click('[data-tab=mi]'); page.wait_for_timeout(200); page.click('#miNext'); page.wait_for_timeout(150)
+        page.click('[data-tab=learn]'); page.wait_for_timeout(200); assert not errs, errs
+        page.click('[data-role=nurse]'); page.wait_for_timeout(200); page.click('[data-role=resident]'); page.wait_for_timeout(150)
+        page.screenshot(path=f'{OUT}/sud-tool-390.png')
+        go('#/psych/mse-sheet', 500); n2 = page.locator('.ms-sec').count(); print('mse sheet sections with SUD', n2)
+        if n2 < 20: bad.append('mse sheet sud pages')
+    if tools['wd']:
+        go('#/psych/withdrawal')
+        for t in ['alcohol', 'cannabis', 'opioid', 'agitation', 'special', 'cases', 'quick']:
+            page.click(f'[data-tab={t}]'); page.wait_for_timeout(250); assert not errs, (t, errs)
+            for sb in page.locator('[data-sub]').all()[:3]: sb.click(); page.wait_for_timeout(150); assert not errs, (t, errs)
+        page.click('[data-tab=opioid]'); page.click('[data-sub=assess]'); page.wait_for_timeout(200)
+        page.click('[data-cw][data-v="2"]'); page.wait_for_timeout(150); assert 'COWS 2/48' in page.input_value('#wdOpiNote'), 'cows chart line'
+        page.screenshot(path=f'{OUT}/wd-opioid-390.png')
+        page.click('[data-role=nurse]'); page.wait_for_timeout(250); assert not errs, errs; page.click('[data-role=resident]'); page.wait_for_timeout(150)
+    if tools['de']:
+        go('#/psych/deesc'); page.click('[data-s="0"]'); page.click('[data-out=failed]'); page.wait_for_timeout(200)
+        note = page.input_value('#dzNote'); assert 'Escalated' in note and 'NOD' not in note, 'deesc note'
+        for t in ['drill', 'after', 'practice']: page.click(f'[data-tab={t}]'); page.wait_for_timeout(200); assert not errs, errs
+        page.screenshot(path=f'{OUT}/deesc-390.png')
+    if tools['di']:
+        go('#/psych/discharge'); assert page.locator('[data-pick]').count() >= 1, 'discharge picks'
+        page.locator('[data-pick]').first.click(); page.wait_for_timeout(150)
+        for g in page.locator('[data-go]').all()[:3]: g.click(); page.wait_for_timeout(150); assert not errs, errs
+        page.screenshot(path=f'{OUT}/discharge-390.png')
+    if tools['de'] or tools['di']:
+        go('#/psych/handout', 500)
+        for preset in ['deesccard', 'discharge', 'risk']:
+            nb = page.evaluate("""async (k) => { await App.pdfKit.load(); const o = Object.assign({english:'show', register:'f', notes:true, answers:false, title:'t', preparedFor:''}, (await (async()=>App.handoutPresets ? App.handoutPresets[k].o : null)()) || {});
+                const dd = App.handoutDoc(Object.assign(o, {preset:k})); return await new Promise(res => pdfMake.createPdf(dd).getBuffer(buf => res(buf.length))); }""", preset)
+            print('handout', preset, 'pdf bytes', nb)
+            if not nb or nb < 5000: bad.append('handout ' + preset)
     ctx.close(); b.close()
 print('HB CONTENT', 'OK' if not bad else 'FAIL')
