@@ -48,7 +48,7 @@ with sync_playwright() as p:
     page.goto(BASE); page.wait_for_selector('#view h1')
     n = page.evaluate("(window.PSYCH_SECTIONS||[]).length")
     if n:
-        for r in ['#/psych/s/suicide', '#/psych/s/depression?p=5', '#/psych/point?s=suicide', '#/psych/listen?s=depression', '#/flash/psych', '#/psych/handout', '#/psych/s/shea-techniques']:
+        for r in ['#/psych/s/suicide', '#/psych/s/depression?p=5', '#/psych/point?s=suicide', '#/psych/listen?s=depression', '#/flash/psych', '#/psych/handout', '#/psych/s/shea-techniques', '#/psych/mse-sheet', '#/psych/s/mse-cog', '#/psych/s/closing', '#/psych/point?s=substance']:
             page.evaluate("h => { location.hash = h; }", r); page.wait_for_timeout(300)
             txt = page.inner_text('#view')
             if 'Something went wrong' in txt or errs: print('BAD', r, errs[:2]); bad.append(r)
@@ -58,6 +58,10 @@ with sync_playwright() as p:
         page.screenshot(path=f'{OUT}/section-390.png')
         page.evaluate("location.hash='#/psych/point?s=hallucinations'"); page.wait_for_timeout(300)
         page.screenshot(path=f'{OUT}/point-390.png')
+        page.evaluate("location.hash='#/psych/mse-sheet'"); page.wait_for_timeout(400)
+        n_sec = page.locator('.ms-sec').count(); print('mse sheet sections', n_sec)
+        if n_sec < 10: bad.append('mse sheet')
+        page.screenshot(path=f'{OUT}/msesheet-390.png')
         # handout PDF
         page.evaluate("location.hash='#/psych/handout'"); page.wait_for_timeout(500)
         pages = page.evaluate("""async () => { const o = Object.assign({}, App.handoutDoc ? {} : {}); 
