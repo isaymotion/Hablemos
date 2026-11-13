@@ -3,6 +3,12 @@
    For every release: add an entry here, then bump APP_META.version (data/app-meta.js) and VERSION in sw.js. */
 window.APP_CHANGELOG = [
   {
+    version: '0.6.1', date: '2026-11-13', title: 'Menu scrolling fixed',
+    items: [
+      { type: 'correction', text: 'The menu that opens from More now scrolls on phones and tablets. Before, it was taller than the screen and could not be scrolled, so the items at the bottom of the list (such as Settings and About) could not be reached from it.' }
+    ]
+  },
+  {
     version: '0.6.0', date: '2026-11-08', title: 'Learn track',
     items: [
       { type: 'feature', text: 'Twenty-three short lessons with quizzes, from sounds and ser/estar to the past tenses for a history, instructions and the subjunctive, plus culture lessons: values, faith and folk healing, idioms of distress, false friends, and when to call a certified medical interpreter.' },
