@@ -153,3 +153,6 @@ Baseline re-verified on a fresh clone of 0.6.0 (data_check, smoke, check_design_
 - SUD templates: `{s}` is the bare noun, `{sa}` the noun with article (`los opioides`, `las apuestas`); `fill()` fixes "a el/de el". Any new shared line (open, remission, MI, nurse) must read naturally for the plural ones; data_check only catches unfilled braces.
 - `PSYCH_DEESC.escLine`, `signatures` and `debrief` are required by `deesc.js` and `handout.js` (fallbacks exist for escLine/signatures, not debrief).
 - Subagent drafting worked well with the shared brief (kept as `tests/pass4-brief.md` on dev-tools): structure from Usap Tayo, explicit substance/dose lists, forbidden-word grep, Playwright pass, "least-sure lines" in the report.
+
+## Note, 13 Nov 2026 (version 0.6.1, pushed)
+- Phone menu fix: the menu that opens from More could not scroll on phones (the fixed `.rail` took the height of its content inside the `.shell` grid). The phone rule in `css/style.css` now sets `align-self: stretch` and a max-height. Found and fixed first in Hanashimashō (`isaymotion/Japanese` 0.12.1); test with `qa/drawer-any.py <port> <label>` on that repo's dev-tools branch ("scrolls OK" at 390×844, 360×640 and 820×1180). Version bumped in app-meta.js, changelog.js, sw.js and README.
