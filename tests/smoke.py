@@ -6,7 +6,7 @@ OUT = sys.argv[2] if len(sys.argv) > 2 else '/home/claude/scratch/hb'
 os.makedirs(OUT, exist_ok=True)
 ROUTES = ['#/', '#/search?q=sentir', '#/dict', '#/flash', '#/flash/due', '#/flash/mistakes', '#/lessons', '#/reading', '#/speak', '#/psych', '#/psych?tab=cases', '#/psych?tab=tools', '#/psych?tab=print',
           '#/psych/cases', '#/psych/interp', '#/psych/listen', '#/psych/point', '#/psych/handout', '#/psych/mse-sheet', '#/psych/sud', '#/psych/mood', '#/psych/withdrawal', '#/psych/deesc', '#/psych/discharge',
-          '#/psych/dcases', '#/psych/mcases', '#/placement', '#/progress', '#/settings', '#/new', '#/about', '#/practice', '#/more', '#/nope']
+          '#/psych/dcases', '#/psych/mcases', '#/placement', '#/verbs', '#/verbs/v/0', '#/cloze', '#/cloze?tab=lessons', '#/transform', '#/build', '#/lessons?lv=B2', '#/lessons/review-a1', '#/progress', '#/settings', '#/new', '#/about', '#/practice', '#/more', '#/nope']
 SHOTS = {'#/': 'home', '#/psych': 'psych', '#/psych?tab=tools': 'tools', '#/about': 'about', '#/more': 'more', '#/settings': 'settings', '#/psych/mood': 'mood'}
 bad = []
 with sync_playwright() as p:
