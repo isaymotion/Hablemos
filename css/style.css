@@ -755,3 +755,71 @@ mark.vf { background: var(--warn-bg); color: var(--gold-ink); font-weight: 700; 
 .pointboard-patient .pstrip { display: none; }
 .pbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; border-radius: var(--r-md); background: var(--surface-2); margin-bottom: 10px; font-size: 1.05rem; }
 .listen-q { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+/* 0.7.0: review lessons and "Common mistakes" lines */
+.pill.rv { background: var(--tint); color: var(--ink); border: 1px solid var(--rule); }
+.lesson-body s { color: var(--muted); text-decoration-thickness: 1.5px; }
+
+/* Fill the blank (#/cloze, js/cloze.js). Only rules css/style.css lacks; tokens from :root, so light and dark both work. */
+.cz-tabs { margin-bottom: 12px; }
+.cz-tabs a, .lvtabs a { display: inline-flex; align-items: center; min-height: 40px; border: 1px solid var(--rule); border-radius: 20px; background: var(--surface); padding: 0 16px; color: var(--fg); text-decoration: none; font: 600 .92rem/1.15 var(--sans); }
+.cz-tabs a:hover, .lvtabs a:hover { border-color: var(--ink-3); }
+.cz-tabs a.on, .lvtabs a.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.cz-sent { font-size: 1.18rem; font-weight: 600; line-height: 1.9; overflow-wrap: anywhere; min-width: 0; }
+.cz-blank { display: inline-block; min-width: 3.2em; border-bottom: 2px solid var(--gold-ink); color: transparent; text-align: center; line-height: 1.2; margin: 0 2px; }
+.cz-opts .opt { min-height: 48px; display: flex; align-items: center; gap: 10px; overflow-wrap: anywhere; min-width: 0; color: var(--fg); font-size: 1.02rem; }
+.cz-num { flex: none; display: inline-grid; place-items: center; width: 1.6em; height: 1.6em; border-radius: 50%; background: var(--surface-2); color: var(--muted); font: 600 .78rem var(--sans); }
+.opt.right .cz-num { background: var(--good); color: var(--surface); }
+.opt.wrong .cz-num { background: var(--bad); color: var(--surface); }
+.cz-fb { gap: 6px; }
+.cz-full { display: flex; align-items: center; gap: 8px; font-size: 1.08rem; font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.cz-full > .tl { flex: 1 1 auto; min-width: 0; }
+.cz-full > .say { flex: none; }
+.cz-check { gap: 8px; min-height: 44px; cursor: pointer; }
+.cz-check input { width: 20px; height: 20px; accent-color: var(--accent); }
+.cz-group { margin: 18px 0 8px; font-size: 1rem; }
+.cz-ltile h3 { overflow-wrap: anywhere; }
+
+/* ---------- Transform the sentence (#/transform) and Sentence builder (#/build), 0.7.0 ---------- */
+.tf-ctl, .bd-ctl { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.tf-instr { font-size: 1.25rem; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere; }
+.tf-froms { display: grid; gap: 6px; padding: 10px 12px; border-left: 3px solid var(--accent); background: var(--surface-2); border-radius: 0 var(--r-md) var(--r-md) 0; }
+.tf-from, .tf-to, .bd-model { font-size: 1.12rem; font-weight: 600; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; overflow-wrap: anywhere; }
+.tf-from .tl, .tf-to .tl, .bd-model .tl { min-width: 0; }
+.tf-key { display: inline-flex; align-items: center; justify-content: center; min-width: 1.5em; height: 1.5em; margin-right: 8px; border: 1px solid var(--rule); border-radius: 6px; font: 600 .78rem/1 var(--sans); color: var(--ink-3); vertical-align: middle; }
+.opt.tl { overflow-wrap: anywhere; }
+.tf-accents { display: flex; flex-wrap: wrap; gap: 6px; }
+.tf-acc { min-width: 44px; min-height: 44px; padding: 0 10px; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface); color: var(--ink); font: 600 1.05rem/1 var(--font-tl); cursor: pointer; }
+.tf-acc:hover:not(:disabled) { border-color: var(--ink-3); }
+.tf-acc:disabled { opacity: .45; cursor: default; }
+.tf-hint { display: grid; gap: 4px; padding: 8px 10px; border-radius: 8px; background: var(--surface); }
+.tf-h { font-size: 1.05rem; font-weight: 600; line-height: 1.4; overflow-wrap: anywhere; }
+.tf-diff { background: var(--warn-bg); color: var(--warn); border-bottom: 2px solid var(--warn); padding: 0 1px; border-radius: 2px; }
+.tf-fb a, .bd-fb a { justify-self: start; }
+.bd-chk { min-height: 44px; align-items: center; }
+.bd-chk input { margin-top: 0; width: 20px; height: 20px; }
+.bd-en { font-size: 1.08rem; font-weight: 600; min-height: 44px; display: flex; align-items: center; overflow-wrap: anywhere; }
+.bd-line { min-height: 64px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px 10px; border: 1px dashed var(--rule); border-radius: var(--r-md); background: var(--surface-2); }
+.bd-ph { padding: 0 4px; font-family: var(--sans); }
+.bd-tray { display: flex; flex-wrap: wrap; gap: 8px; min-height: 44px; }
+.bd-tile { min-height: 48px; max-width: 100%; padding: 6px 12px; border: 1px solid var(--rule); border-radius: var(--r-md); background: var(--surface); color: var(--ink); font: 600 1.1rem/1.3 var(--font-tl); cursor: pointer; overflow-wrap: anywhere; text-align: left; }
+.bd-tile:hover:not(:disabled) { border-color: var(--ink-3); }
+.bd-tile.in { box-shadow: inset 0 -3px 0 var(--accent); }
+.bd-tile:disabled { cursor: default; opacity: 1; }
+.bd-tile.ok { border-color: var(--good); background: var(--good-bg); box-shadow: none; }
+.bd-tile.alt { border-color: var(--warn); background: var(--warn-bg); box-shadow: none; }
+.bd-tile.no { border-color: var(--bad); background: var(--bad-bg); box-shadow: none; }
+@media (max-width: 420px) { .tf-instr { font-size: 1.12rem; } .bd-tile { font-size: 1.04rem; padding: 6px 10px; } }
+
+/* Verb trainer (#/verbs, js/verbs.js) */
+.vb-seg { flex-wrap: wrap; }
+.vb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr)); gap: 12px; }
+.vb-tense h3 { margin: 0 0 6px; font-size: 1rem; }
+.vb-row { display: grid; grid-template-columns: minmax(0, 7.2em) minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 5px 0; border-top: 1px solid var(--rule); min-height: 40px; }
+.vb-row b { overflow-wrap: anywhere; }
+.vb-ex { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.vb-ex > div { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.input.vb-ok { border-color: var(--good); }
+.input.vb-no { border-color: var(--bad); }
+
+.lvtabs { display: flex; flex-wrap: wrap; gap: 6px; }

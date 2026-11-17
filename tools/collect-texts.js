@@ -9,7 +9,8 @@ const ctx = { window: {}, console, TextEncoder, Buffer };
 ctx.window = ctx;
 vm.createContext(ctx);
 const load = (f) => vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
-const files = ['js/data/dict-core.js', 'js/data/dict-everyday.js', 'js/data/dict-clinical.js', 'js/data/dict-more.js', 'js/data/lessons.js', 'js/data/reading.js', 'js/data/dialogues.js', 'js/data/psych-phrases.js', 'js/data/psych-cases.js', 'js/data/psych-flow.js', 'js/data/psych-deesc.js', 'js/data/psych-discharge.js', 'js/data/psych-discharge-cases.js', 'js/data/psych-admit-mse.js', 'js/data/psych-mse-cases.js', 'js/data/psych-mse-sheet.js', 'js/data/psych-sud.js', 'js/data/psych-withdrawal.js', 'js/data/psych-mood.js', 'js/data/psych-shea.js', 'js/data/psych-answers.js',
+const files = ['js/data/dict-core.js', 'js/data/dict-everyday.js', 'js/data/dict-clinical.js', 'js/data/dict-more.js', 'js/data/lessons.js', 'js/data/lessons-2.js', 'js/data/lessons-3.js', 'js/data/lessons-4.js', 'js/data/lessons-5.js', 'js/data/reading.js', 'js/data/dialogues.js', 'js/data/psych-phrases.js', 'js/data/psych-cases.js', 'js/data/psych-flow.js', 'js/data/psych-deesc.js', 'js/data/psych-discharge.js', 'js/data/psych-discharge-cases.js', 'js/data/psych-admit-mse.js', 'js/data/psych-mse-cases.js', 'js/data/psych-mse-sheet.js', 'js/data/psych-sud.js', 'js/data/psych-withdrawal.js', 'js/data/psych-mood.js', 'js/data/psych-shea.js', 'js/data/psych-answers.js',
+  'js/data/grammar-cloze-a1.js', 'js/data/grammar-cloze-a2.js', 'js/data/grammar-cloze-b1.js', 'js/data/grammar-cloze-b2.js', 'js/data/grammar-transform-1.js', 'js/data/verbs.js',
   'js/data/meta.js', 'js/audio-key.js'];
 if (fs.existsSync(path.join(root, 'js/lang.js'))) files.push('js/lang.js'); // ctx.LANG.testLine = settings voice test line
 files.forEach(load);
@@ -36,6 +37,13 @@ if (ctx.PSYCH_ANSWERS) { ctx.PSYCH_ANSWERS.common.forEach((g) => g.items.forEach
 add('Sí, doctor.'); // default discharge practice answer
 (ctx.PSYCH_MSE_SHEET ? ctx.PSYCH_MSE_SHEET.sections : []).forEach((s) => (s.blocks || []).forEach((b) => b.items.forEach((it) => add(it.tl)))); // MSE interviewer sheet lines not already in PSYCH_SECTIONS
 (ctx.PSYCH_MSE_CASES || []).forEach((c) => { if (c.cc) add(c.cc.ans[0]); Object.values(c.domains).forEach((d) => Object.values(d.ans || {}).forEach((a) => add(a[0]))); });
+// 0.7.0 grammar drills: the completed fill-the-blank sentence (same App.fillBlank as js/cloze.js), the model answer of
+// every transform item, and the verb trainer's infinitives and example sentences (conjugated forms use the device voice).
+ctx.App = ctx.App || {};
+load('js/cloze.js');
+(ctx.GRAMMAR_CLOZE || []).forEach((x) => add(ctx.App.fillBlank(x.s, x.a)));
+(ctx.GRAMMAR_TRANSFORM || []).forEach((x) => add(x.to));
+(ctx.ES_VERBS || []).forEach((v) => { add(v.inf); (v.ex || []).forEach((e) => add(e[0])); });
 add((ctx.LANG && ctx.LANG.testLine) || 'Buenos días. ¿Cómo se siente hoy?'); // settings voice test
 
 // Substance use screener: lines are templates ({s} substance, {w} withdrawal symptoms, {u} unit) filled at run time

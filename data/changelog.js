@@ -3,6 +3,18 @@
    For every release: add an entry here, then bump APP_META.version (data/app-meta.js) and VERSION in sw.js. */
 window.APP_CHANGELOG = [
   {
+    version: '0.7.0', date: '2026-11-17', title: 'Grammar drills and 58 new lessons',
+    items: [
+      { type: 'feature', text: 'Verb trainer: 154 verbs with every form built by rule (present, preterite, imperfect, present perfect, future, conditional, both subjunctives, commands, gerund and participle), example sentences, and three drills: choose the form, name the form, type the form. Find it under Practice and in the menu.' },
+      { type: 'feature', text: 'Fill the blank: 345 sentences from A1 to B2, by level or by lesson, with the reason after each answer and a round for your mistakes. Lessons that have a set show a "Practise this grammar" button.' },
+      { type: 'feature', text: 'Transform the sentence: 160 items. Make it negative, put it in the past, turn it into a command, replace the object with a pronoun, join two sentences, use the subjunctive, and more. Choose the answer or type it; a row of accent keys sits under the typing box.' },
+      { type: 'feature', text: 'Sentence builder: put the words of a Spanish sentence back in order. The sentences come from the lessons, dialogues, readings and grammar drills.' },
+      { type: 'content', text: 'Fifty-eight new grammar lessons, 81 in all, in one order from A1 to B2: articles, possessives, hay and estar, stem-changing verbs, the preterite and imperfect, hace and desde, object pronouns, por and para, the subjunctive in use, reported speech, se, si clauses, regret, discourse markers, casual speech, and reading forms and consent sheets. Each level ends with a review lesson and each new lesson has a Common mistakes section.' },
+      { type: 'update', text: 'The Lessons page has a level filter (All, A1, A2, B1, B2) and shows how many lessons you have done at that level.' },
+      { type: 'content', text: 'All the new Spanish is a draft for review by a native Spanish-speaking clinician, like the rest of the app. New sentences get their recorded voice a few minutes after this release.' }
+    ]
+  },
+  {
     version: '0.6.1', date: '2026-11-13', title: 'Menu scrolling fixed',
     items: [
       { type: 'correction', text: 'The menu that opens from More now scrolls on phones and tablets. Before, it was taller than the screen and could not be scrolled, so the items at the bottom of the list (such as Settings and About) could not be reached from it.' }

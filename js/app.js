@@ -66,12 +66,14 @@
     [/^\/psych\/mcase\/(?<id>[\w-]+)$/, V.mseCase, 'psych'],
     [/^\/psych\/dcase\/(?<id>[\w-]+)$/, V.dischargeCase, 'psych'],
     [/^\/placement$/, V.placement, 'placement'],
+    [/^\/cloze$/, V.cloze, 'cloze'], [/^\/transform$/, V.transform, 'transform'], [/^\/build$/, V.build, 'build'],
+    [/^\/verbs$/, V.verbs, 'verbs'], [/^\/verbs\/v\/(?<n>\d+)$/, V.verb, 'verbs'],
     [/^\/progress$/, V.progress, 'progress'],
     [/^\/settings$/, V.settings, 'settings'],
     [/^\/new$/, V.whatsnew, 'new'],
     [/^\/about$/, V.about, 'about']
   ];
-  const TITLES = { home: '', practice: 'Practice', dict: 'Dictionary', flash: 'Flashcards', lessons: 'Lessons', reading: 'Reading', speak: 'Speaking', psych: 'Psychiatry', placement: 'Placement', progress: 'Progress', settings: 'Settings', new: "What's New", about: 'About' };
+  const TITLES = { home: '', practice: 'Practice', dict: 'Dictionary', flash: 'Flashcards', lessons: 'Lessons', reading: 'Reading', speak: 'Speaking', psych: 'Psychiatry', placement: 'Placement', progress: 'Progress', settings: 'Settings', new: "What's New", about: 'About', verbs: 'Verb trainer', cloze: 'Fill the blank', transform: 'Transform the sentence', build: 'Sentence builder' };
 
   /* ---------- Navigation: one grouped list for the desktop rail, the phone drawer (More) and the #/more page ----------
      [key, href, label, icon]. Group labels are shell strings (data/strings.js); item labels are the app's own. */
@@ -84,7 +86,7 @@
   const NAV = [
     ['', [['home', '#/', 'Home', icons.home], ['practice', '#/practice', 'Practice', icons.target]]],
     ['nav.learn', [['lessons', '#/lessons', 'Lessons', icons.lesson], ['reading', '#/reading', 'Reading', icons.read], ['speak', '#/speak', 'Speaking', icons.speak], ['dict', '#/dict', 'Dictionary', icons.book]]],
-    ['nav.drill', [['flash', '#/flash', 'Flashcards', icons.cards], ['placement', '#/placement', 'Placement test', icons.target]]],
+    ['nav.drill', [['flash', '#/flash', 'Flashcards', icons.cards], ['verbs', '#/verbs', 'Verb trainer', icons.verb], ['cloze', '#/cloze', 'Fill the blank', icons.verb], ['transform', '#/transform', 'Transform the sentence', icons.verb], ['build', '#/build', 'Sentence builder', icons.verb], ['placement', '#/placement', 'Placement test', icons.target]]],
     ['nav.interview', [['psych', '#/psych', 'Psychiatry ' + LANG.name, icons.brain]].concat(PSY_PRACTICE)],
     ['nav.tools', PSY_TOOLS],
     ['nav.app', [['progress', '#/progress', 'Progress', icons.chart], ['settings', '#/settings', 'Settings', icons.gear], ['new', '#/new', "What's New", icons.spark], ['about', '#/about', 'About', icons.info]]]
@@ -175,7 +177,7 @@
     dict: HAS.dict ? App.DICT.length + ' entries, both directions, root-word search' : later, flash: 'Spaced repetition across every deck',
     lessons: HAS.lessons ? 'Grammar, culture and interpreter use' : later, reading: HAS.reading ? 'Graded passages' : later, speak: HAS.speak ? 'Dialogues with listening and recording' : later,
     practice: 'Every drill on one page', psych: (window.PSYCH_SECTIONS || []).length + ' interview sections and the ward tools',
-    placement: HAS.placement ? '20 questions to find your level' : later, progress: 'Streak, stats, backup', settings: 'Register, voice, theme', new: 'What changed in each version', about: 'Credits and disclaimers'
+    placement: HAS.placement ? '20 questions to find your level' : later, verbs: 'Conjugation tables and three drills', cloze: 'Choose the word that completes the sentence', transform: 'Rewrite a sentence: negative, past, command', build: 'Put the words in order', progress: 'Streak, stats, backup', settings: 'Register, voice, theme', new: 'What changed in each version', about: 'Credits and disclaimers'
   };
   V.practice = (el) => {
     const s = App.state, due = App.decks().find((d) => d.id === 'due').ids.length;
@@ -186,7 +188,11 @@
       T('#/flash/due', 'Review', due ? due + ' cards due' : 'Flashcards', 'Spaced repetition across every deck.') +
       (HAS.lessons ? T('#/lessons', 'Quiz', 'Lesson quizzes', Object.keys(s.done.lessons).length + ' of ' + LESSONS.length + ' lessons done.') : '') +
       (HAS.reading ? T('#/reading', 'Read', 'Reading', 'Graded passages with questions.') : '') +
-      (HAS.speak ? T('#/speak', 'Speak', 'Speaking', 'Dialogues with listening and recording.') : '') + '</div>' +
+      (HAS.speak ? T('#/speak', 'Speak', 'Speaking', 'Dialogues with listening and recording.') : '') +
+      ((window.ES_VERBS || []).length ? T('#/verbs', 'Grammar', 'Verb trainer', (window.ES_VERBS || []).length + ' verbs in every tense: choose, name or type the form.') : '') +
+      ((window.GRAMMAR_CLOZE || []).length ? T('#/cloze', 'Grammar', 'Fill the blank', 'Choose the word that completes the sentence, by level or by lesson.') : '') +
+      ((window.GRAMMAR_TRANSFORM || []).length ? T('#/transform', 'Grammar', 'Transform the sentence', 'Make it negative, past, a command: choose or type.') : '') +
+      T('#/build', 'Grammar', 'Sentence builder', 'Put the Spanish words back in order.') + '</div>' +
       (!HAS.lessons ? '<p class="muted small">' + later + ': the ' + esc(LANG.name) + ' learn track (lessons, reading, dialogues).</p>' : '') +
       '<h2 style="margin-top:18px">Clinical</h2><div class="grid">' +
       T('#/psych/cases', 'Simulate', 'Case simulations', (window.PSYCH_CASES || []).length + ' interviews with feedback.') +
