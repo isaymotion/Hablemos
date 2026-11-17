@@ -222,23 +222,35 @@
   };
 
   /* ---------- Lessons ---------- */
-  V.lessons = (el) => {
+  const LEVELS = ['A1', 'A2', 'B1', 'B2'];
+  const reviewPill = '<span class="pill rv">Review</span>';
+  /* App.lessonLinks: functions (lesson) => HTML drawn in a row under the quiz (e.g. "Practise this grammar" from js/cloze.js). */
+  App.lessonLinks = App.lessonLinks || [];
+  V.lessons = (el, p, q) => {
+    // Level filter (?lv=A2 …): with many lessons, one level at a time is easier to scan. The choice is remembered.
+    const lvs = LEVELS.filter((lv) => LESSONS.some((l) => l.level === lv));
+    q = q || {};
+    const lv = q.lv === 'all' ? '' : lvs.includes(q.lv) ? q.lv : lvs.includes(S().lessonLevel) && !q.lv ? S().lessonLevel : '';
+    if ((S().lessonLevel || '') !== lv) { S().lessonLevel = lv; App.save(); }
     const units = {};
-    LESSONS.forEach((l) => (units[l.unit] = units[l.unit] || []).push(l));
-    el.innerHTML = '<h1>Lessons</h1>' + (LESSONS.length ? '<p class="muted">Short grammar and culture lessons, each with a quiz. Tap <span class="kbd">🔊</span> on any example to hear it.</p>' : soon('The ' + LANG.name + ' learn track (ser/estar, tú/usted, tenses for timelines, idioms of distress, culture, when to call an interpreter)')) +
-      Object.entries(units).map(([u, ls]) => '<h2>' + esc(u) + '</h2><div class="grid">' + ls.map((l) => {
+    LESSONS.filter((l) => !lv || l.level === lv).forEach((l) => (units[l.level + '|' + l.unit] = units[l.level + '|' + l.unit] || []).push(l));
+    const doneIn = (k) => LESSONS.filter((l) => (!k || l.level === k) && l.id in S().done.lessons).length + ' / ' + LESSONS.filter((l) => !k || l.level === k).length;
+    el.innerHTML = '<h1>Lessons</h1>' + (LESSONS.length ? '<p class="muted">Short grammar and culture lessons in order, each with a quiz. Tap the speaker on any example to hear it.</p>' : soon('The ' + LANG.name + ' learn track (ser/estar, tú/usted, tenses for timelines, idioms of distress, culture, when to call an interpreter)')) +
+      (lvs.length > 1 ? '<div class="row" style="flex-wrap:wrap;gap:8px;margin-bottom:4px"><div class="seg" role="group" aria-label="Level">' + [['', 'All']].concat(lvs.map((k) => [k, k])).map(([k, t]) => '<a role="button" href="#/lessons?lv=' + (k || 'all') + '" class="' + (lv === k ? 'on' : '') + '">' + esc(t) + '</a>').join('') + '</div><span class="pill">' + doneIn(lv) + ' done</span></div>' : '') +
+      Object.entries(units).map(([u, ls]) => '<h2>' + esc(u.split('|')[1]) + (lv ? '' : ' <span class="muted small">' + esc(u.split('|')[0]) + '</span>') + '</h2>'<div class="grid">' + ls.map((l) => {
         const sc = S().done.lessons[l.id];
-        return '<a class="tile" href="#/lessons/' + l.id + '"><div class="row">' + lvPill(l.level) + (sc != null ? '<span class="pill good">' + icons.check.replace('<svg', '<svg width="12" height="12"') + ' ' + sc + '%</span>' : '') + '</div><h3 style="margin-top:6px">' + esc(l.title) + '</h3><p>' + esc(l.summary) + '</p></a>';
+        return '<a class="tile" href="#/lessons/' + l.id + '"><div class="row">' + lvPill(l.level) + (l.review ? reviewPill : '') + (sc != null ? '<span class="pill good">' + icons.check.replace('<svg', '<svg width="12" height="12"') + ' ' + sc + '%</span>' : '') + '</div><h3 style="margin-top:6px">' + esc(l.title) + '</h3><p>' + esc(l.summary) + '</p></a>';
       }).join('') + '</div>').join('');
   };
   V.lesson = (el, p) => {
     const l = LESSONS.find((x) => x.id === p.id);
     if (!l) { el.innerHTML = '<p>Lesson not found.</p>'; return; }
     const idx = LESSONS.indexOf(l), next = LESSONS[idx + 1], prev = LESSONS[idx - 1];
-    el.innerHTML = crumb([['Lessons', '#/lessons'], [l.title]]) + '<div class="row">' + lvPill(l.level) + '<span class="muted small">' + esc(l.unit) + '</span></div><h1 style="margin-top:6px">' + esc(l.title) + '</h1>' +
+    el.innerHTML = crumb([['Lessons', '#/lessons'], [l.title]]) + '<div class="row">' + lvPill(l.level) + (l.review ? reviewPill : '') + '<span class="muted small">' + esc(l.unit) + '</span></div><h1 style="margin-top:6px">' + esc(l.title) + '</h1>' +
       (l.draft ? '<div class="notice warn" style="margin-bottom:12px">Draft for review: the ' + esc(LANG.name) + ' lines in this lesson are practice wording pending review by a native Spanish-speaking clinician.</div>' : '') +
       '<div class="lesson-body">' + l.body.replace(/<table>/g, '<div class="tablewrap"><table>').replace(/<\/table>/g, '</table></div>') + '</div>' +
       '<h2 style="margin-top:20px">Check yourself</h2><div id="lq"></div>' +
+      (App.lessonLinks.map((f) => { try { return f(l) || ''; } catch (e) { return ''; } }).join('') ? '<div class="row" style="flex-wrap:wrap;gap:8px;margin-top:14px">' + App.lessonLinks.map((f) => { try { return f(l) || ''; } catch (e) { return ''; } }).join('') + '</div>' : '') +
       '<div class="spread" style="margin-top:16px">' + (prev ? '<a class="btn" href="#/lessons/' + prev.id + '">← ' + esc(prev.title) + '</a>' : '<span></span>') + (next ? '<a class="btn" href="#/lessons/' + next.id + '">' + esc(next.title) + ' →</a>' : '') + '</div>';
     // speak buttons for examples
     el.querySelectorAll('.lesson-body .ex').forEach((ex) => { const b = ex.querySelector('b'); if (b) { ex.style.gridTemplateColumns = 'minmax(0,1fr) auto'; const btn = document.createElement('div'); btn.innerHTML = App.sayBtn(b.textContent); btn.style.gridRow = '1 / span 2'; btn.style.gridColumn = '2'; ex.appendChild(btn.firstChild); } });
