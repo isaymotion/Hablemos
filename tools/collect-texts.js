@@ -9,7 +9,7 @@ const ctx = { window: {}, console, TextEncoder, Buffer };
 ctx.window = ctx;
 vm.createContext(ctx);
 const load = (f) => vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
-const files = ['js/data/dict-core.js', 'js/data/dict-everyday.js', 'js/data/dict-clinical.js', 'js/data/dict-more.js', 'js/data/lessons.js', 'js/data/lessons-2.js', 'js/data/lessons-3.js', 'js/data/lessons-4.js', 'js/data/lessons-5.js', 'js/data/reading.js', 'js/data/dialogues.js', 'js/data/psych-phrases.js', 'js/data/psych-cases.js', 'js/data/psych-flow.js', 'js/data/psych-deesc.js', 'js/data/psych-discharge.js', 'js/data/psych-discharge-cases.js', 'js/data/psych-admit-mse.js', 'js/data/psych-mse-cases.js', 'js/data/psych-mse-sheet.js', 'js/data/psych-sud.js', 'js/data/psych-withdrawal.js', 'js/data/psych-mood.js', 'js/data/psych-shea.js', 'js/data/psych-answers.js',
+const files = ['js/data/dict-core.js', 'js/data/dict-everyday.js', 'js/data/dict-clinical.js', 'js/data/dict-more.js', 'js/data/lessons.js', 'js/data/lessons-2.js', 'js/data/lessons-3.js', 'js/data/lessons-4.js', 'js/data/lessons-5.js', 'js/data/lessons-6.js', 'js/data/lesson-extra-1.js', 'js/data/lesson-extra-2.js', 'js/data/word-pairs-1.js', 'js/data/word-pairs-2.js', 'js/data/numbers.js', 'js/data/picture-bodymap.js', 'js/data/picture-sets-body.js', 'js/data/picture-sets-home.js', 'js/data/picture-sets-town.js', 'js/data/picture-sets-animals.js', 'js/data/picture-sets-machines.js', 'js/data/picture-sets-food.js', 'js/data/picture-sets-clothes.js', 'js/data/picture-sets-nature.js', 'js/data/picture-sets-daily.js', 'js/data/reading.js', 'js/data/dialogues.js', 'js/data/psych-phrases.js', 'js/data/psych-cases.js', 'js/data/psych-flow.js', 'js/data/psych-deesc.js', 'js/data/psych-discharge.js', 'js/data/psych-discharge-cases.js', 'js/data/psych-admit-mse.js', 'js/data/psych-mse-cases.js', 'js/data/psych-mse-sheet.js', 'js/data/psych-sud.js', 'js/data/psych-withdrawal.js', 'js/data/psych-mood.js', 'js/data/psych-shea.js', 'js/data/psych-answers.js',
   'js/data/grammar-cloze-a1.js', 'js/data/grammar-cloze-a2.js', 'js/data/grammar-cloze-b1.js', 'js/data/grammar-cloze-b2.js', 'js/data/grammar-transform-1.js', 'js/data/verbs.js',
   'js/data/meta.js', 'js/audio-key.js'];
 if (fs.existsSync(path.join(root, 'js/lang.js'))) files.push('js/lang.js'); // ctx.LANG.testLine = settings voice test line
@@ -44,6 +44,16 @@ load('js/cloze.js');
 (ctx.GRAMMAR_CLOZE || []).forEach((x) => add(ctx.App.fillBlank(x.s, x.a)));
 (ctx.GRAMMAR_TRANSFORM || []).forEach((x) => add(x.to));
 (ctx.ES_VERBS || []).forEach((v) => { add(v.inf); (v.ex || []).forEach((e) => add(e[0])); });
+// 0.8.0: lesson extras (the right line of each mistake and the extra examples; never the wrong line), word pairs (each
+// word and, for collocations, the phrase), numbers (every row and clinic sentence), picture words (every word with its
+// article, every listen-and-point sentence; never the regional note r) and the body map questions and pain words.
+const arr = (x) => (Array.isArray(x) ? x : []);
+Object.values(ctx.LESSON_EXTRA || {}).forEach((x) => { arr(x.mistakes).forEach((m) => add(m[1])); arr(x.more).forEach((m) => add(m[0])); });
+arr(ctx.WORD_PAIRS).forEach((p) => { add(p.a); add(p.b); if (p.type === 'col') add(p.a + ' ' + p.b); });
+arr((ctx.ES_NUMBERS || {}).groups).forEach((g) => arr(g.rows).forEach((r) => add(r[1])));
+arr((ctx.ES_NUMBERS || {}).clinical).forEach((x) => add(x[0]));
+arr(ctx.PICTURE_SETS).forEach((s) => { arr(s.parts).forEach((p) => p && add(p.w)); arr(s.say).forEach((x) => x && add(x.es)); });
+if (ctx.PICTURE_BODYMAP) { arr(ctx.PICTURE_BODYMAP.ask).forEach((x) => add(x.es)); arr(ctx.PICTURE_BODYMAP.words).forEach((x) => add(x.es)); }
 add((ctx.LANG && ctx.LANG.testLine) || 'Buenos días. ¿Cómo se siente hoy?'); // settings voice test
 
 // Substance use screener: lines are templates ({s} substance, {w} withdrawal symptoms, {u} unit) filled at run time

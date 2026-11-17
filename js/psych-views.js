@@ -29,6 +29,7 @@
         (PSYCH_SECTIONS.length ? T('#/psych/listen', 'Listen', 'Listening drill', 'Hear a patient reply at natural speed, choose the meaning, then see the text.') : '') +
         (PSYCH_SECTIONS.length ? T('#/flash/psych', 'Memorize', 'Psychiatry flashcards', 'All phrases with spaced repetition.') : '') + '</div>',
       tools: (has('PSYCH_ANSWERS') || has('PSYCH_MOOD') || has('PSYCH_DEESC') ? '' : soon('The ward tools (point board, mood episode checker, substance use screener, withdrawal and agitation guide, de-escalation, discharge assessment)')) + '<div class="grid" style="margin-top:14px">' +
+        (window.PICTURE_BODYMAP ? T('#/pictures/bodymap', 'Bedside', 'Body map', 'The patient points to where it hurts on a drawing; pain words in Spanish and English; print a handout.') : '') +
         (has('PSYCH_ANSWERS') || PSYCH_SECTIONS.length ? T('#/psych/point', 'Bedside', 'Point board (' + esc(LANG.point.title) + ')', 'Turn the phone around: the patient points to a reply, the phone speaks it, you read the English.') : '') +
         (has('PSYCH_MOOD') ? T('#/psych/mood', 'Checker', 'Mood episode', 'SIGECAPS and DIGFAST as tap-to-count DSM-5-TR criteria in ' + esc(LANG.name) + ', with the published Spanish PHQ-9 and MDQ as the documented scores.') : '') +
         (has('PSYCH_SUD') ? T('#/psych/sud', 'Screen · counsel', 'Substance use', 'Alcohol, tobacco, cannabis, methamphetamine, opioids, cocaine, gambling: criteria, severity, brief intervention.') : '') +
