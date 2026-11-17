@@ -1,11 +1,11 @@
-# Hablemos — handoff (passes 1 to 6 done; pass 7a review workbook sent 2026-11-08; 2026-11-13 baseline re-verified, no app change; next: 7b when her corrections arrive, else 7c QA)
+# Hablemos — handoff (passes 1 to 6 done; pass 7a review workbook sent 2026-11-08; 2026-11-13: 0.6.1 phone-menu fix, baseline re-verified; next: 7b when her corrections arrive, else 7c QA)
 
 Start here. Usap Tayo's own handoff (`claude/handoff.md`, also `HANDOFF.md` on the Tagalog repo's dev-tools branch) holds the shared engine documentation (section 3 data formats, section 8 pitfalls); this doc holds what differs in Hablemos.
 
 ## 1. Project
 - **What:** Hablemos ("let's talk"), the Spanish/English sister of Usap Tayo: for English-speaking clinicians interviewing Spanish-speaking psychiatry patients. Same engine, Spanish content.
 - **Repo:** github.com/isaymotion/Hablemos (remote also answers to `isaymotion/hablemos`). `main` = the app; `dev-tools` = tests. GitHub Pages is enabled (a pages-build-deployment run follows every push); live: https://isaymotion.github.io/Hablemos/ (not reachable from the session's network; check it on a phone).
-- **Version:** 0.6.0 (2026-11-08), cache `hablemos-0.6.0`, storage key `hablemos.v1` (+ `hablemos.lastBackup`, `hablemos.navmax`), backup file `app: 'hablemos'`. Attribution line exact, as in the other apps (footer, About, README line 7).
+- **Version:** 0.6.1 (2026-11-13, phone menu scroll fix; see the note at the end), cache `hablemos-0.6.1`, storage key `hablemos.v1` (+ `hablemos.lastBackup`, `hablemos.navmax`), backup file `app: 'hablemos'`. Attribution line exact, as in the other apps (footer, About, README line 7).
 - **Design:** terracotta palette (`palette.py 25`), `--night #6E3E1C` / dark `#20150E`; accents are the flag's red (`--accent` light `#AA151B`, `--navy #8E1C21` keeps its engine name) and gold (`--gold #F1BF00`, dark accent `#E3B53F`). Icon = her flag-and-brain image (`icons/`, standard names incl. `icon-maskable-192/512.png`).
 - Everything in section 2 of the Usap Tayo handoff (`claude/handoff.md`) applies: fixed rules, commit authorship, append-only phrase indexes, no patient data, subagents for simple work, UI copy style.
 
