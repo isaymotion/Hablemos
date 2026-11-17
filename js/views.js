@@ -12,6 +12,17 @@
   const soon = (what) => '<div class="notice info">' + esc(what) + ' arrives in a later release of ' + esc(APP_META.name) + '. Every Spanish section is a draft for review until a native Spanish-speaking clinician has checked it.</div>';
   const lvPill = (lv) => '<span class="pill lv">' + esc(lv) + '</span>';
   const crumb = (items) => '<div class="breadcrumb">' + items.map(([t, h]) => (h ? '<a href="' + h + '">' + esc(t) + '</a>' : esc(t))).join(' / ') + '</div>';
+  // 0.9.0: example sentence of a dictionary word (window.DICT_EX: ['<headword>|<English>', es, en, level, hit?]; the key is the
+  // first two fields of its dictionary line). Returns [es, en, level, hit] or null; hit = the word of the sentence that is the
+  // headword when it is inflected ('' when the headword stands in the sentence as it is). The first sentence for a key wins.
+  let exIdx = null;
+  App.exampleFor = (e) => {
+    if (!e) return null;
+    if (!exIdx) { exIdx = new Map(); (window.DICT_EX || []).forEach((x) => { if (x && x[0] && x[1] && !exIdx.has(x[0])) exIdx.set(x[0], [x[1], x[2] || '', x[3] || '', x[4] || '']); }); }
+    return exIdx.get(e.tl + '|' + e.en) || null;
+  };
+  // Links a dialogue or reading to its listening questions (window.LISTEN_Q), if it has any.
+  App.listenLink = (id) => (window.LISTEN_Q && Array.isArray(window.LISTEN_Q[id]) && window.LISTEN_Q[id].length ? '<a class="btn" href="#/listen?tab=story&id=' + encodeURIComponent(id) + '">' + icons.ear + ' Listening questions</a>' : '');
 
   /* ---------- Reusable quiz ---------- */
   // qs: [{q, opts, a, exp, cardId}]
@@ -154,13 +165,15 @@
     if (!e) { el.innerHTML = '<p>Word not found. <a href="#/dict">Back to dictionary</a></p>'; return; }
     const r = e.root || '';
     const related = r ? (App.byRoot.get(App.flat(r)) || []).filter((x) => x.id !== e.id) : [];
+    const ex = App.exampleFor(e);
     const phrases = [];
     PSYCH_SECTIONS.forEach((s) => s.phrases.forEach((ph, i) => { if (App.flat(ph.f + ' ' + (ph.c || '')).includes(e.ftl) && e.ftl.length > 2) phrases.push([s, ph, i]); }));
     el.innerHTML = crumb([['Dictionary', '#/dict'], [e.tl]]) +
       '<div class="card stack"><div class="spread"><h1 class="tl" style="margin:0">' + esc(e.tl) + '</h1><div class="row">' + App.sayBtn(e.tl) +
       '<button class="btn sm" data-addcard="' + e.id + '">' + (S().srs[e.id] ? icons.check + ' In deck' : icons.plus + ' Add to flashcards') + '</button></div></div>' +
       '<div style="font-size:1.15rem">' + esc(e.en) + '</div><div class="row"><span class="pill">' + esc(App.POS[e.pos] || e.pos) + '</span><a class="pill" href="#/dict?cat=' + e.cat + '">' + esc(App.CATS[e.cat] || e.cat) + '</a>' + (r ? '<span class="pill">root: ' + esc(r) + '</span>' : '') + '</div>' +
-      (e.note ? '<div class="notice info">' + esc(e.note) + '</div>' : '') + '</div>' +
+      (e.note ? '<div class="notice info">' + esc(e.note) + '</div>' : '') +
+      (ex ? '<div class="dict-ex"><div class="spread"><b class="tl">' + esc(ex[0]) + '</b>' + App.sayBtn(ex[0]) + '</div><span class="muted">' + esc(ex[1]) + '</span></div>' : '') + '</div>' +
       (related.length ? '<h2 style="margin-top:18px">Same root</h2><div class="card">' + related.map((x) => entryHTML(x)).join('') + '</div>' : '') +
       (phrases.length ? '<h2 style="margin-top:18px">In psychiatry phrases</h2><div class="card">' + phrases.slice(0, 8).map(([s, ph, i]) => '<div class="entry"><div class="w"><a href="#/psych/s/' + s.id + '?p=' + i + '">' + esc(ph.f) + '</a></div><div class="d muted">' + esc(ph.en) + '</div></div>').join('') + '</div>' : '');
   };
