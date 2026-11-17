@@ -3,6 +3,17 @@
    For every release: add an entry here, then bump APP_META.version (data/app-meta.js) and VERSION in sw.js. */
 window.APP_CHANGELOG = [
   {
+    version: '0.9.0', date: '2026-11-18', title: 'Listening practice, a level review test and example sentences',
+    items: [
+      { type: 'feature', text: 'Listening practice: hear a word or a sentence and choose what it means, write what you hear (dictation, with accent keys), tell apart 70 sound pairs such as pero and perro or hablo and habló, and answer questions after hearing a whole dialogue or reading. Slower, natural and fast speeds. Find it under Practice.' },
+      { type: 'feature', text: 'Level review test: a mixed test for A1, A2, B1 or B2 with grammar, verbs, vocabulary, listening and reading, about 44 questions. No feedback until the end, an optional 25-minute timer, and you can leave and resume. The result shows a score for each area and links to the drill for each weak one.' },
+      { type: 'content', text: 'Example sentences for 1,197 dictionary words, on the word page and on the back of its flashcard. They also feed In context in the vocabulary quiz.' },
+      { type: 'content', text: 'Ten new readings (20 in all) and eight new dialogues (16 in all), from a day on the ward and a call to make an appointment to a family meeting before discharge and working with an interpreter. Each has listening questions.' },
+      { type: 'update', text: 'The placement test now has 30 questions. Reading and Speaking lists run from A1 to B2. The Progress page shows your listening and test scores.' },
+      { type: 'content', text: 'All the new Spanish is a draft for review by a native Spanish-speaking clinician, like the rest of the app. New words and sentences get their recorded voice a few minutes after the release.' }
+    ]
+  },
+  {
     version: '0.8.0', date: '2026-11-18', title: 'Picture words, vocabulary drills, numbers and a body map',
     items: [
       { type: 'feature', text: 'Picture words: 38 pictures (the body, the home, the town, a hospital floor, animals, machines, food, clothes, nature, daily life) with 505 words. Tap a pin to learn the word with its article, then find it, label it (choose or type) or listen and point. Every picture has a print sheet. Find it under Practice.' },

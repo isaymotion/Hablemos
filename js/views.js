@@ -488,6 +488,19 @@
     const nrows = groups.filter((g) => nums[g.id + ':read'] != null || nums[g.id + ':listen'] != null).map((g) => [esc(g.title), pctPill(num(nums[g.id + ':read'])), pctPill(num(nums[g.id + ':listen']))]);
     out.push(psBlock('Numbers, dates and time', '#/numbers', nrows.length || num(nums.clinic) != null ? (nrows.length ? psTbl(['Group', 'Read', 'Listen'], nrows) : '') +
       (num(nums.clinic) != null ? '<div class="spread small"><a href="#/numbers?tab=clinic">In the clinic</a><span>Best ' + pctPill(num(nums.clinic)) + '</span></div>' : '') : ''));
+    // Listening practice and level review test (0.9.0)
+    const l2 = store('listen2'), lrows = [];
+    const L2 = [['hear:words:everyday', 'Hear: everyday words'], ['hear:words:clinical', 'Hear: clinical words']].concat(['A1', 'A2', 'B1', 'B2'].map((k) => ['hear:sentences:' + k, 'Hear: sentences ' + k]),
+      [['dict:words:everyday', 'Dictation: everyday words'], ['dict:words:clinical', 'Dictation: clinical words']], ['A1', 'A2', 'B1', 'B2'].map((k) => ['dict:sentences:' + k, 'Dictation: sentences ' + k]));
+    L2.forEach(([k, t]) => { if (num(l2[k]) != null) lrows.push([esc(t), pctPill(num(l2[k]))]); });
+    Object.keys(l2).filter((k) => k.indexOf('pairs:') === 0 && num(l2[k]) != null).sort().forEach((k) => lrows.push([esc('Sound pairs: ' + (k === 'pairs:all' ? 'all types' : k.slice(6))), pctPill(num(l2[k]))]));
+    const stories = Object.keys(l2).filter((k) => k.indexOf('story:') === 0 && num(l2[k]) != null);
+    const storyAll = (() => { try { return App.listenStoryIds ? App.listenStoryIds().length : 0; } catch (e) { return 0; } })();
+    out.push(psBlock('Listening practice', '#/listen', lrows.length || stories.length ? (lrows.length ? psTbl(['Drill', 'Best'], lrows) : '') + (stories.length ? psBar('Dialogues and readings heard', stories.length, Math.max(storyAll, stories.length)) : '') : ''));
+    const tst = store('test'), tinfo = store('testInfo'), AR = [['grammar', 'Grammar'], ['verbs', 'Verbs'], ['vocab', 'Vocabulary'], ['listening', 'Listening'], ['reading', 'Reading']];
+    const tl = ['A1', 'A2', 'B1', 'B2'].filter((k) => num(tst[k]) != null);
+    const frac = (x) => (Array.isArray(x) && x[1] ? x[0] + ' / ' + x[1] : '—');
+    out.push(psBlock('Level review test', '#/test', tl.length ? psTbl(['Level', 'Best'].concat(AR.map((a) => a[1])), tl.map((k) => { const ar = (tinfo[k] && tinfo[k].areas) || {}; return [esc(k), pctPill(num(tst[k]))].concat(AR.map((a) => esc(frac(ar[a[0]])))); })) : ''));
     // Grammar drills (0.7.0)
     twoCol('Verb trainer', 'verbs', '#/verbs', 'Level', [['choose', 'Choose'], ['name', 'Name'], ['type', 'Type']], false, lvName);
     const lessonTitle = (k) => { if (k.indexOf('l:') !== 0) return lvName(k); const l = LESSONS.find((y) => y.id === k.slice(2)); return l ? l.title : k.slice(2); };
