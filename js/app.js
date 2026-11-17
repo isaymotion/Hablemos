@@ -67,26 +67,28 @@
     [/^\/psych\/dcase\/(?<id>[\w-]+)$/, V.dischargeCase, 'psych'],
     [/^\/placement$/, V.placement, 'placement'],
     [/^\/cloze$/, V.cloze, 'cloze'], [/^\/transform$/, V.transform, 'transform'], [/^\/build$/, V.build, 'build'],
+    [/^\/vocab$/, V.vocab, 'vocab'], [/^\/pairs$/, V.pairs, 'pairs'], [/^\/numbers$/, V.numbers, 'numbers'],
+    [/^\/pictures$/, V.pictures, 'pictures'], [/^\/pictures\/bodymap$/, V.pictureBodymap, 'pictures'], [/^\/pictures\/(?<id>[\w-]+)$/, V.pictures, 'pictures'],
     [/^\/verbs$/, V.verbs, 'verbs'], [/^\/verbs\/v\/(?<n>\d+)$/, V.verb, 'verbs'],
     [/^\/progress$/, V.progress, 'progress'],
     [/^\/settings$/, V.settings, 'settings'],
     [/^\/new$/, V.whatsnew, 'new'],
     [/^\/about$/, V.about, 'about']
   ];
-  const TITLES = { home: '', practice: 'Practice', dict: 'Dictionary', flash: 'Flashcards', lessons: 'Lessons', reading: 'Reading', speak: 'Speaking', psych: 'Psychiatry', placement: 'Placement', progress: 'Progress', settings: 'Settings', new: "What's New", about: 'About', verbs: 'Verb trainer', cloze: 'Fill the blank', transform: 'Transform the sentence', build: 'Sentence builder' };
+  const TITLES = { home: '', practice: 'Practice', dict: 'Dictionary', flash: 'Flashcards', lessons: 'Lessons', reading: 'Reading', speak: 'Speaking', psych: 'Psychiatry', placement: 'Placement', progress: 'Progress', settings: 'Settings', new: "What's New", about: 'About', verbs: 'Verb trainer', cloze: 'Fill the blank', transform: 'Transform the sentence', build: 'Sentence builder', vocab: 'Vocabulary quiz', numbers: 'Numbers, dates and time', pictures: 'Picture words', pairs: 'Word pairs' };
 
   /* ---------- Navigation: one grouped list for the desktop rail, the phone drawer (More) and the #/more page ----------
      [key, href, label, icon]. Group labels are shell strings (data/strings.js); item labels are the app's own. */
   const PSY_PRACTICE = [['p-cases', '#/psych/cases', 'Case simulations', icons.case], ['p-interp', '#/psych/interp', 'What is the patient saying?', icons.ear], ['p-listen', '#/psych/listen', 'Listening drill', icons.sound],
     ['p-mcases', '#/psych/mcases', 'Admission MSE practice', icons.eye], ['p-dcases', '#/psych/dcases', 'Discharge practice', icons.check]];
-  const PSY_TOOLS = [['p-point', '#/psych/point', 'Point board (' + LANG.point.title + ')', icons.speak], ['p-mood', '#/psych/mood', 'Mood episode checker', icons.chart], ['p-sud', '#/psych/sud', 'Substance use', icons.target],
+  const PSY_TOOLS = [['p-point', '#/psych/point', 'Point board (' + LANG.point.title + ')', icons.speak], ['p-bodymap', '#/pictures/bodymap', 'Body map', icons.eye], ['p-mood', '#/psych/mood', 'Mood episode checker', icons.chart], ['p-sud', '#/psych/sud', 'Substance use', icons.target],
     ['p-wd', '#/psych/withdrawal', 'Withdrawal and agitation', icons.spark], ['p-deesc', '#/psych/deesc', 'De-escalation', icons.speak],
     ['p-dis', '#/psych/discharge', 'Discharge assessment', icons.check], ['p-mse', '#/psych/mse-sheet', 'MSE interviewer sheet', icons.lesson],
     ['p-ho', '#/psych/handout', 'Printable handout', icons.read]];
   const NAV = [
     ['', [['home', '#/', 'Home', icons.home], ['practice', '#/practice', 'Practice', icons.target]]],
     ['nav.learn', [['lessons', '#/lessons', 'Lessons', icons.lesson], ['reading', '#/reading', 'Reading', icons.read], ['speak', '#/speak', 'Speaking', icons.speak], ['dict', '#/dict', 'Dictionary', icons.book]]],
-    ['nav.drill', [['flash', '#/flash', 'Flashcards', icons.cards], ['verbs', '#/verbs', 'Verb trainer', icons.verb], ['cloze', '#/cloze', 'Fill the blank', icons.verb], ['transform', '#/transform', 'Transform the sentence', icons.verb], ['build', '#/build', 'Sentence builder', icons.verb], ['placement', '#/placement', 'Placement test', icons.target]]],
+    ['nav.drill', [['flash', '#/flash', 'Flashcards', icons.cards], ['vocab', '#/vocab', 'Vocabulary quiz', icons.book], ['pairs', '#/pairs', 'Word pairs', icons.cards], ['verbs', '#/verbs', 'Verb trainer', icons.verb], ['cloze', '#/cloze', 'Fill the blank', icons.verb], ['transform', '#/transform', 'Transform the sentence', icons.verb], ['build', '#/build', 'Sentence builder', icons.verb], ['numbers', '#/numbers', 'Numbers, dates and time', icons.chart], ['pictures', '#/pictures', 'Picture words', icons.eye], ['placement', '#/placement', 'Placement test', icons.target]]],
     ['nav.interview', [['psych', '#/psych', 'Psychiatry ' + LANG.name, icons.brain]].concat(PSY_PRACTICE)],
     ['nav.tools', PSY_TOOLS],
     ['nav.app', [['progress', '#/progress', 'Progress', icons.chart], ['settings', '#/settings', 'Settings', icons.gear], ['new', '#/new', "What's New", icons.spark], ['about', '#/about', 'About', icons.info]]]
@@ -177,7 +179,7 @@
     dict: HAS.dict ? App.DICT.length + ' entries, both directions, root-word search' : later, flash: 'Spaced repetition across every deck',
     lessons: HAS.lessons ? 'Grammar, culture and interpreter use' : later, reading: HAS.reading ? 'Graded passages' : later, speak: HAS.speak ? 'Dialogues with listening and recording' : later,
     practice: 'Every drill on one page', psych: (window.PSYCH_SECTIONS || []).length + ' interview sections and the ward tools',
-    placement: HAS.placement ? '20 questions to find your level' : later, verbs: 'Conjugation tables and three drills', cloze: 'Choose the word that completes the sentence', transform: 'Rewrite a sentence: negative, past, command', build: 'Put the words in order', progress: 'Streak, stats, backup', settings: 'Register, voice, theme', new: 'What changed in each version', about: 'Credits and disclaimers'
+    placement: HAS.placement ? '20 questions to find your level' : later, verbs: 'Conjugation tables and three drills', cloze: 'Choose the word that completes the sentence', transform: 'Rewrite a sentence: negative, past, command', build: 'Put the words in order', vocab: 'Meaning, recall, in context, type it; topic matching', numbers: 'Ages, doses, dates, clock times', pairs: 'Opposites, similar words and words that go together', pictures: 'Words from pictures, and a printable body map', progress: 'Streak, stats, backup', settings: 'Register, voice, theme', new: 'What changed in each version', about: 'Credits and disclaimers'
   };
   V.practice = (el) => {
     const s = App.state, due = App.decks().find((d) => d.id === 'due').ids.length;
@@ -192,11 +194,17 @@
       ((window.ES_VERBS || []).length ? T('#/verbs', 'Grammar', 'Verb trainer', (window.ES_VERBS || []).length + ' verbs in every tense: choose, name or type the form.') : '') +
       ((window.GRAMMAR_CLOZE || []).length ? T('#/cloze', 'Grammar', 'Fill the blank', 'Choose the word that completes the sentence, by level or by lesson.') : '') +
       ((window.GRAMMAR_TRANSFORM || []).length ? T('#/transform', 'Grammar', 'Transform the sentence', 'Make it negative, past, a command: choose or type.') : '') +
-      T('#/build', 'Grammar', 'Sentence builder', 'Put the Spanish words back in order.') + '</div>' +
+      T('#/build', 'Grammar', 'Sentence builder', 'Put the Spanish words back in order.') +
+      (HAS.dict ? T('#/vocab', 'Vocabulary', 'Vocabulary quiz', 'Dictionary decks four ways: meaning, recall, in context, type it.') : '') +
+      ((window.TOPIC_SETS || []).length ? T('#/vocab?tab=match', 'Vocabulary', 'Topic matching', 'Match the word to the meaning: body, symptoms, feelings, medicines and more.') : '') +
+      ((window.PICTURE_SETS || []).length ? T('#/pictures', 'Picture', 'Picture words', 'Learn words from pictures: the body, home, town, animals and more.') : '') +
+      ((window.WORD_PAIRS || []).length ? T('#/pairs', 'Vocabulary', 'Word pairs', (window.WORD_PAIRS || []).length + ' pairs: opposites, similar words, words that go together.') : '') +
+      ((window.ES_NUMBERS || {}).groups ? T('#/numbers', 'Listen', 'Numbers, dates and time', 'Ages, doses, dates and clock times: read them and hear them.') : '') + '</div>' +
       (!HAS.lessons ? '<p class="muted small">' + later + ': the ' + esc(LANG.name) + ' learn track (lessons, reading, dialogues).</p>' : '') +
       '<h2 style="margin-top:18px">Clinical</h2><div class="grid">' +
       T('#/psych/cases', 'Simulate', 'Case simulations', (window.PSYCH_CASES || []).length + ' interviews with feedback.') +
       T('#/psych/interp', 'Listen', 'What is the patient saying?', 'Interpret patient and family lines.') +
+      (window.PICTURE_BODYMAP ? T('#/pictures/bodymap', 'Clinic', 'Body map', 'The patient points to where it hurts; print a handout.') : '') +
       T('#/psych/listen', 'Listen', 'Listening drill', 'Hear a reply at natural speed, choose the meaning.') +
       T('#/psych/mcases', 'Document', 'Admission MSE practice', 'Interview, document, compare.') +
       T('#/psych/dcases', 'Document', 'Discharge practice', 'Five patients, discharge or defer.') +

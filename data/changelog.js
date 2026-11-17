@@ -3,6 +3,20 @@
    For every release: add an entry here, then bump APP_META.version (data/app-meta.js) and VERSION in sw.js. */
 window.APP_CHANGELOG = [
   {
+    version: '0.8.0', date: '2026-11-18', title: 'Picture words, vocabulary drills, numbers and a body map',
+    items: [
+      { type: 'feature', text: 'Picture words: 38 pictures (the body, the home, the town, a hospital floor, animals, machines, food, clothes, nature, daily life) with 505 words. Tap a pin to learn the word with its article, then find it, label it (choose or type) or listen and point. Every picture has a print sheet. Find it under Practice.' },
+      { type: 'feature', text: 'Body map: the patient taps where it hurts on a drawing of the body, front or back. The page has the pain questions and ten pain words in Spanish and English, and prints as a handout. Find it under Practice and in the ward tools.' },
+      { type: 'feature', text: 'Vocabulary quiz: any dictionary deck four ways. Meaning, Recall, In context (choose the word that fits a sentence) and Type it, with accent keys. Topic matching has 19 sets, from body parts and symptoms to medicines, risk words and idioms of distress: match six words to six meanings against the clock, or take the set as a quiz.' },
+      { type: 'feature', text: 'Word pairs: 280 pairs from A1 to B2. Opposites, similar words with a note on the difference, and words that go together (surtir la receta, dar de alta, conciliar el sueño). Learn, match or quiz.' },
+      { type: 'feature', text: 'Numbers, dates and time: twelve groups (numbers, ordinals, clock times, dates, how long, doses, phone numbers and scales) to read and to hear, and 40 clinic sentences where you listen for the number.' },
+      { type: 'content', text: 'Ten picture lessons with the pictures inside them: position words, where it hurts, describing people and things, clothes and colors, directions in a hospital, instructions for machines, how a room is, and explaining with a picture. 91 lessons in all.' },
+      { type: 'content', text: 'The 23 original lessons each gained common mistakes, six more examples and a second quiz, More practice.' },
+      { type: 'update', text: 'The Progress page shows your best score in every drill under Practice scores.' },
+      { type: 'content', text: 'All the new Spanish is a draft for review by a native Spanish-speaking clinician, like the rest of the app. New words and sentences get their recorded voice a few minutes after this release.' }
+    ]
+  },
+  {
     version: '0.7.0', date: '2026-11-17', title: 'Grammar drills and 58 new lessons',
     items: [
       { type: 'feature', text: 'Verb trainer: 154 verbs with every form built by rule (present, preterite, imperfect, present perfect, future, conditional, both subjunctives, commands, gerund and participle), example sentences, and three drills: choose the form, name the form, type the form. Find it under Practice and in the menu.' },

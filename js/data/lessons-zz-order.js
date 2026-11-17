@@ -34,9 +34,9 @@
   const L = root.LESSONS;
   if (!Array.isArray(L) || !L.length) return;
   const ORDER = ('sounds ser-estar hay-estar gender-agreement articles-contractions subject-pronouns possessives demonstratives basic-prepositions muy-mucho tu-usted questions negation ' +
-    'tener-expressions ir-a-future stem-changing irregular-yo querer-poder-necesitar numbers-dates time-frequency family-household review-a1 ' +
+    'tener-expressions ir-a-future stem-changing irregular-yo querer-poder-necesitar numbers-dates time-frequency family-household review-a1 position-words body-donde-duele describing-with-tener clothes-colors directions-map review-pictures-a1 ' +
     'present-tense reflexive-feelings gustar-doler commands-instructions past-timelines preterite-regular preterite-irregular imperfect preterite-vs-imperfect hace-desde present-perfect ' +
-    'direct-object-pronouns indirect-object-pronouns por-para present-progressive saber-conocer obligation-advice comparatives connectors-basic body-symptoms medicines-dosing review-a2 ' +
+    'direct-object-pronouns indirect-object-pronouns por-para present-progressive saber-conocer obligation-advice comparatives connectors-basic body-symptoms medicines-dosing review-a2 machine-instructions states-pictures explaining-with-pictures review-pictures-a2 ' +
     'subjunctive-basics subjunctive-wishes subjunctive-emotion-doubt subjunctive-time-purpose negative-commands-pronouns future-conditional pluperfect reported-speech relative-clauses ' +
     'se-impersonal se-accidental verbs-of-change periphrases diminutives prepositional-verbs regional-variety spanglish softeners values faith-folk idioms-distress false-friends interpreting review-b1 ' +
     'imperfect-subjunctive si-clauses conditional-perfect-regret subjunctive-concession passive-and-se ser-estar-adjectives lo-neutro future-of-probability discourse-markers casual-speech advanced-pronouns chart-and-form-spanish review-b2').split(' ');

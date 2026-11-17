@@ -6,7 +6,7 @@
 
 **App created by Isabella Navarro, MD. Latest version November 2026. isaymotion@gmail.com**
 
-Version **0.7.0** (2026-11-17): verb trainer, fill the blank, transform the sentence, sentence builder and 58 new grammar lessons (81 in all). 0.6.1: phone menu scrolls again. 0.6.0: the Usap Tayo engine with a Spanish language pack, all 27 interview sections (opening to closing, plus Shea's techniques), patient replies for every section and every tool, the interview flow handout, the MSE interviewer sheet, the clinical tools (mood episode checker, substance use screener, withdrawal and agitation guide with an opioid tab, de-escalation checklist, discharge assessment), the practice cases (seven case simulations, the interpretation drill, five discharge cases and two admission MSE cases) and the learn track (23 lessons, a 2,300-entry clinical dictionary, 10 readings, 8 dialogues, placement test), all draft for review.
+Version **0.8.0** (2026-11-18): picture words (38 pictures, 505 words) with a printable body map, vocabulary quiz and topic matching, word pairs, numbers, dates and time, ten picture lessons (91 in all), extras for the 23 original lessons, and practice scores on Progress. 0.7.0 (2026-11-17): verb trainer, fill the blank, transform the sentence, sentence builder and 58 new grammar lessons (81 in all). 0.6.1: phone menu scrolls again. 0.6.0: the Usap Tayo engine with a Spanish language pack, all 27 interview sections (opening to closing, plus Shea's techniques), patient replies for every section and every tool, the interview flow handout, the MSE interviewer sheet, the clinical tools (mood episode checker, substance use screener, withdrawal and agitation guide with an opioid tab, de-escalation checklist, discharge assessment), the practice cases (seven case simulations, the interpretation drill, five discharge cases and two admission MSE cases) and the learn track (23 lessons, a 2,300-entry clinical dictionary, 10 readings, 8 dialogues, placement test), all draft for review.
 
 ## What it is
 
@@ -44,11 +44,16 @@ The app shares its engine with Usap Tayo. The language pack `js/lang.js` sets vo
 | **Discharge assessment and practice** | Guided field-by-field discharge interview with documentation picks, and five simulated patients to practise on with a discharge-or-defer decision. | Live (draft for review) |
 | **Admission MSE practice** | Two simulated admission interviews (Mateo, Brayan) checked against a model MSE, with an admission vs discharge comparison. | Live (draft for review) |
 | **Printable handouts** | PDF or print of the interview flow, MSE, de-escalation checklist and pocket card, and discharge guide, with English shown, hidden or as an answer key. | Live (draft for review) |
-| **Dictionary, lessons, reading, dialogues, placement** | Clinical Spanish dictionary (about 2,300 entries, root lookup), 81 lessons with quizzes from A1 to B2 (a level filter, a review lesson per level), 10 graded readings, 8 dialogues to listen, shadow and role-play, and a 20-question placement test. | Live (draft for review) |
+| **Dictionary, lessons, reading, dialogues, placement** | Clinical Spanish dictionary (about 2,300 entries, root lookup), 91 lessons with quizzes from A1 to B2 (a level filter, a review lesson per level), 10 graded readings, 8 dialogues to listen, shadow and role-play, and a 20-question placement test. | Live (draft for review) |
 | **Verb trainer** (0.7.0) | 154 verbs (A1 41, A2 45, B1 30, B2 10, clinical 28) with every form built by rule in `js/conjugate.js`, example sentences, and three drills: choose, name or type the form. Command and "let's" forms of self-harm verbs are never built. Route `#/verbs`. Data `js/data/verbs.js` (append only: the position is the id). | Live (draft for review) |
 | **Fill the blank** (0.7.0) | 345 sentences (A1 100, A2 105, B1 80, B2 60), 5 per grammar lesson, by level or by lesson, with the reason after each answer. Route `#/cloze`. Data `js/data/grammar-cloze-*.js`. | Live (draft for review) |
 | **Transform the sentence** (0.7.0) | 160 items (40 per level): choose the right version or type it. Route `#/transform`. Data `js/data/grammar-transform-1.js`. | Live (draft for review) |
 | **Sentence builder** (0.7.0) | Put the words of a sentence from the lessons, dialogues, readings and drills back in order. Route `#/build`. No data of its own. | Live (draft for review) |
+| **Picture words and body map** (0.8.0) | 38 pictures in nine groups with 505 words: tap to learn, Identify, Label it (choose or type), Listen and point, print sheets. The body map lets a patient tap where it hurts and prints as a handout. Routes `#/pictures`, `#/pictures/<id>`, `#/pictures/bodymap`. Data `js/data/picture-sets-*.js`, `js/data/picture-bodymap.js`; line art in `pictures/art-*.js` (no words, so it does not start the audio job). | Live (draft for review) |
+| **Vocabulary quiz and topic matching** (0.8.0) | Dictionary decks as Meaning, Recall, In context and Type it; 19 topic sets (336 words) to match or quiz. Route `#/vocab`, `#/vocab?tab=match`. Data `js/data/topic-sets.js`. | Live (draft for review) |
+| **Word pairs** (0.8.0) | 280 pairs (70 per level): opposites, similar words, collocations. Learn, match, quiz. Route `#/pairs`. Data `js/data/word-pairs-1.js`, `-2.js`. | Live (draft for review) |
+| **Numbers, dates and time** (0.8.0) | 12 groups (142 rows) to read and hear, 40 clinic listening sentences. Route `#/numbers`. Data `js/data/numbers.js`. | Live (draft for review) |
+| **Lesson extras** (0.8.0) | Common mistakes, more examples and a More practice quiz for the 23 original lessons. Data `js/data/lesson-extra-1.js`, `-2.js`. | Live (draft for review) |
 
 ## Publish it with GitHub Pages
 
@@ -75,8 +80,9 @@ All content lives in plain JavaScript files under `js/data/`. No build step. The
 |---|---|
 | `meta.js` | Placement test |
 | `dict-core.js`, `dict-everyday.js`, `dict-clinical.js`, `dict-more.js` | Dictionary (`spanish | english | pos | category | root | note` lines) |
-| `lessons.js`, `lessons-2.js` to `lessons-5.js`, `lessons-zz-order.js`, `reading.js`, `dialogues.js` | Lessons (81; new lesson ids also go in the ORDER list of `lessons-zz-order.js`), readings, dialogues |
+| `lessons.js`, `lessons-2.js` to `lessons-6.js`, `lessons-zz-order.js`, `reading.js`, `dialogues.js` | Lessons (91; new lesson ids also go in the ORDER list of `lessons-zz-order.js`), readings, dialogues |
 | `grammar-cloze-*.js`, `grammar-transform-1.js`, `verbs.js` | Fill the blank, Transform the sentence, verb trainer (ids are permanent: append only) |
+| `picture-sets-*.js`, `picture-bodymap.js`, `topic-sets.js`, `word-pairs-*.js`, `numbers.js`, `lesson-extra-*.js` | Picture words and body map, topic matching sets, word pairs, numbers, lesson extras (ids are permanent: append only) |
 | `psych-phrases.js` | Interview phrase sections |
 | `psych-shea.js` | Validity-technique phrases and links to the Psychiatric Interviewing Trainer |
 | `psych-answers.js` | Point-board replies per interview section |

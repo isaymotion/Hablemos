@@ -242,20 +242,42 @@
         return '<a class="tile" href="#/lessons/' + l.id + '"><div class="row">' + lvPill(l.level) + (l.review ? reviewPill : '') + (sc != null ? '<span class="pill good">' + icons.check.replace('<svg', '<svg width="12" height="12"') + ' ' + sc + '%</span>' : '') + '</div><h3 style="margin-top:6px">' + esc(l.title) + '</h3><p>' + esc(l.summary) + '</p></a>';
       }).join('') + '</div>').join('');
   };
+  /* 0.8.0 lesson extras (window.LESSON_EXTRA[id], js/data/lesson-extra-*.js): "Common mistakes" and "More examples" after
+     the body (inside .lesson-body, so the examples get speaker buttons), and a second quiz "More practice" after the
+     lesson's own; best score in state.done.lessonMore[id] (lesson completion stays done.lessons). The WRONG line of a
+     mistake is struck through and never spoken: it is not an .ex. */
+  const lessonExtra = (id) => { const x = window.LESSON_EXTRA && Object.prototype.hasOwnProperty.call(window.LESSON_EXTRA, id) ? window.LESSON_EXTRA[id] : null; return x && typeof x === 'object' ? x : null; };
+  const extraHTML = (x) => {
+    const mis = (x.mistakes || []).filter((m) => Array.isArray(m) && m[0] && m[1]), more = (x.more || []).filter((m) => Array.isArray(m) && m[0]);
+    if (!mis.length && !more.length) return '';
+    return '<div class="lesson-body lx">' +
+      (mis.length ? '<h3>Common mistakes</h3><div class="lx-mist">' + mis.map(([bad, good, why]) =>
+        '<div class="lx-m"><div class="lx-bad"><span class="lx-mk" aria-hidden="true">✗</span><span class="sr-only">Wrong: </span><s>' + esc(bad) + '</s></div>' +
+        '<div class="ex lx-ok"><b>' + esc(good) + '</b><span>' + esc(why || '') + '</span></div></div>').join('') + '</div>' : '') +
+      (more.length ? '<h3>More examples</h3>' + more.map(([es, en]) => '<div class="ex"><b>' + esc(es) + '</b><span>' + esc(en || '') + '</span></div>').join('') : '') +
+      '</div>';
+  };
   V.lesson = (el, p) => {
     const l = LESSONS.find((x) => x.id === p.id);
     if (!l) { el.innerHTML = '<p>Lesson not found.</p>'; return; }
     const idx = LESSONS.indexOf(l), next = LESSONS[idx + 1], prev = LESSONS[idx - 1];
+    const x = lessonExtra(l.id), xq = x && Array.isArray(x.quiz) ? x.quiz.filter((k) => Array.isArray(k) && Array.isArray(k[1])) : [];
     el.innerHTML = crumb([['Lessons', '#/lessons'], [l.title]]) + '<div class="row">' + lvPill(l.level) + (l.review ? reviewPill : '') + '<span class="muted small">' + esc(l.unit) + '</span></div><h1 style="margin-top:6px">' + esc(l.title) + '</h1>' +
       (l.draft ? '<div class="notice warn" style="margin-bottom:12px">Draft for review: the ' + esc(LANG.name) + ' lines in this lesson are practice wording pending review by a native Spanish-speaking clinician.</div>' : '') +
       '<div class="lesson-body">' + l.body.replace(/<table>/g, '<div class="tablewrap"><table>').replace(/<\/table>/g, '</table></div>') + '</div>' +
+      (x ? extraHTML(x) : '') +
       '<h2 style="margin-top:20px">Check yourself</h2><div id="lq"></div>' +
+      (xq.length ? '<h2 style="margin-top:20px">More practice</h2><div id="lq2"></div>' : '') +
       (App.lessonLinks.map((f) => { try { return f(l) || ''; } catch (e) { return ''; } }).join('') ? '<div class="row" style="flex-wrap:wrap;gap:8px;margin-top:14px">' + App.lessonLinks.map((f) => { try { return f(l) || ''; } catch (e) { return ''; } }).join('') + '</div>' : '') +
       '<div class="spread" style="margin-top:16px">' + (prev ? '<a class="btn" href="#/lessons/' + prev.id + '">← ' + esc(prev.title) + '</a>' : '<span></span>') + (next ? '<a class="btn" href="#/lessons/' + next.id + '">' + esc(next.title) + ' →</a>' : '') + '</div>';
+    if (App.mountPics) el.querySelectorAll('.lesson-body').forEach((b) => App.mountPics(b));
     // speak buttons for examples
-    el.querySelectorAll('.lesson-body .ex').forEach((ex) => { const b = ex.querySelector('b'); if (b) { ex.style.gridTemplateColumns = 'minmax(0,1fr) auto'; const btn = document.createElement('div'); btn.innerHTML = App.sayBtn(b.textContent); btn.style.gridRow = '1 / span 2'; btn.style.gridColumn = '2'; ex.appendChild(btn.firstChild); } });
+    el.querySelectorAll('.lesson-body .ex').forEach((ex) => { const b = ex.querySelector('b'); if (b) { ex.style.gridTemplateColumns = 'minmax(0,1fr) auto'; const tmp = document.createElement('div'); tmp.innerHTML = App.sayBtn(b.textContent); const btn = tmp.firstChild; btn.style.gridRow = '1 / span 2'; btn.style.gridColumn = '2'; btn.style.alignSelf = 'center'; b.style.gridColumn = '1'; const sp = ex.querySelector('span'); if (sp) sp.style.gridColumn = '1'; ex.appendChild(btn); } });
     App.runQuiz(el.querySelector('#lq'), l.quiz.map(([q, opts, a, exp]) => ({ q, opts, a, exp })), {
       onDone: (r, n) => { const pct = Math.round((100 * r) / n); S().done.lessons[l.id] = Math.max(pct, S().done.lessons[l.id] || 0); App.activity(10); }
+    });
+    if (xq.length) App.runQuiz(el.querySelector('#lq2'), xq.map(([q, opts, a, exp]) => ({ q, opts, a, exp })), {
+      onDone: (r, n) => { const dn = S().done, m = dn.lessonMore && typeof dn.lessonMore === 'object' ? dn.lessonMore : (dn.lessonMore = {}); m[l.id] = Math.max(Math.round((100 * r) / n), m[l.id] || 0); App.activity(5); }
     });
   };
 
@@ -399,6 +421,69 @@
   };
 
   /* ---------- Progress ---------- */
+  /* Practice scores (0.8.0): the best results each drill keeps in state.done. Every read tolerates a missing key (old
+     backups). Keys: vocab['<deckId>:<mode>'] %, vocab['match:<setId>'] {m,t}, vocab['topic:<setId>:<mode>'] %;
+     pairs['<mode>:<lv>'] %; numbers['<group>:read|listen'] %, numbers.clinic %; verbs['<lv>:<mode>'] %; cloze['<lv>' |
+     'l:<lesson id>'] %; transform['<lv>:<mode>'] %; build['<lv>'] %; lessonMore['<lesson id>'] %. */
+  const pctPill = (v) => (v == null ? '<span class="muted">—</span>' : '<span class="pill ' + (v >= 80 ? 'good' : v >= 50 ? 'warn' : 'bad') + '">' + v + '%</span>');
+  const psBar = (label, a, b, extra) => '<div><div class="spread small"><span>' + label + '</span><span class="muted">' + a + ' / ' + b + (extra ? ' · ' + extra : '') + '</span></div><div class="progress"><i style="width:' + Math.round((100 * a) / Math.max(1, b)) + '%"></i></div></div>';
+  const psTbl = (head, rows) => '<div class="tablewrap ps-tw"><table class="ps-table"><thead><tr>' + head.map((h, k) => '<th' + (k ? ' class="ps-n"' : '') + '>' + esc(h) + '</th>').join('') + '</tr></thead><tbody>' +
+    rows.map((r) => '<tr>' + r.map((c, k) => '<td' + (k ? ' class="ps-n"' : '') + '>' + c + '</td>').join('') + '</tr>').join('') + '</tbody></table></div>';
+  const psBlock = (title, href, body) => '<div class="card stack ps-block"><div class="spread"><h3 style="margin:0">' + esc(title) + '</h3><a class="btn sm" href="' + href + '">Open</a></div>' +
+    (body || '<p class="muted" style="margin:0">Not tried yet. <a href="' + href + '">Start</a></p>') + '</div>';
+  function practiceScores(s) {
+    const done = s.done || {}, out = [];
+    const num = (v) => (typeof v === 'number' ? v : v && typeof v === 'object' && typeof v.p === 'number' ? v.p : null);
+    const store = (k) => (done[k] && typeof done[k] === 'object' ? done[k] : {});
+    const LV_ORDER = ['A1', 'A2', 'B1', 'B2', 'C', 'all'];
+    const lvName = (k) => (k === 'all' || k === 'All' ? 'All levels' : k === 'C' ? 'Clinical' : k);
+    const lvSort = (a, b) => { const x = LV_ORDER.indexOf(a), y = LV_ORDER.indexOf(b); return (x < 0 ? 99 : x) - (y < 0 ? 99 : y) || String(a).localeCompare(String(b)); };
+    const oneCol = (title, key, href, head, label, sortFn) => {
+      const st = store(key), ks = Object.keys(st).filter((k) => num(st[k]) != null).sort(sortFn || lvSort);
+      out.push(psBlock(title, href, ks.length ? psTbl([head, 'Best'], ks.map((k) => [esc(label(k)), pctPill(num(st[k]))])) : ''));
+    };
+    const twoCol = (title, key, href, head, modes, modeFirst, label, sortFn) => {
+      const st = store(key), rows = {};
+      Object.keys(st).forEach((k) => { if (num(st[k]) == null) return; const at = modeFirst ? k.indexOf(':') : k.lastIndexOf(':'); if (at < 0) return;
+        const m = modeFirst ? k.slice(0, at) : k.slice(at + 1), x = modeFirst ? k.slice(at + 1) : k.slice(0, at);
+        if (!modes.some((mm) => mm[0] === m)) return; (rows[x] = rows[x] || {})[m] = num(st[k]); });
+      const xs = Object.keys(rows).sort(sortFn || lvSort);
+      out.push(psBlock(title, href, xs.length ? psTbl([head].concat(modes.map((m) => m[1])), xs.map((x) => [esc(label(x))].concat(modes.map((m) => pctPill(rows[x][m[0]]))))) : ''));
+    };
+    // Vocabulary quiz
+    const vocab = store('vocab'), VM = [['meaning', 'Meaning'], ['recall', 'Recall'], ['context', 'In context'], ['type', 'Type it']];
+    const decks = {}; try { App.decks().forEach((d) => (decks[d.id] = d.name)); } catch (e) { /* decks need the dictionary */ }
+    const vd = {};
+    Object.keys(vocab).forEach((k) => { if (k.startsWith('match:') || k.startsWith('topic:') || typeof vocab[k] !== 'number') return; const at = k.lastIndexOf(':'); if (at < 0) return; (vd[k.slice(0, at)] = vd[k.slice(0, at)] || {})[k.slice(at + 1)] = vocab[k]; });
+    const vIds = Object.keys(vd).sort((a, b) => String(decks[a] || a).localeCompare(String(decks[b] || b)));
+    out.push(psBlock('Vocabulary quiz', '#/vocab', vIds.length ? psTbl(['Deck'].concat(VM.map((m) => m[1])), vIds.map((id) => [esc(decks[id] || id)].concat(VM.map((m) => pctPill(vd[id][m[0]]))))) : ''));
+    // Topic matching
+    const sets = Array.isArray(window.TOPIC_SETS) ? window.TOPIC_SETS : [];
+    const mt = sets.filter((x) => (vocab['match:' + x.id] && typeof vocab['match:' + x.id] === 'object') || typeof vocab['topic:' + x.id + ':meaning'] === 'number' || typeof vocab['topic:' + x.id + ':recall'] === 'number');
+    out.push(psBlock('Topic matching', '#/vocab?tab=match', mt.length ? psBar('Sets tried', mt.length, sets.length) +
+      psTbl(['Set', 'Misses', 'Time', 'Quiz'], mt.map((x) => { const r = vocab['match:' + x.id] || {}; const qs = [vocab['topic:' + x.id + ':meaning'], vocab['topic:' + x.id + ':recall']].filter((v) => typeof v === 'number');
+        return [esc(x.title), r.m != null ? String(r.m) : '—', r.t != null ? r.t + ' s' : '—', pctPill(qs.length ? Math.max.apply(null, qs) : null)]; })) : ''));
+    twoCol('Word pairs', 'pairs', '#/pairs', 'Level', [['match', 'Match'], ['quiz', 'Quiz']], true, lvName);
+    const picTitle = (id) => { try { const x = App.pictures && App.pictures.get(id); return x ? x.title : id; } catch (e) { return id; } };
+    twoCol('Picture words', 'pictures', '#/pictures', 'Picture', [['identify', 'Identify'], ['label', 'Label'], ['listen', 'Listen']], true, picTitle, (x, y) => String(picTitle(x)).localeCompare(String(picTitle(y))));
+    // Numbers, dates and time
+    const nums = store('numbers'), groups = (((window.ES_NUMBERS || {}).groups) || []).concat([{ id: 'mixed', title: 'All groups mixed' }]);
+    const nrows = groups.filter((g) => nums[g.id + ':read'] != null || nums[g.id + ':listen'] != null).map((g) => [esc(g.title), pctPill(num(nums[g.id + ':read'])), pctPill(num(nums[g.id + ':listen']))]);
+    out.push(psBlock('Numbers, dates and time', '#/numbers', nrows.length || num(nums.clinic) != null ? (nrows.length ? psTbl(['Group', 'Read', 'Listen'], nrows) : '') +
+      (num(nums.clinic) != null ? '<div class="spread small"><a href="#/numbers?tab=clinic">In the clinic</a><span>Best ' + pctPill(num(nums.clinic)) + '</span></div>' : '') : ''));
+    // Grammar drills (0.7.0)
+    twoCol('Verb trainer', 'verbs', '#/verbs', 'Level', [['choose', 'Choose'], ['name', 'Name'], ['type', 'Type']], false, lvName);
+    const lessonTitle = (k) => { if (k.indexOf('l:') !== 0) return lvName(k); const l = LESSONS.find((y) => y.id === k.slice(2)); return l ? l.title : k.slice(2); };
+    const cloRank = (k) => (k.indexOf('l:') === 0 ? 100 + LESSONS.findIndex((y) => y.id === k.slice(2)) : LV_ORDER.indexOf(k));
+    oneCol('Fill the blank', 'cloze', '#/cloze', 'Level or lesson', lessonTitle, (a, b) => cloRank(a) - cloRank(b));
+    twoCol('Transform the sentence', 'transform', '#/transform', 'Level', [['choose', 'Choose'], ['type', 'Type']], false, lvName);
+    oneCol('Sentence builder', 'build', '#/build', 'Level', lvName);
+    // Lesson "More practice" quizzes
+    const lm = store('lessonMore'), withMore = LESSONS.filter((l) => window.LESSON_EXTRA && window.LESSON_EXTRA[l.id] && Array.isArray(window.LESSON_EXTRA[l.id].quiz));
+    const lmDone = withMore.filter((l) => typeof lm[l.id] === 'number');
+    if (withMore.length) out.push(psBlock('Lesson "More practice" quizzes', '#/lessons', lmDone.length ? psBar('Quizzes done', lmDone.length, withMore.length) + psTbl(['Lesson', 'Best'], lmDone.map((l) => [esc(l.title), pctPill(lm[l.id])])) : ''));
+    return '<div class="ps-grid">' + out.join('') + '</div>';
+  }
   V.progress = (el) => {
     const s = S();
     const learned = Object.keys(s.srs).length;
@@ -414,6 +499,7 @@
       '<h2 style="margin-top:18px">Completion</h2><div class="card stack">' +
       [['Lessons', Object.keys(s.done.lessons).length, LESSONS.length], ['Reading passages', Object.keys(s.done.reading).length, READING.length], ['Dialogues', Object.keys(s.done.dialogues).length, DIALOGUES.length + PSYCH_CASES.length], ['Psychiatry sections opened', secSeen, sec], ['Case simulations', Object.keys(s.done.cases).length, PSYCH_CASES.length]]
         .map(([t, a, b]) => '<div><div class="spread small"><span>' + t + '</span><span class="muted">' + a + ' / ' + b + '</span></div><div class="progress"><i style="width:' + Math.round((100 * a) / Math.max(1, b)) + '%"></i></div></div>').join('') + '</div>' +
+      '<h2 style="margin-top:18px">Practice scores</h2><p class="muted small" style="margin-top:0">Your best result in each drill. Scores stay on this device and travel with your backup.</p>' + practiceScores(s) +
       '<h2 style="margin-top:18px">Backup</h2><div class="card stack"><p style="margin:0">Progress is saved on this device. Export a backup file to move it to another phone or browser. The same buttons are in the footer of every page.</p>' +
       '<div class="row"><button class="btn" id="exp">Export backup</button><label class="btn" for="imp">Import backup</label><input type="file" id="imp" class="sr-only" accept="application/json,.json"></div>' +
       '<p class="small muted" style="margin:0">' + esc(App.t('backup.onDevice').replace('{summary}', App.backup.summary())) + '</p>' +
