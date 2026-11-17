@@ -10,6 +10,8 @@
   // Pages whose data has not arrived yet draw a notice instead of running on empty data (used by every module view).
   App.notYet = (el, title, what, crumbTo) => { el.innerHTML = (crumbTo ? '<div class="breadcrumb"><a href="#/psych">Psychiatry</a> / ' + esc(title) + '</div>' : '') + '<h1>' + esc(title) + '</h1>' + soon(what); return true; };
   const soon = (what) => '<div class="notice info">' + esc(what) + ' arrives in a later release of ' + esc(APP_META.name) + '. Every Spanish section is a draft for review until a native Spanish-speaking clinician has checked it.</div>';
+  // 0.9.0: reading and dialogue lists run A1 to B2 (stable within a level), whichever file an item came from.
+  const byLevel = (list) => { const LV = ['A1', 'A2', 'B1', 'B2']; return list.map((x, i) => [x, i]).sort((a, b) => (LV.indexOf(a[0].level) - LV.indexOf(b[0].level)) || a[1] - b[1]).map((x) => x[0]); };
   const lvPill = (lv) => '<span class="pill lv">' + esc(lv) + '</span>';
   const crumb = (items) => '<div class="breadcrumb">' + items.map(([t, h]) => (h ? '<a href="' + h + '">' + esc(t) + '</a>' : esc(t))).join(' / ') + '</div>';
   // 0.9.0: example sentence of a dictionary word (window.DICT_EX: ['<headword>|<English>', es, en, level, hit?]; the key is the
@@ -94,7 +96,7 @@
       (due ? tile('#/flash/due', 'Review', due + ' cards due', 'Spaced repetition keeps words fresh.') : tile('#/flash', 'Flashcards', 'Start a deck', 'Vocabulary and psychiatry phrases.')) +
       (qd ? tile(qd[0], 'Quick practice', qd[1], qd[2]) : '') +
       (nextLesson ? tile('#/lessons/' + nextLesson.id, 'Next lesson · ' + esc(nextLesson.level), esc(nextLesson.title), esc(nextLesson.summary)) : '') +
-      (!s.level && PLACEMENT.length ? tile('#/placement', 'New here?', 'Take the placement test', '20 questions to find your level.') : '') +
+      (!s.level && PLACEMENT.length ? tile('#/placement', 'New here?', 'Take the placement test', PLACEMENT.length + ' questions to find your level.') : '') +
       '</div>' +
       (pins.length ? '<h2 style="margin-top:22px">Pinned</h2><div class="grid">' + pins.map((p) => tile(esc(p.hash), esc(p.sec || 'Pinned'), esc(p.title))).join('') + '</div>' : '') +
       (recent.length ? '<h2 style="margin-top:22px">Continue</h2><div class="grid">' + recent.map((r) => tile(esc(r.hash), esc(r.sec || 'Recent'), esc(r.title))).join('') + '</div>' : '') +
@@ -213,12 +215,13 @@
       const c = App.cardFor(queue[i]);
       if (!c) { i++; draw(); return; }
       const front = enFirst ? esc(c.en) : esc(c.tl), back = enFirst ? esc(c.tl) : esc(c.en);
+      const cex = String(c.id).charAt(0) === 'd' ? App.exampleFor(App.dictById[c.id]) : null;
       el.innerHTML = crumb([['Flashcards', '#/flash'], [deck.name]]) +
         '<div class="spread" style="margin-bottom:8px"><span class="muted small">' + (i + 1) + ' / ' + queue.length + (S().srs[c.id] ? '' : ' · <span class="pill">new</span>') + '</span>' + App.sayBtn(c.tl) + '</div>' +
         '<div class="progress" style="margin-bottom:12px"><i style="width:' + Math.round((100 * i) / queue.length) + '%"></i></div>' +
         '<div class="card flash" id="fc" tabindex="0" role="button" aria-label="Flip card"><div>' +
         '<div class="front" style="' + (enFirst ? 'font-family:var(--font-ui);font-size:1.35rem' : '') + '">' + front + '</div>' +
-        (flipped ? '<div class="back ' + (enFirst ? 'tl' : '') + '">' + back + '</div>' + (c.alt ? '<div class="hint tl">Also: ' + esc(c.alt) + '</div>' : '') + (c.note ? '<div class="hint">' + esc(c.note) + '</div>' : '') + (c.sub ? '<div class="hint">' + esc(c.sub) + '</div>' : '') : '<div class="hint">Tap or press Space to show the answer</div>') +
+        (flipped ? '<div class="back ' + (enFirst ? 'tl' : '') + '">' + back + '</div>' + (c.alt ? '<div class="hint tl">Also: ' + esc(c.alt) + '</div>' : '') + (c.note ? '<div class="hint">' + esc(c.note) + '</div>' : '') + (c.sub ? '<div class="hint">' + esc(c.sub) + '</div>' : '') + (cex ? '<div class="hint fc-ex"><span class="tl">' + esc(cex[0]) + '</span><br>' + esc(cex[1]) + '</div>' : '') : '<div class="hint">Tap or press Space to show the answer</div>') +
         '</div></div>' +
         (flipped ? '<div class="grade" style="margin-top:12px">' + [['again', 'Again', 0], ['', 'Hard', 1], ['good', 'Good', 2], ['', 'Easy', 3]].map(([cls, t, g]) => '<button class="' + cls + '" data-g="' + g + '">' + t + '<small>' + App.nextLabel(c.id, g) + '</small></button>').join('') + '</div><p class="muted small" style="text-align:center">Keys: 1 Again · 2 Hard · 3 Good · 4 Easy</p>' : '');
       const fc = el.querySelector('#fc');
@@ -297,7 +300,7 @@
   /* ---------- Reading ---------- */
   V.reading = (el) => {
     el.innerHTML = '<h1>Reading</h1>' + (READING.length ? '' : soon(LANG.name + ' reading passages')) + '<p class="muted">Read the ' + esc(LANG.name) + ' first. Reveal the translation only when you need it, then answer the questions. Passages marked <span class="pill warn">clinical</span> practice psychiatric content.</p><div class="grid">' +
-      READING.map((r) => '<a class="tile" href="#/reading/' + r.id + '"><div class="row">' + lvPill(r.level) + (r.psych ? '<span class="pill warn">clinical</span>' : '') + (S().done.reading[r.id] != null ? '<span class="pill good">' + S().done.reading[r.id] + '%</span>' : '') + '</div><h3 class="tl" style="margin-top:6px">' + esc(r.title) + '</h3><p>' + esc(r.titleEn) + '</p></a>').join('') + '</div>';
+      byLevel(READING).map((r) => '<a class="tile" href="#/reading/' + r.id + '"><div class="row">' + lvPill(r.level) + (r.psych ? '<span class="pill warn">clinical</span>' : '') + (S().done.reading[r.id] != null ? '<span class="pill good">' + S().done.reading[r.id] + '%</span>' : '') + '</div><h3 class="tl" style="margin-top:6px">' + esc(r.title) + '</h3><p>' + esc(r.titleEn) + '</p></a>').join('') + '</div>';
   };
   V.passage = (el, p) => {
     const r = READING.find((x) => x.id === p.id);
@@ -308,7 +311,7 @@
       el.querySelector('#trbtn').textContent = showTr ? 'Hide translation' : 'Show translation';
     };
     el.innerHTML = crumb([['Reading', '#/reading'], [r.title]]) + '<div class="row">' + lvPill(r.level) + '</div><h1 class="tl" style="margin-top:6px">' + esc(r.title) + '</h1><p class="muted">' + esc(r.titleEn) + '</p>' +
-      '<div class="row"><button class="btn" id="readall">' + icons.sound + ' Listen</button><button class="btn" id="trbtn"></button></div>' +
+      '<div class="row"><button class="btn" id="readall">' + icons.sound + ' Listen</button><button class="btn" id="trbtn"></button>' + App.listenLink(r.id) + '</div>' +
       '<div class="card passage" id="pbody" style="margin-top:12px"></div>' +
       '<h2 style="margin-top:16px">Glossary</h2><div class="gloss">' + r.gloss.map(([t, e]) => '<span><b>' + esc(t) + '</b> — ' + esc(e) + '</span>').join('') + '</div>' +
       '<h2 style="margin-top:16px">Questions</h2><div id="rq"></div>';
@@ -324,7 +327,7 @@
   V.speak = (el) => {
     el.innerHTML = '<h1>Speaking</h1>' + (DIALOGUES.length || PSYCH_CASES.length ? '' : soon(LANG.name + ' dialogues')) + speechSupportNote() +
       '<p class="muted">Each dialogue has three modes: <b>Listen</b> to the whole conversation, <b>Shadow</b> each line after the audio, and <b>Role-play</b>, where your lines are hidden and you say them from the English cue. Clinical dialogues are in the <a href="#/psych">psychiatry track</a>.</p><div class="grid">' +
-      DIALOGUES.map((d) => '<a class="tile" href="#/speak/' + d.id + '"><div class="row">' + lvPill(d.level) + (S().done.dialogues[d.id] != null ? '<span class="pill good">' + S().done.dialogues[d.id] + '%</span>' : '') + '</div><h3 style="margin-top:6px">' + esc(d.title) + '</h3><p>' + d.lines.length + ' lines · you are ' + esc(d.roles[d.you]) + '</p></a>').join('') + '</div>' +
+      byLevel(DIALOGUES).map((d) => '<a class="tile" href="#/speak/' + d.id + '"><div class="row">' + lvPill(d.level) + (S().done.dialogues[d.id] != null ? '<span class="pill good">' + S().done.dialogues[d.id] + '%</span>' : '') + '</div><h3 style="margin-top:6px">' + esc(d.title) + '</h3><p>' + d.lines.length + ' lines · you are ' + esc(d.roles[d.you]) + '</p></a>').join('') + '</div>' +
       '<h2 style="margin-top:18px">Clinical dialogues</h2><div class="grid">' + PSYCH_CASES.map((c) => '<a class="tile" href="#/speak/case-' + c.id + '"><div class="row">' + lvPill(c.level) + '<span class="pill warn">clinical</span></div><h3 style="margin-top:6px">' + esc(c.title) + '</h3><p>Role-play the best-practice interview lines.</p></a>').join('') + '</div>';
   };
   function speechSupportNote() {
@@ -396,7 +399,7 @@
         try { rec = await App.record(); q('#rec').innerHTML = '<span class="recdot"></span> Stop'; } catch (e) { App.toast('Microphone unavailable or permission denied.'); }
       };
     };
-    el.innerHTML = crumb([['Speaking', '#/speak'], [d.title]]) + '<div class="row">' + lvPill(d.level) + '</div><h1 style="margin-top:6px">' + esc(d.title) + '</h1>' + (d.setting ? '<p class="muted">' + esc(d.setting) + '</p>' : '') + speechSupportNote() +
+    el.innerHTML = crumb([['Speaking', '#/speak'], [d.title]]) + '<div class="row">' + lvPill(d.level) + '</div><h1 style="margin-top:6px">' + esc(d.title) + '</h1>' + (d.setting ? '<p class="muted">' + esc(d.setting) + '</p>' : '') + (App.listenLink(d.id) ? '<div class="row" style="margin-bottom:10px">' + App.listenLink(d.id) + '</div>' : '') + speechSupportNote() +
       '<div class="seg" role="group" aria-label="Mode" style="margin-bottom:12px">' + [['listen', 'Listen'], ['shadow', 'Shadow'], ['role', 'Role-play']].map(([k, t]) => '<button data-m="' + k + '" class="' + (mode === k ? 'on' : '') + '">' + t + '</button>').join('') + '</div>' +
       '<div class="dlg" id="dlg"></div><div class="row" id="dctl" style="margin-top:14px;position:sticky;bottom:calc(70px + env(safe-area-inset-bottom,0px));background:var(--bg);padding:8px 0"></div>';
     el.querySelectorAll('[data-m]').forEach((b) => (b.onclick = () => { mode = b.dataset.m; step = 0; scores = []; recUrl = {}; el.querySelectorAll('[data-m]').forEach((x) => x.classList.toggle('on', x === b)); draw(); const c = d.lines[0]; if (mode === 'role' && c[0] !== d.you) setTimeout(() => App.speak(textOf(c)), 250); }));
@@ -406,8 +409,9 @@
   /* ---------- Placement ---------- */
   V.placement = (el) => {
     if (!PLACEMENT.length) { el.innerHTML = '<h1>Placement test</h1>' + soon('The placement test'); return; }
-    el.innerHTML = '<h1>Placement test</h1><p class="muted">20 questions from beginner (A1) to upper-intermediate (B2). Skip what you don\'t know; guessing only hides your real level.</p><div id="pq"></div>';
-    const qs = PLACEMENT.map(([lv, q, opts, a]) => ({ lv, q, opts: opts.concat(["I don't know"]), a }));
+    el.innerHTML = '<h1>Placement test</h1><p class="muted">' + PLACEMENT.length + ' questions from beginner (A1) to upper-intermediate (B2). Skip what you don\'t know; guessing only hides your real level.</p><div id="pq"></div>';
+    const LV = ['A1', 'A2', 'B1', 'B2'];
+    const qs = PLACEMENT.map(([lv, q, opts, a]) => ({ lv, q, opts: opts.concat(["I don't know"]), a })).sort((x, y) => LV.indexOf(x.lv) - LV.indexOf(y.lv));   // stable: items keep their order within a level
     let i = 0; const got = { A1: 0, A2: 0, B1: 0, B2: 0 }, tot = { A1: 0, A2: 0, B1: 0, B2: 0 };
     qs.forEach((q) => tot[q.lv]++);
     const box = el.querySelector('#pq');
