@@ -65,9 +65,9 @@
     return 'MDQ ' + yes + '/13 yes' + (ans < 13 ? ' (' + (13 - ans) + ' unanswered)' : '') + (st.mdqSame ? ', same period: ' + st.mdqSame : '') + (st.mdqProb ? ', problem: ' + st.mdqProb : '') + ' → ' + (ans === 13 && st.mdqSame && st.mdqProb ? (pos ? 'positive screen' : 'negative screen') : 'incomplete') + '.';
   }
 
-  /* Nurse view (0.19.0): what the ward nurse asks and watches each day, behind the shared Resident / Nurse switch
+  /* Nurse view (0.19.0): what the unit nurse asks and watches each day, behind the shared Resident / Nurse switch
      (js/nurse-script.js, data PSYCH_NURSE_TOOLS.mood). Shows only when that data has steps. */
-  const NS = App.nurseScript('mood', { intro: 'What the ward nurse asks and watches each day, and when to tell the doctor. The episode criteria, PHQ-9 and MDQ are in the Resident view.' });
+  const NS = App.nurseScript('mood', { intro: 'What the unit nurse asks and watches each day, and when to tell the doctor. The episode criteria, PHQ-9 and MDQ are in the Resident view.' });
 
   const copyBtn = (id) => '<button class="btn sm primary" data-copy="' + id + '">Copy chart line</button>';
 

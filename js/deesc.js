@@ -11,7 +11,7 @@
 
   /* Nurse view (0.18.0): the same Resident / Nurse switch (settings.role) as the substance use tool, from the shared
      helper in js/nurse-script.js (data PSYCH_NURSE_TOOLS.deesc). */
-  const NS = App.nurseScript('deesc', { intro: 'What the ward nurse says around an incident: calling the doctor, getting help, talking with the patient afterwards, and reassuring the other patients. The 12-step bedside checklist is in the Resident view.' });
+  const NS = App.nurseScript('deesc', { intro: 'What the unit nurse says around an incident: what to tell the patient while you call the doctor and as help arrives, talking with the patient afterwards, and reassuring the other patients. The 12-step bedside checklist is in the Resident view.' });
   const isNurse = NS.on;
 
   // Speak a line and resolve when finished (or after a timeout if speech is unavailable).
