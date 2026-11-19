@@ -8,9 +8,9 @@
   const ref = (r) => { const [sid, i] = r.split(':'); const s = PSYCH_SECTIONS.find((x) => x.id === sid); return s && s.phrases[+i]; };
   const main = (p) => (S().settings.register === 'c' ? p.c || p.f : p.f);
   const alt = (p) => (S().settings.register === 'c' ? p.f : p.c);
-  /* Nurse view (0.18.0): discharge-day teaching by the ward nurse, behind the same Resident / Nurse switch
+  /* Nurse view (0.18.0): discharge-day teaching by the unit nurse, behind the same Resident / Nurse switch
      (settings.role) as the substance use tool, from the shared helper in js/nurse-script.js (data PSYCH_NURSE_TOOLS.discharge). */
-  const NS = App.nurseScript('discharge', { intro: 'Discharge-day teaching by the ward nurse: belongings, medicines with teach-back, the next appointment, warning signs, and the family. The discharge summary fields are in the Resident view.' });
+  const NS = App.nurseScript('discharge', { intro: 'Discharge-day teaching by the unit nurse: belongings, medicines with teach-back, the next appointment, warning signs, and the family. The discharge summary fields are in the Resident view.' });
   const isNurse = NS.on;
   const KIND = { observe: 'Mostly observe', ask: 'Ask and observe', explain: 'Explain and confirm', sign: 'Sign' };
 
