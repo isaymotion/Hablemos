@@ -67,8 +67,9 @@
     },
     fb: (ok, ch) => {
       const ws = words(x.bad), d = diff(x), l = lessonOf(x.l);
-      const what = d.was.length ? (d.now.length ? 'The wrong word is <span class="tl">' + esc(ws[x.i]) + '</span>' : 'The extra word is <span class="tl">' + esc(ws[x.i]) + '</span>') : 'A word is missing after <span class="tl">' + esc(ws[x.i]) + '</span>';
-      return '<div class="small">' + what + (ok ? '.' : '. You tapped <span class="tl">' + esc(ws[ch] != null ? ws[ch] : '') + '</span>.') + '</div>' +
+      const bare = (w) => String(w).replace(/^[¿¡"'(]+|[.,;:!?"')]+$/g, '') || String(w);   // no doubled punctuation in the message
+      const what = d.was.length ? (d.now.length ? 'The wrong word is <span class="tl">' + esc(bare(ws[x.i])) + '</span>' : 'The extra word is <span class="tl">' + esc(bare(ws[x.i])) + '</span>') : 'A word is missing after <span class="tl">' + esc(bare(ws[x.i])) + '</span>';
+      return '<div class="small">' + what + (ok ? '.' : '. You tapped <span class="tl">' + esc(bare(ws[ch] != null ? ws[ch] : '')) + '</span>.') + '</div>' +
         '<div class="er-fix"><span class="tl">' + esc(x.fix) + '</span>' + App.sayBtn(x.fix, x.fix) + '</div>' +
         (isStr(x.en) ? '<div>' + esc(x.en) + '</div>' : '') + (isStr(x.why) ? '<div class="muted small er-why">' + esc(x.why) + '</div>' : '') +
         (l ? '<div class="small"><a href="#/lessons/' + encodeURIComponent(l.id) + '">Lesson: ' + esc(l.title) + '</a></div>' : '');

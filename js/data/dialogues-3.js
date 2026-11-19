@@ -33,7 +33,7 @@ window.DIALOGUES = (window.DIALOGUES || []).concat([
 [0, `Gracias. Voy a avisar a la doctora. Descanse un momento.`, `Thank you. I am going to tell the doctor. Rest for a moment.`, `Gracias. Voy a avisar a la doctora. Descansa un momento.`],
 [1, `Gracias, enfermera.`, `Thank you, nurse.`]
 ]},
-{ id: "medication-teachback", level: "A2", title: "Teaching a new medicine and asking the patient to say it back", roles: ["You (nurse)", "Patient"], you: 0, lines: [
+{ id: "medication-teachback", level: "A2", title: "A new medicine, with teach-back", roles: ["You (nurse)", "Patient"], you: 0, lines: [
 [0, `Buenos días, Rosa. La doctora le recetó una medicina nueva. Quiero explicársela.`, `Good morning, Rosa. The doctor prescribed a new medicine for you. I want to explain it to you.`, `Buenos días, Rosa. La doctora te recetó una medicina nueva. Quiero explicártela.`],
 [1, `Gracias. ¿Cómo la tomo?`, `Thank you. How do I take it?`],
 [0, `Tome una pastilla en la mañana, con comida.`, `Take one pill in the morning, with food.`, `Toma una pastilla en la mañana, con comida.`],
@@ -61,7 +61,7 @@ window.DIALOGUES = (window.DIALOGUES || []).concat([
 [0, `Claro. Puede traerla en una bolsa y dejarla en la oficina de enfermería.`, `Of course. You can bring it in a bag and leave it at the nursing office.`, `Claro. Puedes traerla en una bolsa y dejarla en la oficina de enfermería.`],
 [1, `Perfecto. Gracias por llamarme, doctora.`, `Perfect. Thank you for calling me, doctor.`]
 ]},
-{ id: "sleep-hygiene-plan", level: "B1", title: "Agreeing a sleep plan with a patient who works nights", roles: ["You (doctor)", "Patient"], you: 0, lines: [
+{ id: "sleep-hygiene-plan", level: "B1", title: "A sleep plan for a night-shift worker", roles: ["You (doctor)", "Patient"], you: 0, lines: [
 [0, `Esteban, hablemos de su sueño. Usted trabaja de noche, ¿verdad?`, `Esteban, let us talk about your sleep. You work at night, right?`, `Esteban, hablemos de tu sueño. Tú trabajas de noche, ¿verdad?`],
 [1, `Sí, de diez de la noche a seis de la mañana. Llego a casa y no puedo dormir.`, `Yes, from ten at night to six in the morning. I get home and cannot sleep.`],
 [0, `¿Qué hace cuando llega a casa?`, `What do you do when you get home?`, `¿Qué haces cuando llegas a casa?`],
@@ -75,7 +75,7 @@ window.DIALOGUES = (window.DIALOGUES || []).concat([
 [0, `Si quiere, empecemos solo con dos cambios esta semana: el café y el celular. ¿Qué le parece?`, `If you want, let us start with only two changes this week: the coffee and the phone. What do you think?`, `Si quieres, empecemos solo con dos cambios esta semana: el café y el celular. ¿Qué te parece?`],
 [1, `Me parece bien. Empiezo hoy.`, `That sounds good to me. I start today.`]
 ]},
-{ id: "teen-first-visit", level: "B1", title: "A first visit with a 14-year-old: school, worries and confidentiality", roles: ["You (doctor)", "Teen"], you: 0, lines: [
+{ id: "teen-first-visit", level: "B1", title: "First visit with a 14-year-old", roles: ["You (doctor)", "Teen"], you: 0, lines: [
 [0, `Hola, Valeria. Soy la doctora Navarro. Gracias por venir. ¿Cómo te sientes hoy?`, `Hi, Valeria. I am Dr. Navarro. Thank you for coming. How do you feel today?`],
 [1, `Un poco nerviosa. No sé qué decir.`, `A little nervous. I do not know what to say.`],
 [0, `Es normal. No hay respuestas malas. ¿Cómo te va en la escuela?`, `That is normal. There are no wrong answers. How is school going for you?`],
@@ -89,7 +89,7 @@ window.DIALOGUES = (window.DIALOGUES || []).concat([
 [0, `Hay una excepción. Si pienso que estás en peligro, o que alguien te hace daño, tengo que pedir ayuda para protegerte. Pero primero te lo diría a ti.`, `There is one exception. If I think you are in danger, or that someone is hurting you, I have to ask for help to protect you. But I would tell you first.`],
 [1, `Está bien. Entiendo. Creo que sí puedo hablar.`, `All right. I understand. I think I can talk.`]
 ]},
-{ id: "delusion-without-arguing", level: "B2", title: "A patient is sure the neighbors watch him: no arguing, no agreeing, and a safety question", roles: ["You (doctor)", "Patient"], you: 0, lines: [
+{ id: "delusion-without-arguing", level: "B2", title: "A fixed belief about the neighbors, without arguing", roles: ["You (doctor)", "Patient"], you: 0, lines: [
 [0, `Buenos días, Pablo. Hoy quiero entender mejor cómo ha estado en su casa.`, `Good morning, Pablo. Today I want to understand better how things have been at your home.`, `Buenos días, Pablo. Hoy quiero entender mejor cómo has estado en tu casa.`],
 [1, `Doctora, los vecinos me vigilan. Ponen aparatos en la pared para escucharme.`, `Doctor, the neighbors watch me. They put devices in the wall to listen to me.`],
 [0, `Se nota que lo está pasando muy mal. Cuénteme más sobre lo que ha notado.`, `I can tell you are having a very hard time. Tell me more about what you have noticed.`, `Se nota que lo estás pasando muy mal. Cuéntame más sobre lo que has notado.`],
