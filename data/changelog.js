@@ -3,6 +3,17 @@
    For every release: add an entry here, then bump APP_META.version (data/app-meta.js) and VERSION in sw.js. */
 window.APP_CHANGELOG = [
   {
+    version: '0.10.0', date: '2026-11-19', title: 'A nurse track, the end-of-treatment review and nine new patients',
+    items: [
+      { type: 'feature', text: 'Nurse track: choose Resident or Nurse on the Psychiatry page. Six nurse sections with 125 phrases (arriving on the unit, medicines and side effects, sleep and meals, safety checks, calming things down, teaching patients and families), each with replies for the point board and the listening drill.' },
+      { type: 'feature', text: 'Nurse view in four tools: De-escalation, Discharge assessment, Mood episode and the MSE interviewer sheet each show a step-by-step nurse script with what to say to the patient or family, and when to call the doctor. A nurse pocket card prints on A6.' },
+      { type: 'feature', text: 'End-of-treatment review: the last planned outpatient session, field by field (treatment course, review MSE, safety, functioning, relapse plan, medicines, plan), with 31 questions and four practice cases where you decide whether regular sessions end.' },
+      { type: 'content', text: 'Nine new case simulations (16 in all): over-the-counter medicine misuse with motivational interviewing, a family interview about dementia, OCD, PTSD after a crash, panic attacks in the emergency department, school refusal in a 14-year-old, and three cases played as the nurse.' },
+      { type: 'content', text: 'Admission MSE practice grows from 2 to 9 patients and discharge practice from 5 to 9. The interpretation drill doubles to 64 lines.' },
+      { type: 'content', text: 'All the new Spanish is a draft for review by a native Spanish-speaking clinician. Nurse scripts also need review by your Nursing Service. New lines get their recorded voice a few minutes after the release.' }
+    ]
+  },
+  {
     version: '0.9.0', date: '2026-11-19', title: 'Listening practice, a level review test and example sentences',
     items: [
       { type: 'feature', text: 'Listening practice: hear a word or a sentence and choose what it means, write what you hear (dictation, with accent keys), tell apart 70 sound pairs such as pero and perro or hablo and habló, and answer questions after hearing a whole dialogue or reading. Slower, natural and fast speeds. Find it under Practice.' },

@@ -22,7 +22,7 @@
       '<h1>Admission MSE practice</h1><p class="muted">Interview a simulated patient on admission, in the order of the MSE section of the hospital\'s admission form (' + esc(PSYCH_ADMIT_MSE.form) + '). Ask in ' + LANG.name + ', document each domain, name the line that supports a key finding, then compare your MSE with a model. Each patient also has a discharge case, so you can see what changed.</p>' +
       '<div class="grid">' + PSYCH_MSE_CASES.map((c) => '<a class="tile" href="#/psych/mcase/' + c.id + '"><span class="eyebrow">' + esc(c.dx || '') + ' · ' + esc(c.level) + '</span><h3>' + esc(c.title) + '</h3><p>' + esc(c.setting) + '</p>' +
         (done[c.id] != null ? '<div class="meta"><span class="pill ' + pillCls(done[c.id]) + '">Best ' + done[c.id] + '%</span></div>' : '') + '</a>').join('') + '</div>' +
-      '<p class="small muted" style="margin-top:14px">Patients are fictional. More admission cases will follow. For quick drills on single findings, including ' + LANG.name + ' culture-or-pathology look-alikes, use the <a href="https://isaymotion.github.io/MSEtrainer/#/practice?lang=tl" target="_blank" rel="noopener">MSE Trainer</a>.</p>';
+      '<p class="small muted" style="margin-top:14px">Patients are fictional. More admission cases will follow. For quick drills on single findings (in English), use the <a href="https://isaymotion.github.io/MSEtrainer/" target="_blank" rel="noopener">MSE Trainer</a>.</p>';
   };
 
   V.mseCase = (el, params) => {
@@ -65,7 +65,7 @@
     const ccView = () => {
       const p = ref(C.cc.ask), a = C.cc.ans, done = cc.pick !== null;
       return '<div class="card stack ds-field"><div><span class="eyebrow">History · before the MSE</span><h2 style="margin:2px 0 0">Chief complaint</h2></div>' +
-        '<div class="ds-assess"><b>What to document.</b> The reason for consultation in the informant\'s own words. Ask the family member who brought the patient.</div>' +
+        '<div class="ds-assess"><b>What to document.</b> The reason for consultation in the informant\'s own words. ' + (!/\(/.test(a[2] || '') ? 'Ask the patient.' : 'Ask the family member who brought the patient.') + '</div>' +
         '<div><div class="eyebrow" style="margin-bottom:6px">Ask</div>' + (p ? qLine(p, a, cc.asked, 'data-ccask="1"', true) : '') + '</div>' +
         (cc.asked ? '<div><div class="eyebrow" style="margin-bottom:6px">Which entry belongs in the Chief Complaints field?</div><div class="opts">' +
           C.cc.opts.map((o, k) => '<button class="opt' + (done ? (o[1] ? ' right' : k === cc.pick ? ' wrong' : '') : '') + '" data-cc="' + k + '"' + (done ? ' disabled' : '') + '>' + esc(o[0]) + '</button>').join('') + '</div>' +
@@ -120,6 +120,8 @@
         '<div class="stack" style="gap:8px">' + rows.map(([t, x, y]) => '<div class="dc-row"><b>' + esc(t) + '</b><div class="small"><span class="eyebrow">Admission</span> ' + esc(a(x)) + '</div><div class="small"><span class="eyebrow">Discharge</span> ' + esc(b(y)) + '</div></div>').join('') + '</div>' +
         '<a class="btn" href="#/psych/dcase/' + dis.id + '">Practice his or her discharge</a></div>';
     };
+    const eot = (window.PSYCH_EOT_CASES || []).find((x) => x.id === C.id);   // 0.20.0: outpatient end-of-treatment review of the same patient
+    const eotRow = () => (eot ? '<div class="card stack"><h3 style="margin:0">Months later</h3><p class="small muted" style="margin:0">The same patient at the end of outpatient treatment: ' + esc(eot.title) + '.</p><div class="row"><a class="btn" href="#/psych/ecase/' + eot.id + '">Practice the end-of-treatment review</a></div></div>' : '');
     const compareView = () => {
       const pct = Math.round((100 * pts()) / maxPts());
       if (allDone()) { const best = store(); best[C.id] = Math.max(pct, best[C.id] || 0); App.save(); }
@@ -136,12 +138,12 @@
         '<details class="card"><summary><b>Write it as on the form</b> <span class="muted small">optional, for self-check</span></summary><div class="stack" style="gap:8px;margin-top:8px">' +
           '<label class="small" for="mseWritten">Your MSE, one line per domain, as you would write it on the Readmission Form</label><textarea class="input" id="mseWritten" rows="10">' + esc(written) + '</textarea>' +
           '<label class="small" for="mseModel">Model MSE</label><textarea class="input" id="mseModel" rows="10" readonly style="font-family:ui-monospace,Menlo,monospace;font-size:.82rem">' + esc(modelMSE()) + '</textarea></div></details>' +
-        '<div class="row"><button class="btn primary" id="dcAgain">Run the case again</button><a class="btn" href="#/psych/mcases">Other cases</a><a class="btn" href="https://isaymotion.github.io/MSEtrainer/#/practice?lang=tl" target="_blank" rel="noopener">Drill findings in MSE Trainer</a></div></div>' + disRows();
+        '<div class="row"><button class="btn primary" id="dcAgain">Run the case again</button><a class="btn" href="#/psych/mcases">Other cases</a><a class="btn" href="https://isaymotion.github.io/MSEtrainer/" target="_blank" rel="noopener">Drill findings in MSE Trainer</a></div></div>' + disRows() + eotRow();
     };
 
     const draw = () => {
       el.innerHTML = '<div class="breadcrumb"><a href="#/psych">Psychiatry</a> / <a href="#/psych/mcases">MSE practice</a> / ' + esc(C.title) + '</div><h1>' + esc(C.title) + '</h1>' +
-        '<div class="notice info">' + esc(C.setting) + '</div>' + chartCard() + nav() +
+        '<div class="notice info">' + esc(C.setting) + '</div>' + (App.listenCaseLink ? App.listenCaseLink('mse-' + C.id) : '') + chartCard() + nav() +
         '<div style="margin-top:12px">' + (cur === 0 ? ccView() : cur <= N ? domainView(F[cur - 1], cur - 1) : compareView()) + '</div>';
       bind();
     };

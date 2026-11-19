@@ -6,7 +6,7 @@
 
 **App created by Isabella Navarro, MD. Latest version November 2026. isaymotion@gmail.com**
 
-Version **0.9.0** (2026-11-19): listening practice (hear, dictation, 70 sound pairs, questions on dialogues and readings), level review test, example sentences for 1,197 dictionary words, ten more readings (20) and eight more dialogues (16), placement test of 30. 0.8.0 (2026-11-18): picture words (38 pictures, 505 words) with a printable body map, vocabulary quiz and topic matching, word pairs, numbers, dates and time, ten picture lessons (91 in all), extras for the 23 original lessons, and practice scores on Progress. 0.7.0 (2026-11-17): verb trainer, fill the blank, transform the sentence, sentence builder and 58 new grammar lessons (81 in all). 0.6.1: phone menu scrolls again. 0.6.0: the Usap Tayo engine with a Spanish language pack, all 27 interview sections (opening to closing, plus Shea's techniques), patient replies for every section and every tool, the interview flow handout, the MSE interviewer sheet, the clinical tools (mood episode checker, substance use screener, withdrawal and agitation guide with an opioid tab, de-escalation checklist, discharge assessment), the practice cases (seven case simulations, the interpretation drill, five discharge cases and two admission MSE cases) and the learn track (23 lessons, a 2,300-entry clinical dictionary, 10 readings, 8 dialogues, placement test), all draft for review.
+Version **0.10.0** (2026-11-19): nurse track (6 sections, 125 phrases, nurse view in four tools, nurse pocket card), end-of-treatment review with four practice cases, nine new case simulations (16), admission MSE cases 9, discharge cases 9, interpretation drill 64. Before it, 0.9.0: listening practice (hear, dictation, 70 sound pairs, questions on dialogues and readings), level review test, example sentences for 1,197 dictionary words, ten more readings (20) and eight more dialogues (16), placement test of 30. 0.8.0 (2026-11-18): picture words (38 pictures, 505 words) with a printable body map, vocabulary quiz and topic matching, word pairs, numbers, dates and time, ten picture lessons (91 in all), extras for the 23 original lessons, and practice scores on Progress. 0.7.0 (2026-11-17): verb trainer, fill the blank, transform the sentence, sentence builder and 58 new grammar lessons (81 in all). 0.6.1: phone menu scrolls again. 0.6.0: the Usap Tayo engine with a Spanish language pack, all 27 interview sections (opening to closing, plus Shea's techniques), patient replies for every section and every tool, the interview flow handout, the MSE interviewer sheet, the clinical tools (mood episode checker, substance use screener, withdrawal and agitation guide with an opioid tab, de-escalation checklist, discharge assessment), the practice cases (seven case simulations, the interpretation drill, five discharge cases and two admission MSE cases) and the learn track (23 lessons, a 2,300-entry clinical dictionary, 10 readings, 8 dialogues, placement test), all draft for review.
 
 ## What it is
 
@@ -53,6 +53,8 @@ The app shares its engine with Usap Tayo. The language pack `js/lang.js` sets vo
 | **Vocabulary quiz and topic matching** (0.8.0) | Dictionary decks as Meaning, Recall, In context and Type it; 19 topic sets (336 words) to match or quiz. Route `#/vocab`, `#/vocab?tab=match`. Data `js/data/topic-sets.js`. | Live (draft for review) |
 | **Word pairs** (0.8.0) | 280 pairs (70 per level): opposites, similar words, collocations. Learn, match, quiz. Route `#/pairs`. Data `js/data/word-pairs-1.js`, `-2.js`. | Live (draft for review) |
 | **Numbers, dates and time** (0.8.0) | 12 groups (142 rows) to read and hear, 40 clinic listening sentences. Route `#/numbers`. Data `js/data/numbers.js`. | Live (draft for review) |
+| **Nurse track** (0.10.0) | Resident / Nurse switch (`settings.role`) on the Psychiatry page; six nurse sections (`js/data/psych-phrases-nurse.js`, `role: 'nurse'`), nurse scripts in De-escalation, Discharge, Mood episode and the MSE sheet (`js/nurse-script.js`, `PSYCH_NURSE_TOOLS` in `psych-nurse-tools*.js`), three nurse case simulations, nurse pocket card (`#/psych/handout?nursecard=1`). | Live (draft for review) |
+| **End-of-treatment review** (0.10.0) | Outpatient last-session review: form `PSYCH_EOT` (`js/data/psych-eot.js`, section `eot`), cases `PSYCH_EOT_CASES` (`psych-eot-cases-*.js`), routes `#/psych/eot`, `#/psych/ecase/<id>` (`js/eot-practice.js` on the discharge practice engine). | Live (draft for review) |
 | **Listening practice** (0.9.0) | Hear (words or sentences by level), Dictation, Sound pairs (70), Dialogues and readings with listening questions (36 texts, 124 questions). Route `#/listen`. Data `js/data/sound-pairs.js`, `listen-questions*.js`. | Live (draft for review) |
 | **Level review test** (0.9.0) | A mixed test per level (grammar, verbs, vocabulary, listening, reading), built from the existing data; timer, resume, score by area. Route `#/test`. | Live |
 | **Dictionary example sentences** (0.9.0) | 1,197 sentences (`js/data/examples-1.js` to `-4.js`), shown on the word page and card back. | Live (draft for review) |
@@ -90,7 +92,7 @@ All content lives in plain JavaScript files under `js/data/`. No build step. The
 | `psych-phrases.js` | Interview phrase sections |
 | `psych-shea.js` | Validity-technique phrases and links to the Psychiatric Interviewing Trainer |
 | `psych-answers.js` | Point-board replies per interview section |
-| `psych-cases.js` | Case simulations and interpretation items |
+| `psych-cases.js`, `psych-cases-<id>.js`, `psych-interp-2.js` | Case simulations (16; `role: 'nurse'` on nurse cases) and interpretation items (64) |
 | `psych-flow.js` | Handout order, pocket-card phrases and MSE domains |
 | `psych-mse-sheet.js` | MSE interviewer sheet |
 | `psych-mood.js` | Mood episode checker, PHQ-9 and MDQ |
@@ -98,7 +100,7 @@ All content lives in plain JavaScript files under `js/data/`. No build step. The
 | `psych-withdrawal.js` | Withdrawal and agitation guide |
 | `psych-deesc.js` | De-escalation checklist |
 | `psych-discharge.js` | Discharge assessment |
-| `psych-discharge-cases.js` | Discharge practice cases |
+| `psych-discharge-cases.js`, `psych-discharge-cases-<id>.js`, `psych-mse-cases-<id>.js`, `psych-eot-cases-<id>.js` | Discharge (9), admission MSE (9) and end-of-treatment (4) practice cases, one file per new patient |
 | `psych-admit-mse.js` | Admission MSE practice |
 | `psych-mse-cases.js` | MSE practice cases |
 

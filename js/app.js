@@ -62,6 +62,8 @@
     [/^\/psych\/deesc$/, V.deesc, 'psych'],
     [/^\/psych\/discharge$/, V.discharge, 'psych'],
     [/^\/psych\/dcases$/, V.dischargeCases, 'psych'],
+    [/^\/psych\/eot$/, V.eotCases, 'psych'],
+    [/^\/psych\/ecase\/(?<id>[\w-]+)$/, V.eotCase, 'psych'],
     [/^\/psych\/mcases$/, V.mseCases, 'psych'],
     [/^\/psych\/mcase\/(?<id>[\w-]+)$/, V.mseCase, 'psych'],
     [/^\/psych\/dcase\/(?<id>[\w-]+)$/, V.dischargeCase, 'psych'],
@@ -80,7 +82,7 @@
   /* ---------- Navigation: one grouped list for the desktop rail, the phone drawer (More) and the #/more page ----------
      [key, href, label, icon]. Group labels are shell strings (data/strings.js); item labels are the app's own. */
   const PSY_PRACTICE = [['p-cases', '#/psych/cases', 'Case simulations', icons.case], ['p-interp', '#/psych/interp', 'What is the patient saying?', icons.ear], ['p-listen', '#/psych/listen', 'Listening drill', icons.sound],
-    ['p-mcases', '#/psych/mcases', 'Admission MSE practice', icons.eye], ['p-dcases', '#/psych/dcases', 'Discharge practice', icons.check]];
+    ['p-mcases', '#/psych/mcases', 'Admission MSE practice', icons.eye], ['p-dcases', '#/psych/dcases', 'Discharge practice', icons.check], ['p-eot', '#/psych/eot', 'End-of-treatment review', icons.check]];
   const PSY_TOOLS = [['p-point', '#/psych/point', 'Point board (' + LANG.point.title + ')', icons.speak], ['p-bodymap', '#/pictures/bodymap', 'Body map', icons.eye], ['p-mood', '#/psych/mood', 'Mood episode checker', icons.chart], ['p-sud', '#/psych/sud', 'Substance use', icons.target],
     ['p-wd', '#/psych/withdrawal', 'Withdrawal and agitation', icons.spark], ['p-deesc', '#/psych/deesc', 'De-escalation', icons.speak],
     ['p-dis', '#/psych/discharge', 'Discharge assessment', icons.check], ['p-mse', '#/psych/mse-sheet', 'MSE interviewer sheet', icons.lesson],
@@ -96,7 +98,7 @@
   App.NAV = NAV;
   const NAV_HREFS = NAV.reduce((a, g) => a.concat(g[1].map((i) => i[1])), []);
   // Deep pages light up their list page in the menu.
-  const PARENT = { '/psych/dcase': ['Discharge practice', '#/psych/dcases'], '/psych/mcase': ['Admission MSE practice', '#/psych/mcases'], '/psych/case': ['Case simulations', '#/psych/cases'], '/psych/s': null };
+  const PARENT = { '/psych/dcase': ['Discharge practice', '#/psych/dcases'], '/psych/ecase': ['End-of-treatment review', '#/psych/eot'], '/psych/mcase': ['Admission MSE practice', '#/psych/mcases'], '/psych/case': ['Case simulations', '#/psych/cases'], '/psych/s': null };
   function activeHref(path) {
     if (NAV_HREFS.includes('#' + path)) return '#' + path;
     const segs = path.split('/').filter(Boolean);
@@ -209,7 +211,8 @@
       (window.PICTURE_BODYMAP ? T('#/pictures/bodymap', 'Clinic', 'Body map', 'The patient points to where it hurts; print a handout.') : '') +
       T('#/psych/listen', 'Listen', 'Listening drill', 'Hear a reply at natural speed, choose the meaning.') +
       T('#/psych/mcases', 'Document', 'Admission MSE practice', 'Interview, document, compare.') +
-      T('#/psych/dcases', 'Document', 'Discharge practice', 'Five patients, discharge or defer.') +
+      T('#/psych/dcases', 'Document', 'Discharge practice', (window.PSYCH_DISCHARGE_CASES || []).length + ' patients, discharge or defer.') +
+      ((window.PSYCH_EOT_CASES || []).length ? T('#/psych/eot', 'Document', 'End-of-treatment review', 'Outpatients at the last planned session: end or continue.') : '') +
       T('#/psych/deesc?tab=drill', 'Rapid drill', 'De-escalation', 'The 12 steps under time pressure.') + '</div>';
   };
   // The same grouped list as the drawer, as a page: for deep links and for desktop.

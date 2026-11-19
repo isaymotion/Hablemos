@@ -9,6 +9,11 @@
   const alt = (p) => (S().settings.register === 'c' ? p.f : p.c);
   const sayLine = (p) => '<div class="dz-line"><div><div class="tl dz-tl">' + esc(main(p)) + '</div>' + (alt(p) && alt(p) !== main(p) ? '<div class="tl small muted">' + esc(alt(p)) + '</div>' : '') + '<div class="small muted">' + esc(p.en) + '</div></div>' + App.sayBtn(main(p)) + '</div>';
 
+  /* Nurse view (0.18.0): the same Resident / Nurse switch (settings.role) as the substance use tool, from the shared
+     helper in js/nurse-script.js (data PSYCH_NURSE_TOOLS.deesc). */
+  const NS = App.nurseScript('deesc', { intro: 'What the ward nurse says around an incident: calling the doctor, getting help, talking with the patient afterwards, and reassuring the other patients. The 12-step bedside checklist is in the Resident view.' });
+  const isNurse = NS.on;
+
   // Speak a line and resolve when finished (or after a timeout if speech is unavailable).
   const speakWait = (text, lang) => App.speakAsync(text, { lang, quiet: true });
 
@@ -33,7 +38,8 @@
     const head = () => '<div class="breadcrumb"><a href="#/psych">Psychiatry</a> / <a href="#/psych/s/deescalation">De-escalation</a> / Checklist</div>' +
       '<h1>De-escalation checklist</h1>' +
       (inst.name ? '<p class="dz-inst"><b>' + esc(inst.name) + '</b><br><span class="muted small">' + esc(inst.address || '') + ' · Form ' + esc(inst.deescForm || '') + '</span></p>' : '') +
-      '<div class="seg dz-tabs" role="tablist" aria-label="De-escalation views">' + [['check', 'Checklist'], ['drill', 'Rapid drill'], ['after', 'If it fails'], ['practice', 'Practice']].map(([k, t]) => '<button role="tab" data-tab="' + k + '" aria-selected="' + (tab === k) + '" class="' + (tab === k ? 'on' : '') + '">' + t + '</button>').join('') + '</div>';
+      NS.row() +
+      (isNurse() ? '' : '<div class="seg dz-tabs" role="tablist" aria-label="De-escalation views">' + [['check', 'Checklist'], ['drill', 'Rapid drill'], ['after', 'If it fails'], ['practice', 'Practice']].map(([k, t]) => '<button role="tab" data-tab="' + k + '" aria-selected="' + (tab === k) + '" class="' + (tab === k ? 'on' : '') + '">' + t + '</button>').join('') + '</div>');
 
     const views = {
       check: () => {
@@ -78,7 +84,7 @@
       }
     };
 
-    const draw = () => { stopAll(); el.innerHTML = head() + '<div id="dzBody" style="margin-top:14px">' + views[tab]() + '</div>'; bind(); };
+    const draw = () => { stopAll(); el.innerHTML = head() + '<div id="dzBody" style="margin-top:14px">' + (isNurse() ? NS.view() : views[tab]()) + '</div>'; bind(); };
     const keep = (fn) => { const y = window.scrollY; fn(); window.scrollTo(0, y); };
     const stopAll = () => { if (drill) drill.stop = true; App.stopSpeech(); };
     const drillLines = (set) => {
@@ -88,6 +94,7 @@
     };
 
     const bind = () => {
+      if (NS.bind(el, draw)) return;
       el.querySelectorAll('[data-tab]').forEach((b) => (b.onclick = () => { tab = b.dataset.tab; draw(); }));
       const $ = (s) => el.querySelector(s);
       if (tab === 'check') {

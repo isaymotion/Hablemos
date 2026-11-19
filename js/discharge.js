@@ -8,6 +8,10 @@
   const ref = (r) => { const [sid, i] = r.split(':'); const s = PSYCH_SECTIONS.find((x) => x.id === sid); return s && s.phrases[+i]; };
   const main = (p) => (S().settings.register === 'c' ? p.c || p.f : p.f);
   const alt = (p) => (S().settings.register === 'c' ? p.f : p.c);
+  /* Nurse view (0.18.0): discharge-day teaching by the ward nurse, behind the same Resident / Nurse switch
+     (settings.role) as the substance use tool, from the shared helper in js/nurse-script.js (data PSYCH_NURSE_TOOLS.discharge). */
+  const NS = App.nurseScript('discharge', { intro: 'Discharge-day teaching by the ward nurse: belongings, medicines with teach-back, the next appointment, warning signs, and the family. The discharge summary fields are in the Resident view.' });
+  const isNurse = NS.on;
   const KIND = { observe: 'Mostly observe', ask: 'Ask and observe', explain: 'Explain and confirm', sign: 'Sign' };
 
   V.discharge = (el) => {
@@ -84,12 +88,15 @@
     const draw = () => {
       el.innerHTML = '<div class="breadcrumb"><a href="#/psych">Psychiatry</a> / Discharge assessment</div><h1>Discharge assessment</h1>' +
         (inst.name ? '<p class="dz-inst"><b>' + esc(inst.name) + '</b><br><span class="muted small">Discharge Summary' + (D.form ? ' · Form ' + esc(D.form) : '') + '</span></p>' : '') +
+        NS.row() + (isNurse() ? NS.view() :
         '<p class="muted">Go through the discharge summary one field at a time: what to assess, what to ask in ' + LANG.name + ', and how to document it. Nothing here is saved, and no patient details are needed.</p>' +
         ((window.PSYCH_DISCHARGE_CASES || []).length ? '<p><a class="btn sm" href="#/psych/dcases">Practice first with a simulated patient →</a></p>' : '') +
-        nav() + '<div style="margin-top:12px">' + (cur < F.length ? fieldView(F[cur], cur) : summaryView()) + '</div>';
+        nav() + '<div style="margin-top:12px">' + (cur < F.length ? fieldView(F[cur], cur) : summaryView()) + '</div>');
       bind();
     };
+    const keep = (fn) => { const y = window.scrollY; fn(); window.scrollTo(0, y); };
     const bind = () => {
+      if (NS.bind(el, draw)) return;
       el.querySelectorAll('[data-go]').forEach((b) => (b.onclick = () => { const n = +b.dataset.go; if (n < 0 || n > F.length) return; cur = n; App.stopSpeech(); draw(); const top = el.querySelector('.ds-field, #dsSum').getBoundingClientRect().top + window.scrollY - 80; if (window.scrollY > top) window.scrollTo(0, top); }));
       const f = F[cur];
       if (cur < F.length && f.kind !== 'sign') {

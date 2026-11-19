@@ -10,9 +10,22 @@
   const soon = (what) => '<div class="notice info" style="margin-top:14px">' + esc(what) + ' arrive in a later release, each marked draft for review until a native Spanish-speaking clinician has checked it.</div>';
   const has = (k) => Array.isArray(window[k]) ? window[k].length > 0 : !!(window[k] && Object.keys(window[k]).some((x) => Array.isArray(window[k][x]) && window[k][x].length));
 
+  /* Resident / Nurse role (0.10.0). settings.role is shared with the substance use tool and the nurse scripts.
+     Nurse view: the nurse sections (role: 'nurse') first, then the resident sections most used on the unit. */
+  const NURSE_ALSO = ['deescalation', 'suicide', 'violence', 'meds', 'admission', 'elderly'];
+  const NURSE_NOTICE = 'Nurse scripts are drafts, pending review by a native Spanish-speaking clinician and your Nursing Service. Use them for practice and check the wording with your unit before using it with patients.';
+  const hasNurse = () => PSYCH_SECTIONS.some((s) => s.role === 'nurse');
+  const role = () => (hasNurse() && S().settings.role === 'nurse' ? 'nurse' : 'resident');
+  App.roleSeg = () => '<div class="seg role-seg" role="group" aria-label="Role">' + [['resident', 'Resident'], ['nurse', 'Nurse']].map(([k, t]) => '<button type="button" data-role="' + k + '" class="' + (role() === k ? 'on' : '') + '" aria-pressed="' + (role() === k) + '">' + t + '</button>').join('') + '</div>';
+  /* Sections in the order the current role sees them; prev / next on a section page follow it. */
+  const roleSections = (r) => r === 'nurse'
+    ? PSYCH_SECTIONS.filter((s) => s.role === 'nurse').concat(NURSE_ALSO.map((id) => PSYCH_SECTIONS.find((s) => s.id === id)).filter(Boolean))
+    : PSYCH_SECTIONS.filter((s) => s.role !== 'nurse');
+
   V.psych = (el, p, q) => {
     const groups = {};
-    PSYCH_SECTIONS.forEach((s) => (groups[s.group] = groups[s.group] || []).push(s));
+    const R = role();
+    roleSections(R).forEach((s) => { const g = R === 'nurse' && s.role !== 'nurse' ? 'Also useful on the unit' : s.group; (groups[g] = groups[g] || []).push(s); });
     const done = S().done;
     const tab = (q && q.tab) || 'interview';
     const T = (h, eyebrow, title, p) => '<a class="tile" href="' + h + '"><span class="eyebrow">' + eyebrow + '</span><h3>' + title + '</h3><p>' + p + '</p></a>';
@@ -24,6 +37,7 @@
       cases: (PSYCH_CASES.length || PSYCH_SECTIONS.length ? '' : soon('The practice cases, interpretation and listening drills')) + '<div class="grid" style="margin-top:14px">' +
         (PSYCH_CASES.length ? T('#/psych/cases', 'Simulate', 'Case simulations', PSYCH_CASES.length + ' interactive interviews with feedback and an MSE summary.') : '') +
         (has('PSYCH_MSE_CASES') ? T('#/psych/mcases', 'Admission', 'Admission MSE practice', 'Interview a patient on admission, document each MSE domain, and name the evidence.') : '') +
+        (has('PSYCH_EOT_CASES') ? T('#/psych/eot', 'Outpatient', 'End-of-treatment review', 'The last planned session: review the treatment, safety and a relapse plan, then decide whether regular sessions end.') : '') +
         (has('PSYCH_DISCHARGE_CASES') ? T('#/psych/dcases', 'Ward', 'Discharge practice', 'Interview, document the discharge MSE, compare with a model answer.') : '') +
         (PSYCH_INTERP.length ? T('#/psych/interp', 'Listen', 'What is the patient saying?', PSYCH_INTERP.length + ' patient and family lines to interpret.') : '') +
         (PSYCH_SECTIONS.length ? T('#/psych/listen', 'Listen', 'Listening drill', 'Hear a patient reply at natural speed, choose the meaning, then see the text.') : '') +
@@ -45,15 +59,19 @@
     el.innerHTML = '<h1>Psychiatry ' + esc(LANG.name) + '</h1>' +
       '<p class="muted" style="margin-top:4px">Phrases for the psychiatric interview and MSE, ' + LANG.registerIntro + '.</p>' +
       '<div class="ptabs" role="tablist">' + TABS.map(([k, t]) => '<a role="tab" aria-selected="' + (k === tab) + '" class="' + (k === tab ? 'on' : '') + '" href="#/psych?tab=' + k + '">' + t + '</a>').join('') + '</div>' +
+      (tab === 'interview' && hasNurse() ? '<div class="row" style="margin-top:12px;gap:10px;flex-wrap:wrap;align-items:center"><span class="muted small">I am a</span>' + App.roleSeg() + '</div>' : '') +
+      (tab === 'interview' && R === 'nurse' ? '<div class="notice warn" style="margin-top:12px">' + esc(NURSE_NOTICE) + '</div><div class="row" style="margin-top:10px"><a class="btn sm" href="#/psych/handout?nursecard=1">Print the nurse pocket card</a></div>' : '') +
       (tab === 'interview' ? '<div class="notice info" style="margin-top:12px">Practice phrasings for training, not validated translations. Confirm wording with your supervisors and adapt to each patient. ' + esc(LANG.variety) + '</div>' : '') +
       body[tab];
+    el.querySelectorAll('[data-role]').forEach((b) => (b.onclick = () => { S().settings.role = b.dataset.role; App.save(); V.psych(el, p, q); }));
   };
 
   V.psychSection = (el, p, q) => {
     const s = PSYCH_SECTIONS.find((x) => x.id === p.id);
     if (!s) { el.innerHTML = '<p>Section not found. <a href="#/psych">Psychiatry</a></p>'; return; }
     if (!S().done.sections[s.id]) { S().done.sections[s.id] = true; App.save(); }
-    const idx = PSYCH_SECTIONS.indexOf(s), next = PSYCH_SECTIONS[idx + 1], prev = PSYCH_SECTIONS[idx - 1];
+    const list = roleSections(s.role === 'nurse' ? 'nurse' : role()), idx = list.indexOf(s);
+    const next = idx < 0 ? null : list[idx + 1], prev = idx < 0 ? null : list[idx - 1];
     let mode = 'study';
     const draw = () => {
       const body = el.querySelector('#pbody');
@@ -93,7 +111,8 @@
     const sheaLink = shea.length && ST ? (shea.length === 1
       ? '<p class="small"><b>Technique notes:</b> ' + sheaA(shea[0]) + ' in the ' + esc(ST.name) + ' explains why these questions are worded this way.</p>'
       : '<div class="small"><b>Technique notes</b> in the ' + esc(ST.name) + ', on why these questions are worded this way:<ul style="margin:4px 0 12px;padding-left:20px">' + shea.map((l) => '<li>' + sheaA(l) + '</li>').join('') + '</ul></div>') : '';
-    const draftNote = s.draft ? '<div class="notice warn" style="margin-bottom:12px">' + esc((ST && ST.draftNotice) || LANG.review) + '</div>' : '';
+    const draftNote = (s.draft ? '<div class="notice warn" style="margin-bottom:12px">' + esc((ST && ST.draftNotice) || LANG.review) + '</div>' : '') +
+      (s.role === 'nurse' ? '<div class="notice info" style="margin-bottom:12px">' + esc(NURSE_NOTICE) + '</div>' : '');
     el.innerHTML = crumb([['Psychiatry', '#/psych'], [s.title]]) + '<span class="eyebrow">' + esc(s.group) + '</span><h1>' + esc(s.title) + '</h1><p class="muted">' + esc(s.intro) + '</p>' + draftNote + sheaLink +
       '<div class="spread" style="margin-bottom:12px"><div class="seg" role="group" aria-label="Mode">' +
       [['study', 'Study'], ['recall', 'Recall'], ['quiz', 'Quiz ' + LANG.quiz.toTarget], ['reverse', 'Quiz ' + LANG.quiz.toEnglish]].map(([k, t]) => '<button data-m="' + k + '" class="' + (mode === k ? 'on' : '') + '">' + t + '</button>').join('') + '</div>' +
@@ -110,9 +129,14 @@
     draw();
   };
 
+  /* Cases may be played as the unit nurse (role: 'nurse', 0.10.0): two groups, the nurse group first for the nurse role. */
+  const caseTile = (c) => '<a class="tile" href="#/psych/case/' + c.id + '"><div class="row"><span class="pill lv">' + esc(c.level) + '</span>' + (c.role === 'nurse' ? '<span class="pill">nurse</span>' : '') + (S().done.cases[c.id] != null ? '<span class="pill good">' + S().done.cases[c.id] + '%</span>' : '') + '</div><h3 style="margin-top:6px">' + esc(c.title) + '</h3><p>' + esc(c.setting) + '</p></a>';
   V.psychCases = (el) => {
-    el.innerHTML = crumb([['Psychiatry', '#/psych'], ['Case simulations']]) + '<h1>Case simulations</h1>' + (PSYCH_CASES.length ? '' : soon('The case simulations')) + '<p class="muted">Read what the patient or family says, then choose your next line. You get feedback on each choice and a findings summary with an MSE at the end. For speaking practice, open the same case in <a href="#/speak">Speaking</a>.</p><div class="grid">' +
-      PSYCH_CASES.map((c) => '<a class="tile" href="#/psych/case/' + c.id + '"><div class="row"><span class="pill lv">' + esc(c.level) + '</span>' + (S().done.cases[c.id] != null ? '<span class="pill good">' + S().done.cases[c.id] + '%</span>' : '') + '</div><h3 style="margin-top:6px">' + esc(c.title) + '</h3><p>' + esc(c.setting) + '</p></a>').join('') + '</div>';
+    const doc = PSYCH_CASES.filter((c) => c.role !== 'nurse'), nur = PSYCH_CASES.filter((c) => c.role === 'nurse');
+    const groups = [['Played as the doctor', doc], ['Played as the nurse', nur]].filter((g) => g[1].length);
+    if (S().settings.role === 'nurse') groups.reverse();
+    el.innerHTML = crumb([['Psychiatry', '#/psych'], ['Case simulations']]) + '<h1>Case simulations</h1>' + (PSYCH_CASES.length ? '' : soon('The case simulations')) + '<p class="muted">Read what the patient or family says, then choose your next line. You get feedback on each choice and a findings summary with an MSE at the end. For speaking practice, open the same case in <a href="#/speak">Speaking</a>.</p>' +
+      (nur.length ? groups.map(([t, list]) => '<h2 style="margin-top:16px">' + t + '</h2><div class="grid">' + list.map(caseTile).join('') + '</div>').join('') : '<div class="grid">' + PSYCH_CASES.map(caseTile).join('') + '</div>');
   };
 
   V.psychCase = (el, p) => {
@@ -149,7 +173,7 @@
         const fb = el.querySelectorAll('.feedback'); if (fb.length) fb[fb.length - 1].scrollIntoView({ block: 'center' });
       }));
     };
-    el.innerHTML = crumb([['Psychiatry', '#/psych'], ['Cases', '#/psych/cases'], [c.title]]) + '<h1>' + esc(c.title) + '</h1><div class="notice info">' + esc(c.setting) + '</div><div id="cbody" style="margin-top:14px"></div>';
+    el.innerHTML = crumb([['Psychiatry', '#/psych'], ['Cases', '#/psych/cases'], [c.title]]) + '<h1>' + esc(c.title) + '</h1><div class="notice info">' + esc(c.setting) + '</div>' + (c.role === 'nurse' ? '<p class="small" style="margin:8px 0 0"><span class="pill">nurse</span> You are the unit nurse.</p>' : '') + '<div id="cbody" style="margin-top:14px"></div>';
     draw();
   };
 

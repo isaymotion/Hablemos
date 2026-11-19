@@ -1164,3 +1164,13 @@ mark.vf { background: var(--warn-bg); color: var(--gold-ink); font-weight: 700; 
 .dict-ex b { font-weight: 600; }
 .dict-ex .spread { align-items: flex-start; gap: 8px; }
 .fc-ex { margin-top: 10px; }
+
+/* ---------- 0.10.0: nurse scripts, nurse pocket card, end-of-treatment review ---------- */
+.nt-row { flex-wrap: wrap; gap: 10px; margin: 10px 0 12px; align-items: center; }
+.nt-n { font-size: .8rem; color: var(--muted); font-style: italic; margin-top: 3px; }
+.nt-step h2 { font-size: 1.05rem; }
+.nc-card { gap: 2px; overflow: visible; }
+.nc-sec { font-weight: 700; color: var(--p-navy); border-bottom: 1px solid var(--p-line); margin-top: 3px; font-size: .95em; }
+.nc-line { padding: 1px 0 2px; break-inside: avoid; page-break-inside: avoid; }
+.nc-line + .nc-line { border-top: 1px dotted var(--p-line); }
+.eot-first { margin-top: 12px; }

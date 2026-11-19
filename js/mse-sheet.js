@@ -79,8 +79,16 @@
     return '<section class="ms-sec' + (sec.risk ? ' risk' : '') + (sec.ut ? ' ut' : '') + '" id="ms-' + sec.id + '">' + head + body + (sec.note ? '<div class="ms-note">' + esc(sec.note) + '</div>' : '') + '</section>';
   }
 
+  /* Nurse view (0.10.0): the nursing admission interview, behind the shared Resident / Nurse switch (js/nurse-script.js,
+     data PSYCH_NURSE_TOOLS.admit). The sheet and its print controls stay in the Resident view. */
+  const NS = App.nurseScript('admit', { intro: 'The nursing admission interview, step by step, in ' + LANG.name + '. The printable MSE sheet is in the Resident view.' });
+
   V.mseSheet = (el) => {
     if (!((window.PSYCH_MSE_SHEET || {}).sections || []).length) return App.notYet(el, 'MSE interviewer sheet', 'The printable MSE interviewer sheet', true);
+    if (NS.on()) {
+      el.innerHTML = crumb([['Psychiatry', '#/psych'], ['MSE interviewer sheet']]) + '<span class="eyebrow">Nurse script · units</span><h1>MSE interviewer sheet</h1>' + NS.row() + NS.view();
+      NS.bind(el, () => V.mseSheet(el)); return;
+    }
     const d = D();
     const inst = (window.APP_META && APP_META.institution) || {};
     const showEn = !!S().settings.mseSheetEn;
@@ -97,13 +105,14 @@
       '<div class="ms-foot"><span>' + esc(d.disclaimer) + '</span><span>' + esc(d.pageWord || 'Page') + ' ' + (pi + 1) + ' / ' + allPages.length + '</span></div></div>').join('');
 
     el.innerHTML = crumb([['Psychiatry', '#/psych'], ['MSE interviewer sheet']]) +
-      '<span class="eyebrow">Print · clinic and wards</span><h1>MSE interviewer sheet</h1>' +
+      '<span class="eyebrow">Print · clinic and wards</span><h1>MSE interviewer sheet</h1>' + NS.row() +
       '<p class="muted">Every screening question for the ' + LANG.name + ' MSE on two pages: opening, mood, depression, suicide, mania, hallucinations, delusions, violence, substance use, anxiety, cognition, insight and judgment. Formal register (usted); the HB mark shows phrases that are also in the app with audio.</p>' +
       '<div class="ho-controls row" style="margin-bottom:14px">' +
       '<button class="btn sm primary" id="msPrint">Print</button>' +
       '<label class="ho-chk"><input type="checkbox" id="msEn"' + (showEn ? ' checked' : '') + '> Show English</label>' +
       '<a class="btn sm ghost" href="#/psych/handout">Other handouts</a></div>' +
       '<style>@media print { @page { margin: 9mm; } }</style><div class="ms-sheet' + (showEn ? ' ms-en-on' : '') + '">' + pages + '</div>';
+    NS.bind(el, () => V.mseSheet(el));
     el.querySelector('#msPrint').onclick = () => window.print();
     el.querySelector('#msEn').onchange = (e) => { S().settings.mseSheetEn = e.target.checked; App.save(); V.mseSheet(el); };
   };
