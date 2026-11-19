@@ -1,11 +1,11 @@
-# Hablemos — handoff (0.8.0 is live; **0.9.0 is built, tested and parked on branch `wip-0.9.0`, NOT released**: waiting for her "ship it" on the 125% screenshots sent 2026-11-18; then her answers on the four 7c findings, 7b when her corrections arrive, the review workbook rebuild)
+# Hablemos — handoff (**0.9.0 is live** since 2026-11-19; the catch-up with Hanashimashō is complete; next: rebuild the review workbook from 0.9.0, her answers on the four 7c findings, 7b when her corrections arrive)
 
 Start here. Usap Tayo's own handoff (`claude/handoff.md`, also `HANDOFF.md` on the Tagalog repo's dev-tools branch) holds the shared engine documentation (section 3 data formats, section 8 pitfalls); this doc holds what differs in Hablemos.
 
 ## 1. Project
 - **What:** Hablemos ("let's talk"), the Spanish/English sister of Usap Tayo: for English-speaking clinicians interviewing Spanish-speaking psychiatry patients. Same engine, Spanish content.
 - **Repo:** github.com/isaymotion/Hablemos (remote also answers to `isaymotion/hablemos`). `main` = the app; `dev-tools` = tests. GitHub Pages is enabled (a pages-build-deployment run follows every push); live: https://isaymotion.github.io/Hablemos/ (not reachable from the session's network; check it on a phone).
-- **Version:** live = 0.8.0 (2026-11-18, released from `wip-0.8.0` as main `42e909c`; audio 7,828 of 7,828; see section 3l). Branch `wip-0.9.0` holds 0.9.0 complete (version strings, changelog, README already say 0.9.0, dated 2026-11-18; see section 3m), live cache `hablemos-0.8.0`, storage key `hablemos.v1` (+ `hablemos.lastBackup`, `hablemos.navmax`), backup file `app: 'hablemos'`. Attribution line exact, as in the other apps (footer, About, README line 7).
+- **Version:** live = 0.9.0 (2026-11-19, main `e52f597` + the audio commit; audio 9,240 of 9,240; see section 3m). No work is parked: the branches `wip-0.7.0`, `wip-0.8.0`, `wip-0.9.0` are all released and can be deleted by her on GitHub. Cache `hablemos-0.9.0`, storage key `hablemos.v1` (+ `hablemos.lastBackup`, `hablemos.navmax`), backup file `app: 'hablemos'`. Attribution line exact, as in the other apps (footer, About, README line 7).
 - **Design:** terracotta palette (`palette.py 25`), `--night #6E3E1C` / dark `#20150E`; accents are the flag's red (`--accent` light `#AA151B`, `--navy #8E1C21` keeps its engine name) and gold (`--gold #F1BF00`, dark accent `#E3B53F`). Icon = her flag-and-brain image (`icons/`, standard names incl. `icon-maskable-192/512.png`).
 - Everything in section 2 of the Usap Tayo handoff (`claude/handoff.md`) applies: fixed rules, commit authorship, append-only phrase indexes, no patient data, subagents for simple work, UI copy style.
 
@@ -120,12 +120,12 @@ Baseline re-verified on a fresh clone of 0.6.0 (data_check, smoke, check_design_
 | Admission MSE domains + practice cases | Done (13 domains; Mateo and Brayan admission cases, 0.5.0) |
 | Mood checker, SUD screener (8 substances), withdrawal/agitation (+ opioid tab), de-escalation checklist, discharge assessment | Done (0.4.0), all draft |
 | Case simulations, interpretation drill, discharge practice cases | Done (0.5.0): 7 cases, 32 interp lines, 5 discharge cases, all draft |
-| Dictionary, lessons, reading, dialogues, placement | 2,320 dictionary lines, 91 lessons, 10 readings, 8 dialogues, 20 placement items (0.8.0); on wip-0.9.0: 20 readings, 16 dialogues, 30 placement items, 1,197 dictionary example sentences; all draft |
+| Dictionary, lessons, reading, dialogues, placement | 2,320 dictionary lines with 1,197 example sentences, 91 lessons, 20 readings, 16 dialogues, 30 placement items; all draft |
 | Grammar drills (0.7.0) | Verb trainer (154 verbs), Fill the blank (345), Transform the sentence (160), Sentence builder, all draft |
-| 0.9.0 (on `wip-0.9.0`, not released) | Listening practice (hear, dictation, 70 sound pairs, 36 texts with 124 listening questions), level review test (44 questions per level), dictionary examples, 10 readings, 8 dialogues, placement 30; all draft |
+| 0.9.0 (live) | Listening practice (hear, dictation, 70 sound pairs, 36 texts with 124 listening questions), level review test (44 questions per level), dictionary examples, 10 readings, 8 dialogues, placement 30; all draft |
 | 0.8.0 (live) | Picture words (38 pictures, 505 words) + body map, 10 picture lessons, vocabulary quiz + 19 topic sets, word pairs (280), numbers / dates / time (142 rows, 40 clinic lines), lesson extras (23 lessons), practice scores on Progress; all draft |
 | Native-speaker review | Workbook sent 2026-11-08 (13 sheets, 4,769 rows); waiting on her corrections; everything is draft |
-| Audio | 7,828 texts and clips after 0.8.0 (job 246 s); 9,240 texts on wip-0.9.0 (1,412 to record), es-MX-DaliaNeural |
+| Audio | 9,240 texts and clips after 0.9.0 (1,412 recorded in 204 s), es-MX-DaliaNeural |
 
 ## 3j. 2026-11-13 session (no Hablemos release)
 - Fresh clone of 0.6.0 re-verified: data_check, smoke (`HB SMOKE OK 34 routes x 2 viewports`, `HB CONTENT OK`), check_sw PASS, check_design_es PASS; `audio/last-run.json` shows 4,875/4,875 clips after the 0.6.0 job (315 s). The 7c QA walk-through was NOT started (session restarted); nothing in section 4 item 2 is done yet.
@@ -230,12 +230,12 @@ Vocabulary: In context may show a headword in another sense (`seguro`, `pronóst
 
 **Next build, 0.9.0** (unchanged plan): listening practice `#/listen` (hear, dictation, sound pairs such as pero / perro, questions on dialogues and readings), level review test `#/test`, dictionary example sentences `DICT_EX` (this also fills In context), more readings and dialogues, placement to 30. Candidates from Hanashimashō not yet ported: signs module, counters do not apply.
 
-## 3m. 2026-11-18 session 2: 0.8.0 released; 0.9.0 built (catch-up build 3), NOT released
+## 3m. 2026-11-18 and 19: 0.8.0 released; 0.9.0 built (catch-up build 3) and RELEASED on 2026-11-19
 She said "Ship it and continue" (no workbook attached, 7c placeholder unfilled = "not yet"). The whole 0.8.0 suite of section 3l passed on a fresh clone; `wip-0.8.0` was squashed into main (`42e909c`), pushed, the audio job recorded 1,589 clips in 246 s (7,828 / 7,828), pulled. **The remote branches `wip-0.8.0` and `wip-0.7.0` could not be deleted from the session** (`git push --delete` prints "Everything up-to-date" and the proxy refuses ref deletes; `gh api -X DELETE` is 403): she can delete them on GitHub (Branches page), they are harmless.
 
-Then 0.9.0 was built and parked on `wip-0.9.0` (branched from main at 0.8.0 with the audio commit merged in). She asked for 125% phone screenshots before the release: 4 contact sheets (20 pages, 390px, 125%, light and dark, `tests/qa9.py`) were sent. **The release is the first job of the next chat, after her "ship it".**
+Then 0.9.0 was built and parked on `wip-0.9.0` (branched from main at 0.8.0 with the audio commit merged in). She asked for 125% phone screenshots before the release: 4 contact sheets (20 pages, 390px, 125%, light and dark, `tests/qa9.py`) were sent. **She said "ship it" on 2026-11-19:** the whole suite below passed again, the release date was set to 2026-11-19, `wip-0.9.0` was squashed into main (`e52f597`), pushed, the audio job recorded 1,412 clips in 204 s (9,240 / 9,240), pulled. Baseline for the next chat = the suite below on `main` (data_check then prints `"audio":9240` and no WARN).
 
-**To release (after her "ship it")**
+**How it was released (the recipe for the next wip branch)**
 ```bash
 git -C /home/claude/hablemos fetch --depth 20 origin main wip-0.9.0 && git -C /home/claude/hablemos checkout -b wip-0.9.0 origin/wip-0.9.0
 # run the whole suite below; set the release date if the day changed (data/changelog.js top entry, README line 9)
@@ -243,9 +243,7 @@ git checkout main && git merge --squash wip-0.9.0 && git commit   # as Isabella,
 git fetch origin main && git rebase origin/main && git push origin main
 # about 5 min later (1,412 new clips): gh run list -R isaymotion/hablemos -L 2 ; git pull --rebase ; audio/last-run.json should say 9240
 ```
-Then update section 1 (version 0.9.0, cache `hablemos-0.9.0`), the title, 3e and this note; `project_write` the doc.
-
-**Suite and expected output on wip-0.9.0** (serve on 8767 first; give the server a long background timeout, it was stopped once mid-session)
+**Suite and expected output on 0.9.0** (serve on 8767 first; give the server a long background timeout, it was stopped once mid-session)
 - `data_check.js` → `{"version":"0.9.0", … "lessons":91,"reading":20,"dialogues":16,"placement":30,"texts":9240,"audio":7828}` + `WARN 1412 texts without audio until the audio job runs` + `DATA OK`
 - the eight checks of 3l unchanged, plus `examples_check` → `EXAMPLES OK 1197 4 A1=237 A2=727 B1=228 B2=5` and `listen_check` → `LISTEN OK 70 36 124`
 - `smoke.py …/index.html <scratch>` → `HB SMOKE OK 63 routes x 2 viewports`, `HB CONTENT OK` (learn present reading 20, dialogues 16, placement 30)
@@ -274,6 +272,8 @@ Level test (generated items): an In context item can have a second fitting word 
 **Review workbook:** `tests/review_collect.js` now also needs sheets for Examples (`ex:<file>:<headword>`), Sound pairs (`sp:<i>`), Listening questions (English only; optional), and the new readings and dialogues fall into the existing Readings / Dialogues sheets once the collector loads `reading-2.js` and `dialogues-2.js`; plus the sheets listed in 3l.
 
 **Still open:** her answers on the four 7c findings (section 3k); 7b when her corrected `hablemos-review-2026-11.xlsx` arrives; `scripts/check_design.py` line 51 in the design skill still requires `tl:` (checked 2026-11-18), so keep `tests/check_design_es.py`.
+
+**Next (in this order unless she says otherwise).** (1) If she attached her corrected `hablemos-review-2026-11.xlsx`: 7b (apply by Where key, section 3i). (2) Otherwise rebuild the review workbook from 0.9.0 with every new sheet (lists in 3k, 3l and above; add the flagged lines to `FLAGS`) and send it to her as `hablemos-review-2026-11b.xlsx`. (3) Her answers on the four 7c findings, then those fixes. The next release number is 0.9.1 for fixes or 0.10.0 for content; a wip branch is `wip-<version>`.
 
 **After 0.9.0** the catch-up with Hanashimashō is complete except its signs module (not ported; no Spanish equivalent was planned) and the larger volume of its dictionary and examples. Candidates for the next builds: rebuild the review workbook with all the new sheets (the most useful next step, since everything is draft), `tests/review_apply.js`, the four 7c fixes, B2 example sentences (only 5 exist, so the B2 test leans on word pairs), examples for the remaining 1,100 dictionary lines, listening questions for the case simulations (`LISTEN_Q['case-<id>']` is already supported by the story tab).
 
