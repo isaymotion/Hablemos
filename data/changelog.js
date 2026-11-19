@@ -3,6 +3,17 @@
    For every release: add an entry here, then bump APP_META.version (data/app-meta.js) and VERSION in sw.js. */
 window.APP_CHANGELOG = [
   {
+    version: '0.11.0', date: '2026-11-19', title: 'Two new drills and extras for every lesson',
+    items: [
+      { type: 'feature', text: 'Find the mistake: 160 sentences from A1 to B2, each with one wrong word (a gender, an ending, ser or estar, a tense, a preposition, a false friend). Tap it, then see the sentence put right with its sound and the reason. Find it under Practice.' },
+      { type: 'feature', text: 'Listen and reply: hear what someone says and choose the natural reply. 120 items, everyday and clinical, from greetings and thanks to what to say when a patient hints at being a burden.' },
+      { type: 'content', text: 'Every lesson now has extras: three more common mistakes, six more examples and a second quiz, More practice. That adds 68 lessons to the 23 that had them.' },
+      { type: 'content', text: 'Ten new readings (30 in all) and eight new dialogues (24 in all), each with listening questions. 220 more example sentences at B1 and B2, and fill-the-blank items for the picture lessons.' },
+      { type: 'update', text: 'The Progress page shows your best scores for the two new drills.' },
+      { type: 'content', text: 'All the new Spanish is a draft for review by a native Spanish-speaking clinician. New sentences get their recorded voice a few minutes after the release.' }
+    ]
+  },
+  {
     version: '0.10.0', date: '2026-11-19', title: 'A nurse track, the end-of-treatment review and nine new patients',
     items: [
       { type: 'feature', text: 'Nurse track: choose Resident or Nurse on the Psychiatry page. Six nurse sections with 125 phrases (arriving on the unit, medicines and side effects, sleep and meals, safety checks, calming things down, teaching patients and families), each with replies for the point board and the listening drill.' },

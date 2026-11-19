@@ -1174,3 +1174,48 @@ mark.vf { background: var(--warn-bg); color: var(--gold-ink); font-weight: 700; 
 .nc-line { padding: 1px 0 2px; break-inside: avoid; page-break-inside: avoid; }
 .nc-line + .nc-line { border-top: 1px dotted var(--p-line); }
 .eot-first { margin-top: 12px; }
+
+/* ---------- 0.11.0: Find the mistake, Listen and reply (shared runner js/drillrun.js) ---------- */
+
+/* ---------- 0.11.0 shared question runner (App.drillRun in js/drillrun.js: Find the mistake, Listen and reply) ---------- */
+.dr-q { gap: 12px; }
+.dr-tags { gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.dr-opts .opt { min-height: 48px; display: flex; align-items: center; gap: 10px; overflow-wrap: anywhere; min-width: 0; width: 100%; color: var(--fg); font: inherit; }
+.dr-opts .opt > .tl { flex: 1 1 auto; min-width: 0; }
+.dr-k { flex: none; display: inline-grid; place-items: center; width: 1.6em; height: 1.6em; border-radius: 50%; background: var(--surface-2); color: var(--muted); font: 600 .78rem var(--sans); }
+.opt.right .dr-k { background: var(--good); color: var(--surface); }
+.opt.wrong .dr-k { background: var(--bad); color: var(--surface); }
+.dr-optrow { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.dr-optrow .opt { flex: 1 1 auto; }
+.dr-optrow .say { width: 44px; height: 44px; }
+.dr-fb { gap: 6px; overflow-wrap: anywhere; }
+.dr-fb > * { min-width: 0; }
+.dr-done h3 { overflow-wrap: anywhere; }
+
+/* ---------- 0.11.0 Find the mistake (#/errors): the sentence as word tiles; after answering the wrong word struck, the right one in place ---------- */
+.er-tiles { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; font-size: 1.15rem; line-height: 1.5; min-width: 0; }
+.er-tile { min-height: 48px; min-width: 44px; padding: 6px 10px; border-radius: var(--r-md); border: 1px solid var(--line); background: var(--surface); color: var(--fg);
+  display: inline-flex; align-items: center; justify-content: center; font: inherit; font-family: var(--font-tl); font-weight: 600; cursor: pointer; max-width: 100%; }
+button.er-tile:hover { border-color: var(--ink-3); }
+button.er-tile:focus-visible { outline: 3px solid var(--focus, var(--accent)); outline-offset: 2px; }
+.er-tile .er-w { display: block; min-width: 0; overflow-wrap: anywhere; }
+.er-done .er-tile { cursor: default; }
+.er-tile.er-was { background: var(--bad-bg); border-color: var(--bad); color: var(--bad); text-decoration: line-through; text-decoration-thickness: 2px; }
+.er-tile.er-now { background: var(--good-bg); border-color: var(--good); color: var(--good); border-width: 2px; }
+.er-tile.er-at { border-color: var(--good); border-width: 2px; }
+.er-tile.er-chose { border-style: dashed; border-color: var(--bad); }
+.er-fix { display: flex; align-items: center; gap: 8px; font-size: 1.08rem; font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.er-fix > .tl { flex: 1 1 auto; min-width: 0; }
+.er-best { font-weight: 500; opacity: .8; }
+@media (max-width: 400px) { .er-tiles { gap: 6px; font-size: 1.08rem; } .er-tile { padding: 6px 8px; } }
+
+/* ---------- 0.11.0 Listen and reply (#/reply) ---------- */
+.rp-play .btn { min-height: 44px; }
+.rp-play > .muted { min-width: 0; flex: 1 1 12em; }
+.rp-said { display: grid; gap: 2px; min-width: 0; }
+.rp-line { gap: 8px; align-items: center; flex-wrap: nowrap; font-weight: 600; min-width: 0; }
+.rp-line > .tl { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.rp-ens { margin: 0; padding-left: 1.4em; display: grid; gap: 6px; }
+.rp-ens li { overflow-wrap: anywhere; }
+.rp-ens li.rp-right { font-weight: 600; }
+.rp-ens li .pill { vertical-align: middle; }

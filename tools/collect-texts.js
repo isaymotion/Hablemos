@@ -13,6 +13,7 @@ const files = ['js/data/dict-core.js', 'js/data/dict-everyday.js', 'js/data/dict
   'js/data/grammar-cloze-a1.js', 'js/data/grammar-cloze-a2.js', 'js/data/grammar-cloze-b1.js', 'js/data/grammar-cloze-b2.js', 'js/data/grammar-transform-1.js', 'js/data/verbs.js',
   'js/data/reading-2.js', 'js/data/dialogues-2.js', 'js/data/examples-1.js', 'js/data/examples-2.js', 'js/data/examples-3.js', 'js/data/examples-4.js', 'js/data/sound-pairs.js',
   'js/data/psych-phrases-nurse.js', 'js/data/psych-eot.js', 'js/data/psych-answers-nurse.js', 'js/data/psych-answers-eot.js', 'js/data/psych-cases-karla.js', 'js/data/psych-cases-dona-carmen.js', 'js/data/psych-cases-nurse.js', 'js/data/psych-cases-ocd.js', 'js/data/psych-cases-ptsd.js', 'js/data/psych-cases-panic.js', 'js/data/psych-cases-camila.js', 'js/data/psych-interp-2.js', 'js/data/psych-discharge-cases-karla.js', 'js/data/psych-discharge-cases-dona-carmen.js', 'js/data/psych-discharge-cases-don-chuy.js', 'js/data/psych-discharge-cases-panic.js', 'js/data/psych-mse-cases-lupe.js', 'js/data/psych-mse-cases-ramiro.js', 'js/data/psych-mse-cases-yesenia.js', 'js/data/psych-mse-cases-ocd.js', 'js/data/psych-mse-cases-ptsd.js', 'js/data/psych-mse-cases-panic.js', 'js/data/psych-mse-cases-camila.js', 'js/data/psych-eot-cases-ocd.js', 'js/data/psych-eot-cases-ptsd.js', 'js/data/psych-eot-cases-panic.js', 'js/data/psych-eot-cases-camila.js', 'js/data/psych-nurse-tools.js', 'js/data/psych-nurse-tools-2.js',
+  'js/data/reading-3.js', 'js/data/dialogues-3.js', 'js/data/grammar-cloze-pic.js', 'js/data/grammar-errors-a1.js', 'js/data/grammar-errors-a2.js', 'js/data/grammar-errors-b1.js', 'js/data/grammar-errors-b2.js', 'js/data/listen-reply-1.js', 'js/data/listen-reply-2.js', 'js/data/lesson-extra-3.js', 'js/data/lesson-extra-4.js', 'js/data/lesson-extra-5.js', 'js/data/lesson-extra-6.js', 'js/data/lesson-extra-7.js', 'js/data/examples-5.js',
   'js/data/meta.js', 'js/audio-key.js'];
 if (fs.existsSync(path.join(root, 'js/lang.js'))) files.push('js/lang.js'); // ctx.LANG.testLine = settings voice test line
 files.forEach(load);
@@ -59,6 +60,8 @@ arr(ctx.PICTURE_SETS).forEach((s) => { arr(s.parts).forEach((p) => p && add(p.w)
 if (ctx.PICTURE_BODYMAP) { arr(ctx.PICTURE_BODYMAP.ask).forEach((x) => add(x.es)); arr(ctx.PICTURE_BODYMAP.words).forEach((x) => add(x.es)); }
 // 0.9.0: dictionary example sentences and both words of every sound pair (the new readings and dialogues are swept above).
 arr(ctx.DICT_EX).forEach((x) => x && add(x[1]));
+arr(ctx.GRAMMAR_ERRORS).forEach((x) => x && add(x.fix));   // 0.11.0 Find the mistake: only the corrected sentence is ever spoken
+arr(ctx.LISTEN_REPLY).forEach((x) => { if (!x) return; add(x.say); arr(x.opts).forEach((o) => o && add(o.es)); });   // 0.11.0 Listen and reply
 arr((ctx.SOUND_PAIRS || {}).items).forEach((x) => { add(x[1]); add(x[3]); });
 add((ctx.LANG && ctx.LANG.testLine) || 'Buenos días. ¿Cómo se siente hoy?'); // settings voice test
 

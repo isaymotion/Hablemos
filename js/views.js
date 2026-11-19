@@ -263,11 +263,11 @@
      lesson's own; best score in state.done.lessonMore[id] (lesson completion stays done.lessons). The WRONG line of a
      mistake is struck through and never spoken: it is not an .ex. */
   const lessonExtra = (id) => { const x = window.LESSON_EXTRA && Object.prototype.hasOwnProperty.call(window.LESSON_EXTRA, id) ? window.LESSON_EXTRA[id] : null; return x && typeof x === 'object' ? x : null; };
-  const extraHTML = (x) => {
+  const extraHTML = (x, own) => {
     const mis = (x.mistakes || []).filter((m) => Array.isArray(m) && m[0] && m[1]), more = (x.more || []).filter((m) => Array.isArray(m) && m[0]);
     if (!mis.length && !more.length) return '';
     return '<div class="lesson-body lx">' +
-      (mis.length ? '<h3>Common mistakes</h3><div class="lx-mist">' + mis.map(([bad, good, why]) =>
+      (mis.length ? '<h3>' + (own ? 'More common mistakes' : 'Common mistakes') + '</h3><div class="lx-mist">' + mis.map(([bad, good, why]) =>
         '<div class="lx-m"><div class="lx-bad"><span class="lx-mk" aria-hidden="true">✗</span><span class="sr-only">Wrong: </span><s>' + esc(bad) + '</s></div>' +
         '<div class="ex lx-ok"><b>' + esc(good) + '</b><span>' + esc(why || '') + '</span></div></div>').join('') + '</div>' : '') +
       (more.length ? '<h3>More examples</h3>' + more.map(([es, en]) => '<div class="ex"><b>' + esc(es) + '</b><span>' + esc(en || '') + '</span></div>').join('') : '') +
@@ -281,7 +281,7 @@
     el.innerHTML = crumb([['Lessons', '#/lessons'], [l.title]]) + '<div class="row">' + lvPill(l.level) + (l.review ? reviewPill : '') + '<span class="muted small">' + esc(l.unit) + '</span></div><h1 style="margin-top:6px">' + esc(l.title) + '</h1>' +
       (l.draft ? '<div class="notice warn" style="margin-bottom:12px">Draft for review: the ' + esc(LANG.name) + ' lines in this lesson are practice wording pending review by a native Spanish-speaking clinician.</div>' : '') +
       '<div class="lesson-body">' + l.body.replace(/<table>/g, '<div class="tablewrap"><table>').replace(/<\/table>/g, '</table></div>') + '</div>' +
-      (x ? extraHTML(x) : '') +
+      (x ? extraHTML(x, /Common mistakes/.test(l.body)) : '') +
       '<h2 style="margin-top:20px">Check yourself</h2><div id="lq"></div>' +
       (xq.length ? '<h2 style="margin-top:20px">More practice</h2><div id="lq2"></div>' : '') +
       (App.lessonLinks.map((f) => { try { return f(l) || ''; } catch (e) { return ''; } }).join('') ? '<div class="row" style="flex-wrap:wrap;gap:8px;margin-top:14px">' + App.lessonLinks.map((f) => { try { return f(l) || ''; } catch (e) { return ''; } }).join('') + '</div>' : '') +
@@ -501,6 +501,12 @@
     const tl = ['A1', 'A2', 'B1', 'B2'].filter((k) => num(tst[k]) != null);
     const frac = (x) => (Array.isArray(x) && x[1] ? x[0] + ' / ' + x[1] : '—');
     out.push(psBlock('Level review test', '#/test', tl.length ? psTbl(['Level', 'Best'].concat(AR.map((a) => a[1])), tl.map((k) => { const ar = (tinfo[k] && tinfo[k].areas) || {}; return [esc(k), pctPill(num(tst[k]))].concat(AR.map((a) => esc(frac(ar[a[0]])))); })) : ''));
+    // 0.11.0: Find the mistake, Listen and reply (best % per level or kind)
+    { const er = store('errors'), ek = ['all', 'A1', 'A2', 'B1', 'B2'].filter((k) => num(er[k]) != null);
+      out.push(psBlock('Find the mistake', '#/errors', ek.length ? psTbl(['Level', 'Best'], ek.map((k) => [esc(k === 'all' ? 'All levels' : k), pctPill(num(er[k]))])) : ''));
+      const rp = store('reply'), rk = Object.keys(rp).filter((k) => k !== 'miss' && num(rp[k]) != null).sort();
+      const rn = (k) => { const [a, b] = k.split(':'); return ({ everyday: 'Everyday', clinical: 'Clinical', all: 'All' }[a] || a) + ', ' + (b === 'all' ? 'all levels' : b); };
+      out.push(psBlock('Listen and reply', '#/reply', rk.length ? psTbl(['Choice', 'Best'], rk.map((k) => [esc(rn(k)), pctPill(num(rp[k]))])) : '')); }
     // Grammar drills (0.7.0)
     twoCol('Verb trainer', 'verbs', '#/verbs', 'Level', [['choose', 'Choose'], ['name', 'Name'], ['type', 'Type']], false, lvName);
     const lessonTitle = (k) => { if (k.indexOf('l:') !== 0) return lvName(k); const l = LESSONS.find((y) => y.id === k.slice(2)); return l ? l.title : k.slice(2); };
