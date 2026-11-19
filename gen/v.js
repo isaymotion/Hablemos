@@ -1,0 +1,11 @@
+global.window={};require('/home/claude/hablemos/js/data/listen-reply-1.js');require('/home/claude/hablemos/js/data/listen-reply-2.js');
+const L=window.LISTEN_REPLY;const lv={},ad={},seen=new Set();let bad=[];
+L.forEach((r,i)=>{if(r.id!=='r-'+String(i+1).padStart(3,'0'))bad.push('id '+r.id);
+ if(r.opts.length!==4||r.opts.some(o=>!o.es||!o.en))bad.push('opts '+r.id);
+ if(!(r.a>=0&&r.a<4))bad.push('a '+r.id);
+ if(r.clin!==(i>=60))bad.push('clin '+r.id);
+ const w=r.say.trim().split(/\s+/).length;if(w<3||w>16)bad.push('words '+r.id+' '+w);
+ if(seen.has(r.say))bad.push('dup '+r.id);seen.add(r.say);
+ const es=r.opts.map(o=>o.es);if(new Set(es).size<4)bad.push('dupopt '+r.id);
+ const k=(i<60?'E':'C')+r.lv;lv[k]=(lv[k]||0)+1;const ka=(i<60?'E':'C')+r.a;ad[ka]=(ad[ka]||0)+1;});
+console.log(L.length,lv,ad,bad);

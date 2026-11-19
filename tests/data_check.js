@@ -6,8 +6,11 @@ const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const ctx = { console, TextEncoder, Buffer, navigator: {}, location: { hash: '' }, document: null };
 ctx.window = ctx; vm.createContext(ctx);
 const srcs = [...html.matchAll(/<script src="((?:js\/data|data|js\/lang|js\/audio-key)[^"]+)"/g)].map((m) => m[1]);
-for (const f of srcs) vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
 const errs = [], warns = [];
+/* A file listed in index.html but not yet written is a WARN; a file that throws is an ERROR naming the file (the rest still loads). */
+for (const f of srcs) { if (!fs.existsSync(path.join(root, f))) { warns.push('listed in index.html but missing: ' + f); continue; } try { vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f }); } catch (e) { errs.push(f + ' does not load: ' + e.message); } }
+/* Work in progress: a data file on disk that index.html does not list yet is loaded too (after the listed ones), with a WARN. */
+fs.readdirSync(path.join(root, 'js/data')).filter((f) => /\.js$/.test(f) && !srcs.includes('js/data/' + f)).sort().forEach((f) => { warns.push('not yet listed in index.html: js/data/' + f); try { vm.runInContext(fs.readFileSync(path.join(root, 'js/data', f), 'utf8'), ctx, { filename: f }); } catch (e) { errs.push('js/data/' + f + ' does not load: ' + e.message); } });
 const S = ctx.PSYCH_SECTIONS || [], A = ctx.PSYCH_ANSWERS || { common: [], sections: {} };
 const ids = new Set(S.map((s) => s.id));
 S.forEach((s) => {
@@ -117,10 +120,34 @@ const AM = ctx.PSYCH_ADMIT_MSE || { domains: [] };
 MC.forEach((c) => {
   if (!c.id || !c.title || !c.level || !c.dx || !c.setting || !(c.chart || []).length) errs.push('mcase ' + c.id + ' missing id/title/level/dx/setting/chart');
   if (!c.cc || !ref(c.cc.ask, 'mcase ' + c.id + ' cc') || !Array.isArray(c.cc.ans) || c.cc.ans.length < 3 || (c.cc.opts || []).filter((o) => o[1]).length !== 1 || c.cc.opts.some((o) => !o[2])) errs.push('mcase ' + c.id + ' chief complaint needs ask ref, ans [es, en, who], opts with one correct and a why each');
-  if (!DC.some((x) => x.id === c.id)) errs.push('mcase ' + c.id + ' has no matching discharge case');
+  if (!DC.some((x) => x.id === c.id) && !(ctx.PSYCH_EOT_CASES || []).some((x) => x.id === c.id)) errs.push('mcase ' + c.id + ' has no matching discharge or end-of-treatment case');
   AM.domains.forEach((d) => { if (!c.domains[d.id]) errs.push('mcase ' + c.id + ' missing domain ' + d.id); });
   Object.entries(c.domains || {}).forEach(([id, cd]) => { const d = AM.domains.find((x) => x.id === id); if (!d) return errs.push('mcase ' + c.id + ' unknown domain ' + id); checkModel('mcase ' + c.id + '.' + id, cd, d); });
 });
+/* 0.10.0: end-of-treatment review (outpatient), nurse track. */
+const EOT = ctx.PSYCH_EOT || { fields: [] }, EC = ctx.PSYCH_EOT_CASES || [];
+if (EOT.fields.length) {
+  if (EOT.fields.length !== 9) errs.push('eot: expected 9 fields');
+  if (!ids.has('eot')) errs.push('eot: section eot not published');
+  EOT.fields.forEach((f) => { if (!f.id || !f.label || !f.kind || !f.assess || !(f.picks || []).length || !(f.ask || []).length) errs.push('eot field ' + f.id + ' incomplete'); (f.refs || []).forEach((r) => ref(r, 'eot ' + f.id)); });
+}
+EC.forEach((c) => {
+  if (!c.id || !c.title || !c.level || !c.dx || !c.setting || !(c.chart || []).length) errs.push('ecase ' + c.id + ' missing id/title/level/dx/setting/chart');
+  if (!c.decision || typeof c.decision.end !== 'boolean' || !c.decision.why) errs.push('ecase ' + c.id + ' missing decision { end, why }');
+  EOT.fields.filter((f) => f.kind !== 'sign').forEach((f) => { if (!(c.fields || {})[f.id]) errs.push('ecase ' + c.id + ' missing field ' + f.id); });
+  Object.entries(c.fields || {}).forEach(([id, cf]) => { const f = EOT.fields.find((x) => x.id === id); if (!f) return errs.push('ecase ' + c.id + ' unknown field ' + id); checkModel('ecase ' + c.id + '.' + id, cf, f); });
+});
+if (new Set(EC.map((c) => c.id)).size !== EC.length || new Set(DC.map((c) => c.id)).size !== DC.length || new Set(MC.map((c) => c.id)).size !== MC.length) errs.push('duplicate ids in the discharge, MSE or end-of-treatment cases');
+const NT = ctx.PSYCH_NURSE_TOOLS || {}; let ntLines = 0;
+Object.entries(NT).forEach(([k, d]) => { if (!d.notice || !d.escalate || !(d.steps || []).length) errs.push('nurse tool ' + k + ' needs notice, steps, escalate');
+  (d.steps || []).forEach((st, i) => { if (!st.title || !(st.lines || []).length) errs.push('nurse tool ' + k + ' step ' + i + ' needs title + lines'); (st.lines || []).forEach((l, j) => { ntLines++; if (!l.tl || !l.c || !l.en) errs.push('nurse tool ' + k + ' step ' + i + ' line ' + j + ' needs tl, c, en'); }); }); });
+const nurseSecs = S.filter((s) => s.role === 'nurse');
+nurseSecs.forEach((s) => { if (s.group !== 'Nursing') errs.push('nurse section ' + s.id + ' must be in group Nursing'); });
+CASES.filter((c) => c.role === 'nurse').forEach((c) => { if (!/^nurse-/.test(c.id)) warns.push('nurse case id without nurse- prefix: ' + c.id); });
+/* Nothing from the Japanese reference may be left in any psychiatry data. */
+{ const CJK = /[぀-ヿ一-鿿《》]|\b119\b|Kimura/; const seenJ = new Set();
+  const sw = (o, where) => { if (typeof o === 'string') { if (CJK.test(o)) errs.push(where + ' has Japanese-reference text: ' + o.slice(0, 50)); return; } if (!o || typeof o !== 'object' || seenJ.has(o)) return; seenJ.add(o); (Array.isArray(o) ? o.map((x, i) => [i, x]) : Object.entries(o)).forEach(([k, v]) => sw(v, where + '.' + k)); };
+  Object.keys(ctx).filter((k) => /^PSYCH_/.test(k)).forEach((k) => sw(ctx[k], k)); }
 /* Pass 6 learn track: lessons, dictionary, readings, dialogues, placement. */
 const LESS = ctx.LESSONS || [], READ = ctx.READING || [], DIAL = ctx.DIALOGUES || [], PLACE = ctx.PLACEMENT || [];
 const dictLines = (ctx.DICT_RAW || []).join('\n').split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('#'));
@@ -161,6 +188,6 @@ const vers = new Set([ctx.APP_META.version, (ctx.APP_CHANGELOG[0] || {}).version
 if (vers.size !== 1) errs.push('versions disagree: ' + [...vers].join(', '));
 warns.forEach((w) => console.log('WARN ' + w));
 errs.forEach((e) => console.log('ERROR ' + e));
-console.log(JSON.stringify({ version: ctx.APP_META.version, sections: S.length, phrases: S.reduce((n, s) => n + s.phrases.length, 0), answers: items, flow: (ctx.PSYCH_FLOW || []).length, mse: (ctx.PSYCH_MSE || []).length, mood, substances: subs, wd, deesc: de, discharge: di, cases: CASES.length, interp: INTERP.length, dcases: DC.length, mcases: MC.length, dict: dictLines.length, lessons: LESS.length, reading: READ.length, dialogues: DIAL.length, placement: PLACE.length, texts, audio }));
+console.log(JSON.stringify({ version: ctx.APP_META.version, sections: S.length, phrases: S.reduce((n, s) => n + s.phrases.length, 0), answers: items, flow: (ctx.PSYCH_FLOW || []).length, mse: (ctx.PSYCH_MSE || []).length, mood, substances: subs, wd, deesc: de, discharge: di, cases: CASES.length, ncases: CASES.filter((c) => c.role === 'nurse').length, nurseSections: nurseSecs.length, nurseLines: ntLines, eot: EOT.fields.length, ecases: EC.length, interp: INTERP.length, dcases: DC.length, mcases: MC.length, dict: dictLines.length, lessons: LESS.length, reading: READ.length, dialogues: DIAL.length, placement: PLACE.length, texts, audio }));
 console.log(errs.length ? 'DATA FAIL' : 'DATA OK');
 process.exit(errs.length ? 1 : 0);

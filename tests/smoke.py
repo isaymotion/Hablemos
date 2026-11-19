@@ -6,7 +6,7 @@ OUT = sys.argv[2] if len(sys.argv) > 2 else '/home/claude/scratch/hb'
 os.makedirs(OUT, exist_ok=True)
 ROUTES = ['#/', '#/search?q=sentir', '#/dict', '#/flash', '#/flash/due', '#/flash/mistakes', '#/lessons', '#/reading', '#/speak', '#/psych', '#/psych?tab=cases', '#/psych?tab=tools', '#/psych?tab=print',
           '#/psych/cases', '#/psych/interp', '#/psych/listen', '#/psych/point', '#/psych/handout', '#/psych/mse-sheet', '#/psych/sud', '#/psych/mood', '#/psych/withdrawal', '#/psych/deesc', '#/psych/discharge',
-          '#/psych/dcases', '#/psych/mcases', '#/placement', '#/listen', '#/listen?tab=dict', '#/listen?tab=pairs', '#/listen?tab=story', '#/listen?tab=story&id=appointment-call', '#/test', '#/reading/mi-recuperacion', '#/speak/interpreter-session', '#/verbs', '#/verbs/v/0', '#/cloze', '#/cloze?tab=lessons', '#/transform', '#/build', '#/vocab', '#/vocab?tab=match', '#/vocab?tab=match&set=body', '#/pairs', '#/pairs?tab=match', '#/numbers', '#/numbers?tab=clinic', '#/pictures', '#/pictures/body-front', '#/pictures/meals-drinks?tab=identify', '#/pictures/bodymap', '#/lessons/position-words', '#/lessons/ser-estar', '#/lessons?lv=B2', '#/lessons/review-a1', '#/progress', '#/settings', '#/new', '#/about', '#/practice', '#/more', '#/nope']
+          '#/psych/dcases', '#/psych/mcases', '#/psych/eot', '#/psych/ecase/ocd', '#/psych/s/nurse-admit', '#/psych/s/eot', '#/psych/case/nurse-night', '#/psych/handout?nursecard=1', '#/psych/point?s=nurse-meds', '#/psych/listen?s=nurse-daily', '#/placement', '#/listen', '#/listen?tab=dict', '#/listen?tab=pairs', '#/listen?tab=story', '#/listen?tab=story&id=appointment-call', '#/test', '#/reading/mi-recuperacion', '#/speak/interpreter-session', '#/verbs', '#/verbs/v/0', '#/cloze', '#/cloze?tab=lessons', '#/transform', '#/build', '#/vocab', '#/vocab?tab=match', '#/vocab?tab=match&set=body', '#/pairs', '#/pairs?tab=match', '#/numbers', '#/numbers?tab=clinic', '#/pictures', '#/pictures/body-front', '#/pictures/meals-drinks?tab=identify', '#/pictures/bodymap', '#/lessons/position-words', '#/lessons/ser-estar', '#/lessons?lv=B2', '#/lessons/review-a1', '#/progress', '#/settings', '#/new', '#/about', '#/practice', '#/more', '#/nope']
 SHOTS = {'#/': 'home', '#/psych': 'psych', '#/psych?tab=tools': 'tools', '#/about': 'about', '#/more': 'more', '#/settings': 'settings', '#/psych/mood': 'mood'}
 bad = []
 with sync_playwright() as p:
@@ -185,9 +185,56 @@ with sync_playwright() as p:
             assert not errs, (cid, i, errs)
         page.click('.ds-chip.sum'); page.wait_for_timeout(150)
         t = page.inner_text('#view')
-        if 'Admission vs discharge' not in t: bad.append('mcase compare ' + cid); print('BAD mcase compare', cid)
+        want = 'Admission vs discharge' if cid in p5['dcases'] else 'Months later'   # outpatients have an end-of-treatment case instead (0.10.0)
+        if want not in t: bad.append('mcase compare ' + cid); print('BAD mcase compare', cid)
         if page.evaluate("document.documentElement.scrollWidth > window.innerWidth"): bad.append('mcase overflow ' + cid)
         if cid == p5['mcases'][0]: page.screenshot(path=f'{OUT}/mcase-compare-390.png', full_page=True)
+    # ---- pass 11 (0.10.0): nurse track and end-of-treatment review (run only when their data exists) ----
+    p11 = page.evaluate("({nurse:(window.PSYCH_SECTIONS||[]).filter(s=>s.role==='nurse').length, tools:Object.keys(window.PSYCH_NURSE_TOOLS||{}), ecases:(window.PSYCH_EOT_CASES||[]).map(c=>c.id)})")
+    print('pass 11 present', p11)
+    if p11['nurse']:
+        go('#/psych'); assert page.locator('[data-role=nurse]').count() == 1, 'role switch'
+        page.click('[data-role=nurse]'); page.wait_for_timeout(200)
+        t = page.inner_text('#view')
+        if 'Nursing' not in t or 'Also useful on the unit' not in t or 'nurse pocket card' not in t.lower(): bad.append('nurse hub')
+        go('#/psych/cases'); t = page.inner_text('#view')
+        if t.find('Played as the nurse') < 0 or t.find('Played as the nurse') > t.find('Played as the doctor'): bad.append('nurse cases first')
+        for route, key in [('#/psych/deesc', 'deesc'), ('#/psych/discharge', 'discharge'), ('#/psych/mood', 'mood'), ('#/psych/mse-sheet', 'admit')]:
+            if key not in p11['tools']: continue
+            go(route); n = page.evaluate("k => PSYCH_NURSE_TOOLS[k].steps.length", key)
+            if page.locator('.nt-step').count() != n or 'Escalate.' not in page.inner_text('#view'): bad.append('nurse view ' + key); print('BAD nurse view', key)
+            if page.evaluate("document.documentElement.scrollWidth > window.innerWidth"): bad.append('nurse view overflow ' + key)
+            page.click('[data-nreg=c]'); page.wait_for_timeout(120); page.click('[data-nreg=f]'); page.wait_for_timeout(120)
+            if key == 'deesc': page.screenshot(path=f'{OUT}/nurse-deesc-390.png', full_page=True)
+        go('#/psych/deesc'); page.click('[data-role=resident]'); page.wait_for_timeout(200)
+        if page.locator('.dz-tabs').count() != 1 or page.locator('.nt-step').count(): bad.append('back to resident view')
+        go('#/psych/handout?nursecard=1', 500)
+        if page.locator('.nc-card').count() != 3 or page.locator('.nc-line').count() < 20: bad.append('nurse card html')
+        nb = page.evaluate("""async () => { await App.pdfKit.load(); const o = Object.assign({english:'show', register:'f', notes:true, answers:false, title:'Nurse Pocket Card', preparedFor:''}, App.handoutPresets.nursecard.o, {preset:'nursecard'});
+            const dd = App.handoutDoc(o); return await new Promise(res => pdfMake.createPdf(dd).getBuffer(buf => res(buf.length))); }""")
+        print('handout nursecard pdf bytes', nb)
+        if not nb or nb < 5000: bad.append('handout nursecard')
+    for cid in p11['ecases']:
+        go('#/psych/ecase/' + cid)
+        nF = page.evaluate("PSYCH_EOT.fields.filter(f=>f.kind!=='sign').length")
+        for i in range(nF):
+            page.click(f'[data-go="{i}"].ds-chip'); page.wait_for_timeout(80)
+            for v in page.evaluate("[...document.querySelectorAll('[data-ask]')].map(b=>b.dataset.ask)"):
+                if page.locator(f'[data-ask="{v}"]').count(): page.click(f'[data-ask="{v}"]'); page.wait_for_timeout(30)
+            idx = page.evaluate("""([cid,i]) => { const F = PSYCH_EOT.fields.filter(f=>f.kind!=='sign'); const f = F[i]; const cf = PSYCH_EOT_CASES.find(c=>c.id===cid).fields[f.id];
+                return cf.need.map(n => f.picks.indexOf(Array.isArray(n)?n[0]:n)); }""", [cid, i])
+            for k in idx: page.click(f'[data-pick="{k}"]')
+            page.click('#dcCheck'); page.wait_for_timeout(80)
+            if 'Matches the model' not in page.inner_text('#view'): bad.append(f'ecase {cid} field {i}'); print('BAD ecase field', cid, i)
+            assert not errs, (cid, i, errs)
+        page.click('.ds-chip.sum'); page.wait_for_timeout(150)
+        dec = page.evaluate("cid => PSYCH_EOT_CASES.find(c=>c.id===cid).decision.end", cid)
+        page.click('[data-dec="1"]' if dec else '[data-dec="0"]'); page.wait_for_timeout(100)
+        t = page.inner_text('#view')
+        if 'Same call as the model' not in t: bad.append('ecase decision ' + cid); print('BAD ecase decision', cid)
+        if 'First visit vs today' not in t: bad.append('ecase first-visit rows ' + cid)
+        if page.evaluate("document.documentElement.scrollWidth > window.innerWidth"): bad.append('ecase overflow ' + cid)
+        if cid == p11['ecases'][0]: page.screenshot(path=f'{OUT}/ecase-compare-390.png', full_page=True)
     # ---- pass 6 learn track (run only when the data exists) ----
     p6 = page.evaluate("({dict:App.DICT.length, lessons:(window.LESSONS||[]).map(l=>[l.id,l.quiz.length]), reading:(window.READING||[]).map(r=>[r.id,r.q.length]), dialogues:(window.DIALOGUES||[]).map(d=>d.id), placement:(window.PLACEMENT||[]).length})")
     print('learn present', {k: len(v) if isinstance(v, list) else v for k, v in p6.items()})

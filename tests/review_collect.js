@@ -2,9 +2,12 @@
 /* Hablemos native-speaker review: collect every Spanish draft into JSON rows.
    Usage: node tests/review_collect.js <app dir> > rows.json
    Then: python3 tests/review_build.py rows.json  (writes hablemos-review-2026-11.xlsx)
-   Output: { "Phrases", "Replies", "Tools", "Strings", "Cases", "Interp", "Discharge cases", "MSE cases", "Lessons",
-   "Readings", "Dialogues", "Dictionary", "Extras", "Cloze", "Transform", "Verbs", "Pictures", "Pairs", "Numbers",
-   "Examples", "Sound pairs", "Lesson text", "Listening questions" }, one array of row objects per sheet, keys = column headers.
+   Output: { "Phrases", "Replies", "Nurse tools", "Tools", "Strings", "Cases", "Interp", "Discharge cases", "MSE cases",
+   "End-of-treatment cases", "Lessons", "Readings", "Dialogues", "Dictionary", "Extras", "Cloze", "Find the mistake",
+   "Listen and reply", "Transform", "Verbs", "Pictures", "Pairs", "Numbers", "Examples", "Sound pairs", "Lesson text",
+   "Listening questions" }, one array of row objects per sheet, keys = column headers.
+   Data files are loaded in the order of the <script> tags of index.html (every js/data/*.js, so new files are picked up by
+   themselves; a global that an older tree lacks, e.g. PSYCH_NURSE_TOOLS in 0.9.0, just gives an empty sheet).
    The Where column is the key used to apply a fix back into the data files:
      p:<sectionId>:<index>  -> phrase f/c in js/data/psych-phrases.js (or the module that pushed the section)
      a:common:<groupId>:<i> / a:<sectionId>:<i> -> js/data/psych-answers.js
@@ -31,14 +34,22 @@
      sp:<i> / sp:guide:<type> -> js/data/sound-pairs.js
      lt:<lessonId>:<i> -> i-th p / li / tr / h3 / h4 / dt / dd block of the lesson body after removing the .ex divs and the
        <p><s> mistake lines (English prose with Spanish words; Fix = the whole corrected text of that block)
-     lq:<textId>:<i> -> LISTEN_Q in js/data/listen-questions*.js (English) */
+     lq:<textId>:<i> -> LISTEN_Q in js/data/listen-questions*.js (English)
+   Added for 0.10.0 and 0.11.0:
+     nt:<key>:<step>:<line> -> PSYCH_NURSE_TOOLS[key].steps[step].lines[line] in js/data/psych-nurse-tools.js / -2.js (0-based; Spanish = tl, Tú = c, Note = n)
+     ec:<caseId>:<fieldId>:<qIdx> (ans) / ec:<caseId>:<fieldId>:quote -> js/data/psych-eot-cases-*.js (PSYCH_EOT_CASES)
+     ge:<id> -> GRAMMAR_ERRORS in js/data/grammar-errors-*.js (Spanish = fix, Wrong version = bad)
+     lr:<id>:say / lr:<id>:opt:<k> -> LISTEN_REPLY in js/data/listen-reply-*.js (say = heard line, opt k = es of option k, a = correct index)
+   Cases rows carry a Role column (clinician / nurse). out.__origin maps id -> data file for lesson, reading, dialogue, and
+   (0.10/0.11) case (PSYCH_CASES), discharge, mse, eot, error, reply, extra (LESSON_EXTRA key), nurseTools (key), section. */
 const fs = require('fs'), path = require('path'), vm = require('vm');
 const root = path.resolve(process.argv[2] || '.');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const ctx = { console, TextEncoder, Buffer, navigator: {}, location: { hash: '' }, document: null };
 ctx.window = ctx; vm.createContext(ctx);
 const srcs = [...html.matchAll(/<script src="((?:js\/data|data|js\/lang|js\/audio-key)[^"]+)"/g)].map((m) => m[1]);
-const ORIGIN = { lesson: {}, reading: {}, dialogue: {}, ex: [], cloze: {}, transform: {}, pair: {}, pic: {}, lq: {} }; // id -> data file (without js/data/ and .js)
+const ORIGIN = { lesson: {}, reading: {}, dialogue: {}, ex: [], cloze: {}, transform: {}, pair: {}, pic: {}, lq: {},
+  case: {}, discharge: {}, mse: {}, eot: {}, error: {}, reply: {}, extra: {}, nurseTools: {}, section: {} }; // id -> data file (without js/data/ and .js)
 const stamp = (map, list, file) => (list || []).forEach((x) => { if (x && x.id && !map[x.id]) map[x.id] = file; });
 for (const f of srcs) {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), ctx, { filename: f });
@@ -46,6 +57,11 @@ for (const f of srcs) {
   stamp(ORIGIN.lesson, ctx.LESSONS, file); stamp(ORIGIN.reading, ctx.READING, file); stamp(ORIGIN.dialogue, ctx.DIALOGUES, file);
   stamp(ORIGIN.cloze, ctx.GRAMMAR_CLOZE, file); stamp(ORIGIN.transform, ctx.GRAMMAR_TRANSFORM, file); stamp(ORIGIN.pair, ctx.WORD_PAIRS, file);
   stamp(ORIGIN.pic, ctx.PICTURE_SETS, file);
+  stamp(ORIGIN.case, ctx.PSYCH_CASES, file); stamp(ORIGIN.discharge, ctx.PSYCH_DISCHARGE_CASES, file); stamp(ORIGIN.mse, ctx.PSYCH_MSE_CASES, file);
+  stamp(ORIGIN.eot, ctx.PSYCH_EOT_CASES, file); stamp(ORIGIN.error, ctx.GRAMMAR_ERRORS, file); stamp(ORIGIN.reply, ctx.LISTEN_REPLY, file);
+  stamp(ORIGIN.section, ctx.PSYCH_SECTIONS, file);
+  Object.keys(ctx.LESSON_EXTRA || {}).forEach((k) => { if (!ORIGIN.extra[k]) ORIGIN.extra[k] = file; });
+  Object.keys(ctx.PSYCH_NURSE_TOOLS || {}).forEach((k) => { if (!ORIGIN.nurseTools[k]) ORIGIN.nurseTools[k] = file; });
   Object.keys(ctx.LISTEN_Q || {}).forEach((k) => { if (!ORIGIN.lq[k]) ORIGIN.lq[k] = file; });
   while (ORIGIN.ex.length < (ctx.DICT_EX || []).length) ORIGIN.ex.push(file);
 }
@@ -126,8 +142,8 @@ if (ST.es) Object.keys(ST.es).forEach((k) => out.Strings.push({ Key: k, English:
 out.Cases = []; out.Interp = []; out['Discharge cases'] = []; out['MSE cases'] = [];
 const esy = (s) => typeof s === 'string' && /[a-záéíóúñ¿¡]/i.test(s);
 (ctx.PSYCH_CASES || []).forEach((c) => c.steps.forEach((st, i) => {
-  out.Cases.push({ Where: 'c:' + c.id + ':' + i + ':line', Case: c.title, Speaker: st.who || '', Spanish: st.line[0] || '', English: st.line[1] || '', Note: '', Fix: '', Comment: '' });
-  (st.choices || []).forEach((ch, j) => out.Cases.push({ Where: 'c:' + c.id + ':' + i + ':' + j, Case: c.title, Speaker: 'You (clinician)', Spanish: ch.tl || '', English: ch.en || '', Note: 'choice scored ' + ch.score + (ch.score === 2 ? ' (best)' : '') + (ch.fb ? '. ' + ch.fb : ''), Fix: '', Comment: '' }));
+  out.Cases.push({ Where: 'c:' + c.id + ':' + i + ':line', Case: c.title, Role: c.role || 'clinician', Speaker: st.who || '', Spanish: st.line[0] || '', English: st.line[1] || '', Note: '', Fix: '', Comment: '' });
+  (st.choices || []).forEach((ch, j) => out.Cases.push({ Where: 'c:' + c.id + ':' + i + ':' + j, Case: c.title, Role: c.role || 'clinician', Speaker: c.role === 'nurse' ? 'You (nurse)' : 'You (clinician)', Spanish: ch.tl || '', English: ch.en || '', Note: 'choice scored ' + ch.score + (ch.score === 2 ? ' (best)' : '') + (ch.fb ? '. ' + ch.fb : ''), Fix: '', Comment: '' }));
 }));
 (ctx.PSYCH_INTERP || []).forEach((it, i) => out.Interp.push({ Where: 'i:' + i, Spanish: it[0] || '', English: it[1] || '', Note: it[2] || '', Fix: '', Comment: '' }));
 const DI_FIELDS = ((ctx.PSYCH_DISCHARGE || {}).fields || []);
@@ -242,8 +258,33 @@ out['Listening questions'] = [];
 const textTitle = (id) => { const r = (ctx.READING || []).find((x) => x.id === id); if (r) return 'Reading: ' + (r.titleEn || r.title); const d = (ctx.DIALOGUES || []).find((x) => x.id === id); return d ? 'Dialogue: ' + d.title : id; };
 Object.entries(ctx.LISTEN_Q || {}).forEach(([id, qs]) => qs.forEach((q, i) => out['Listening questions'].push({ Where: 'lq:' + id + ':' + i, Text: textTitle(id), English: q[0] || '', Options: (q[1] || []).join(' | '), Answer: (q[1] || [])[q[2]] || '', Note: q[3] || '', Fix: '', Comment: '' })));
 
+
+/* 0.10.0 and 0.11.0: nurse tool scripts, end-of-treatment cases, find the mistake, listen and reply */
+out['Nurse tools'] = [];
+Object.entries(ctx.PSYCH_NURSE_TOOLS || {}).forEach(([key, tl]) => ((tl && tl.steps) || []).forEach((st, i) => (st.lines || []).forEach((ln, j) => {
+  if (!ln || typeof ln !== 'object') return;
+  out['Nurse tools'].push({ Where: 'nt:' + key + ':' + i + ':' + j, Tool: key, Step: st.title || '', Spanish: ln.tl || '', 'Tú': ln.c || '', English: ln.en || '', Note: ln.n || '', Fix: '', Comment: '' });
+})));
+out['End-of-treatment cases'] = [];
+const EOT_FIELDS = ((ctx.PSYCH_EOT || {}).fields || []);
+(ctx.PSYCH_EOT_CASES || []).forEach((c) => Object.entries(c.fields || {}).forEach(([fid, f]) => {
+  const field = EOT_FIELDS.find((x) => x.id === fid);
+  Object.entries(f.ans || {}).forEach(([q, a]) => {
+    const ask = field && field.ask[+q];
+    out['End-of-treatment cases'].push({ Where: 'ec:' + c.id + ':' + fid + ':' + q, Case: c.title, Field: field ? field.label : fid, Speaker: a[2] || 'Patient', 'Asked (English)': ask ? ask.en : '', Spanish: a[0] || '', English: a[1] || '', Fix: '', Comment: '' });
+  });
+  if (esy(f.quote)) out['End-of-treatment cases'].push({ Where: 'ec:' + c.id + ':' + fid + ':quote', Case: c.title, Field: field ? field.label : fid, Speaker: 'Chart quote', 'Asked (English)': '', Spanish: f.quote, English: '', Fix: '', Comment: '' });
+}));
+out['Find the mistake'] = (ctx.GRAMMAR_ERRORS || []).map((e) => ({ Where: 'ge:' + e.id, Level: e.lv || '', Type: e.type || '', Spanish: e.fix || '', 'Wrong version': e.bad || '', English: e.en || '', Why: e.why || '', Fix: '', Comment: '' }));
+out['Listen and reply'] = [];
+(ctx.LISTEN_REPLY || []).forEach((r) => {
+  out['Listen and reply'].push({ Where: 'lr:' + r.id + ':say', Level: r.lv || '', Who: r.who || '', Kind: 'heard', Spanish: r.say || '', English: r.en || '', Correct: '', Why: r.why || '', Fix: '', Comment: '' });
+  (r.opts || []).forEach((o, k) => out['Listen and reply'].push({ Where: 'lr:' + r.id + ':opt:' + k, Level: r.lv || '', Who: r.who || '', Kind: 'reply option', Spanish: o.es || '', English: o.en || '', Correct: k === r.a ? 'correct' : '', Why: '', Fix: '', Comment: '' }));
+});
+
 /* Which data file each id lives in (for applying fixes), on stderr-free side channel: rows.origin */
-out.__origin = { lesson: ORIGIN.lesson, reading: ORIGIN.reading, dialogue: ORIGIN.dialogue };
+out.__origin = { lesson: ORIGIN.lesson, reading: ORIGIN.reading, dialogue: ORIGIN.dialogue, case: ORIGIN.case, discharge: ORIGIN.discharge, mse: ORIGIN.mse,
+  eot: ORIGIN.eot, error: ORIGIN.error, reply: ORIGIN.reply, extra: ORIGIN.extra, nurseTools: ORIGIN.nurseTools, section: ORIGIN.section };
 
 process.stdout.write(JSON.stringify(out, null, 1));
 process.stderr.write(Object.entries(out).filter(([k]) => k[0] !== '_').map(([k, v]) => k + ' ' + v.length).join(', ') + '\n');

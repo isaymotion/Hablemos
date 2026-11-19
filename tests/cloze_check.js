@@ -11,10 +11,10 @@ if (!files.length) errs.push('no js/data/grammar-cloze-*.js file');
 // The syllabus of the pass 8 brief: level → lesson ids (existing and new). Items may use any of them except the reviews.
 const SYL = {
   A1: 'sounds ser-estar gender-agreement tu-usted questions negation numbers-dates articles-contractions subject-pronouns hay-estar possessives demonstratives ' +
-    'basic-prepositions muy-mucho tener-expressions ir-a-future stem-changing irregular-yo querer-poder-necesitar time-frequency family-household review-a1',
+    'basic-prepositions muy-mucho tener-expressions ir-a-future stem-changing irregular-yo querer-poder-necesitar time-frequency family-household review-a1 position-words body-donde-duele describing-with-tener clothes-colors directions-map',
   A2: 'present-tense reflexive-feelings gustar-doler past-timelines commands-instructions body-symptoms medicines-dosing preterite-regular preterite-irregular imperfect ' +
     'preterite-vs-imperfect hace-desde present-perfect direct-object-pronouns indirect-object-pronouns por-para present-progressive saber-conocer obligation-advice ' +
-    'comparatives connectors-basic review-a2',
+    'comparatives connectors-basic review-a2 machine-instructions states-pictures explaining-with-pictures',
   B1: 'subjunctive-basics regional-variety spanglish softeners values faith-folk idioms-distress false-friends interpreting subjunctive-wishes subjunctive-emotion-doubt ' +
     'subjunctive-time-purpose negative-commands-pronouns future-conditional pluperfect reported-speech relative-clauses se-impersonal se-accidental verbs-of-change ' +
     'periphrases diminutives prepositional-verbs review-b1',
