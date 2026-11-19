@@ -1,4 +1,4 @@
-# Hablemos — handoff (**0.9.0 is live** since 2026-11-19; the catch-up with Hanashimashō is complete; next: rebuild the review workbook from 0.9.0, her answers on the four 7c findings, 7b when her corrections arrive)
+# Hablemos — handoff (**0.9.0 is live** since 2026-11-19; review workbook `hablemos-review-2026-11b.xlsx` sent 2026-11-19; next: her choice of the 0.10.0 expansion (section 3n), her answers on the four 7c findings, 7b when her corrections arrive)
 
 Start here. Usap Tayo's own handoff (`claude/handoff.md`, also `HANDOFF.md` on the Tagalog repo's dev-tools branch) holds the shared engine documentation (section 3 data formats, section 8 pitfalls); this doc holds what differs in Hablemos.
 
@@ -124,7 +124,7 @@ Baseline re-verified on a fresh clone of 0.6.0 (data_check, smoke, check_design_
 | Grammar drills (0.7.0) | Verb trainer (154 verbs), Fill the blank (345), Transform the sentence (160), Sentence builder, all draft |
 | 0.9.0 (live) | Listening practice (hear, dictation, 70 sound pairs, 36 texts with 124 listening questions), level review test (44 questions per level), dictionary examples, 10 readings, 8 dialogues, placement 30; all draft |
 | 0.8.0 (live) | Picture words (38 pictures, 505 words) + body map, 10 picture lessons, vocabulary quiz + 19 topic sets, word pairs (280), numbers / dates / time (142 rows, 40 clinic lines), lesson extras (23 lessons), practice scores on Progress; all draft |
-| Native-speaker review | Workbook sent 2026-11-08 (13 sheets, 4,769 rows); waiting on her corrections; everything is draft |
+| Native-speaker review | Second workbook `hablemos-review-2026-11b.xlsx` sent 2026-11-19 (24 sheets, 11,865 rows, built from 0.9.0; see 3n); the first one (2026-11-08, 4,769 rows) stays valid; waiting on her corrections; everything is draft |
 | Audio | 9,240 texts and clips after 0.9.0 (1,412 recorded in 204 s), es-MX-DaliaNeural |
 
 ## 3j. 2026-11-13 session (no Hablemos release)
@@ -273,11 +273,44 @@ Level test (generated items): an In context item can have a second fitting word 
 
 **Still open:** her answers on the four 7c findings (section 3k); 7b when her corrected `hablemos-review-2026-11.xlsx` arrives; `scripts/check_design.py` line 51 in the design skill still requires `tl:` (checked 2026-11-18), so keep `tests/check_design_es.py`.
 
-**Next (in this order unless she says otherwise).** (1) If she attached her corrected `hablemos-review-2026-11.xlsx`: 7b (apply by Where key, section 3i). (2) Otherwise rebuild the review workbook from 0.9.0 with every new sheet (lists in 3k, 3l and above; add the flagged lines to `FLAGS`) and send it to her as `hablemos-review-2026-11b.xlsx`. (3) Her answers on the four 7c findings, then those fixes. The next release number is 0.9.1 for fixes or 0.10.0 for content; a wip branch is `wip-<version>`.
+**Next: superseded by section 3n (workbook rebuilt and sent 2026-11-19; expansion plan waiting for her choice).** Earlier wording: (1) If she attached her corrected `hablemos-review-2026-11.xlsx`: 7b (apply by Where key, section 3i). (2) Otherwise rebuild the review workbook from 0.9.0 with every new sheet (lists in 3k, 3l and above; add the flagged lines to `FLAGS`) and send it to her as `hablemos-review-2026-11b.xlsx`. (3) Her answers on the four 7c findings, then those fixes. The next release number is 0.9.1 for fixes or 0.10.0 for content; a wip branch is `wip-<version>`.
 
 **After 0.9.0** the catch-up with Hanashimashō is complete except its signs module (not ported; no Spanish equivalent was planned) and the larger volume of its dictionary and examples. Candidates for the next builds: rebuild the review workbook with all the new sheets (the most useful next step, since everything is draft), `tests/review_apply.js`, the four 7c fixes, B2 example sentences (only 5 exist, so the B2 test leans on word pairs), examples for the remaining 1,100 dictionary lines, listening questions for the case simulations (`LISTEN_Q['case-<id>']` is already supported by the story tab).
 
+## 3n. 2026-11-19 session 2: baseline verified, review workbook rebuilt from 0.9.0, expansion plan (no app release)
+Fresh clone of main (`c155b16`, the 0.9.0 audio commit). The whole 0.9.0 suite of section 3m passed: data_check (`"audio":9240`, no WARN, `DATA OK`), the ten data checks, `HB SMOKE OK 63 routes x 2 viewports` + `HB CONTENT OK`, the nine browser smokes (cloze, verbs, pairs, vocab, numbers, pictures, listen, leveltest, drills), check_design_es `--browser` PASS, check_sw PASS. (pictures_check ran without the reference comparison; the Japanese clone was fetched later in the session.) No workbook attached (7b skipped); the 7c placeholder was unfilled again = "not yet", nothing changed for 7c. **No `main` changes this session; dev-tools only.**
+
+**Review workbook, second edition: `hablemos-review-2026-11b.xlsx`** (sent to her 2026-11-19; 24 sheets, 11,865 rows, 7,096 new or changed since the first file, 396 highlighted, about 1 MB).
+- Rebuild: `mkdir -p /tmp/review && cd /tmp/review && node /home/claude/hablemos-dev/tests/review_collect.js /home/claude/hablemos > rows.json && python3 /home/claude/hablemos-dev/tests/review_build.py rows.json`.
+- `tests/review_collect.js`: the old 12 sheets plus **Extras** (`lx:<lesson>:mistake|more|quiz:<i>`), **Cloze** (`cz:<id>`; Spanish = the sentence with the answer filled in), **Transform** (`tf:<id>`; Spanish = `to`), **Verbs** (`v:<inf>`, `v:<inf>:ex:<i>`), **Pictures** (`pic:<set>:<part>`, `pic:<set>:say:<i>`, `pic:bodymap:ask|word:<i>`), **Pairs** (`wp:<id>`), **Numbers** (`num:<group>:<i>`, `num:<group>:note`, `num:clinic:<i>`), **Examples** (`ex:<file>:<headword|English>`: the full DICT_EX key, because headwords repeat), **Sound pairs** (`sp:<i>`, `sp:guide:<type>`), **Lesson text** (`lt:<lessonId>:<i>` = i-th p / li / tr / h3 / h4 / dt / dd block of the body after removing the `.ex` divs and the `<p><s>` mistake lines; this closes the old gap that lesson prose was not reviewable), **Listening questions** (`lq:<textId>:<i>`, English). The Lessons sheet gained a Level column and `l:<id>:mistake:<i>` rows (Spanish = the right line; the struck wrong line is in Options); it now covers all 91 lessons, Readings all 20, Dialogues all 16, placement 30. `rows.json` also carries `__origin` (lesson / reading / dialogue id → data file) for applying fixes.
+- `tests/review-2026-11-keys.json` = the Where keys of the first workbook with a hash of each row's Spanish (made by running the old collector on the 0.6.0 tree, commit `ddf4131`; counts matched the 2026-11-08 output). `review_build.py` uses it for the **Status** column on the 12 old sheets: blank = same row as in the first file, `new`, or `changed`. Result: every old row is unchanged (0 changed); new rows on old sheets: Lessons 1,396, Readings 199, Dialogues 96. **Corrections she writes in either file apply by the same Where key**; the How to use page says so.
+- Flags: the 3f / 3g / 3h lists apply to rows that were in the first workbook; `tests/review_flags_b.py` (written by a Sonnet subagent from 3k, 3l, 3m, each string checked against the data) applies to new rows: `FLAGS_3K/3L/3M` substrings, `ID_FLAGS` (cloze ids), `WORD_FLAGS` (whole-cell matches, also searched in the Regional column), `PAIR_FLAGS` (both words in one Pairs / Sound pairs row). Notes from that pass: the "ahorita, weak distractors" cloze is `c-b1-071`, not `c-b1-063` as 3k says (both flagged); not found in the data and so not flagged: `carne de puerco` as an example sentence, the literal `dijo que viene` (covered by ids c-b1-032 to 035); three lesson-table strings (`qué hace cuando se siente así`, `cuando se sienta así`, `ahorita cuándo`) do not match a row because of markup inside the cell.
+- Per-sheet counts (rows / highlighted): Phrases 707 / 27, Replies 439 / 13, Tools 139 / 3, Strings 57 / 0, Cases 140 / 10, Interp 32 / 7, Discharge cases 272 / 12, MSE cases 112 / 17, Lessons 1,672, Readings 392, Dialogues 178, Dictionary 2,320 / 40, Extras 345, Cloze 345, Transform 160, Verbs 462, Pictures 901, Pairs 280, Numbers 194, Examples 1,197, Sound pairs 76, Lesson text 1,321, Listening questions 124 (the build prints the exact new and flagged numbers).
+
+**Her request mid-session: "expand the lessons or psychiatry portions further, similar to the comprehensiveness in Hanashimashō".** Hanashimashō is now **1.0.0**. Code-and-data-only reference clone (no audio, about a minute): `GIT_LFS_SKIP_SMUDGE=1 git clone --depth 1 --filter=blob:none --sparse https://github.com/isaymotion/japanese /home/claude/isaymotion/japanese && git -C /home/claude/isaymotion/japanese sparse-checkout set --no-cone '/*.md' '/index.html' '/js/*.js' '/js/data/*.js' '/data/*.js'` (add `'/pictures/*.js'` and `'/css/*'` when porting views). Gap measured 2026-11-19 (Hanashimashō / Hablemos):
+| Area | Hanashimashō 1.0.0 | Hablemos 0.9.0 |
+|---|---|---|
+| Phrase sections / phrases | 46 / 863 | 39 / 707 |
+| Nurse track | 6 sections `nurse-admit, nurse-meds, nurse-daily, nurse-risk, nurse-calm, nurse-educ` (125 phrases), `PSYCH_NURSE_TOOLS` (two files), 3 nurse cases | none |
+| End-of-treatment review (outpatient) | `PSYCH_EOT` + section `eot` (31) + `PSYCH_EOT_CASES`, route `#/psych/eot`, `/psych/ecase` | none |
+| Case simulations | 15 (adds OTC misuse + MI, dementia family interview, 3 nurse cases, OCD, PTSD, panic in the ER, school refusal) | 7 |
+| Interpretation drill | 64 | 32 |
+| Admission MSE cases / discharge cases | 12 / 9 | 2 / 5 |
+| Lessons / with extras | 277 / 176 | 91 / 23 |
+| Readings / dialogues / listening texts | 40 / 28 / 108 | 20 / 16 / 36 |
+| Fill the blank / transform | 812 / 290 | 345 / 160 |
+| Find the mistake `#/errors` (`GRAMMAR_ERRORS`) | 240 | none |
+| Listen and reply `#/reply` (`LISTEN_REPLY`) | 190 | none |
+| Dictionary examples | 4,074 | 1,197 (B2: 5) |
+| Other routes not in Hablemos | `#/today`, `#/write`, `#/sounds`, `#/particles`, `#/kana`, `#/kanji`, `#/signs` (the last four are Japanese-only) | |
+
+**Proposed builds (she has not chosen yet; ask, then build on `wip-<version>` and show 125% phone screenshots before release):**
+- **0.10.0 psychiatry** (recommended first, it is what the app is for): nurse track (6 sections + nurse tools + 3 nurse cases, US ward context), end-of-treatment review with cases, 8 more case simulations (OCD, PTSD, panic in the ER, teen school refusal in tú, dementia family interview, an MI case, nurse cases; keep the existing roster and add new fictional names to the brief), interpretation drill 32 → 64, admission MSE cases 2 → about 8 and discharge cases 5 → 9 (every MSE case needs a discharge case with the same id), replies for the new sections. Port the engines (`psych-nurse` views, `eot` views) from Hanashimashō the usual way: agents create new files only, the main session wires.
+- **0.11.0 lessons**: extras (mistakes, more examples, second quiz) for the 68 lessons that have none, Find the mistake drill, Listen and reply drill, a C1 unit (about 16 to 20 lessons: clinical report style, nuance of mood, idiom, register shifts) only if she wants the level, cloze to about 5 per new lesson, B2 example sentences (5 exist), readings and dialogues toward 30 / 24.
+- Each build adds roughly 1,500 to 3,000 more unreviewed Spanish rows; the review collector must gain a sheet per new data file in the same session.
+
 ## 5d. Pitfalls learned on 2026-11-18 (session 2)
+- 2026-11-19: `python3 -m http.server` without `--bind 127.0.0.1` was refused by the session's safety check; always bind to localhost. `check_design_es.py` prints a harmless `WARN check_sw.py could not run` (run the skill's check_sw.py separately). A blobless sparse clone of the Japanese repo (command in 3n) avoids the 1.1 GB audio.
 - `rsync` is not installed in the session image; agents made their private copies with `tar` (same excludes).
 - Remote branch deletion is refused by the session's git proxy (see 3m).
 - A background `http.server` is stopped at its background time limit even mid-session; start it with a long timeout and restart before smokes.
