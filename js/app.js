@@ -66,7 +66,7 @@
     [/^\/psych\/mcase\/(?<id>[\w-]+)$/, V.mseCase, 'psych'],
     [/^\/psych\/dcase\/(?<id>[\w-]+)$/, V.dischargeCase, 'psych'],
     [/^\/placement$/, V.placement, 'placement'],
-    [/^\/cloze$/, V.cloze, 'cloze'], [/^\/transform$/, V.transform, 'transform'], [/^\/build$/, V.build, 'build'],
+    [/^\/cloze$/, V.cloze, 'cloze'], [/^\/transform$/, V.transform, 'transform'], [/^\/build$/, V.build, 'build'], [/^\/listen$/, V.listen, 'listen'], [/^\/test$/, V.leveltest, 'test'],
     [/^\/vocab$/, V.vocab, 'vocab'], [/^\/pairs$/, V.pairs, 'pairs'], [/^\/numbers$/, V.numbers, 'numbers'],
     [/^\/pictures$/, V.pictures, 'pictures'], [/^\/pictures\/bodymap$/, V.pictureBodymap, 'pictures'], [/^\/pictures\/(?<id>[\w-]+)$/, V.pictures, 'pictures'],
     [/^\/verbs$/, V.verbs, 'verbs'], [/^\/verbs\/v\/(?<n>\d+)$/, V.verb, 'verbs'],
@@ -75,7 +75,7 @@
     [/^\/new$/, V.whatsnew, 'new'],
     [/^\/about$/, V.about, 'about']
   ];
-  const TITLES = { home: '', practice: 'Practice', dict: 'Dictionary', flash: 'Flashcards', lessons: 'Lessons', reading: 'Reading', speak: 'Speaking', psych: 'Psychiatry', placement: 'Placement', progress: 'Progress', settings: 'Settings', new: "What's New", about: 'About', verbs: 'Verb trainer', cloze: 'Fill the blank', transform: 'Transform the sentence', build: 'Sentence builder', vocab: 'Vocabulary quiz', numbers: 'Numbers, dates and time', pictures: 'Picture words', pairs: 'Word pairs' };
+  const TITLES = { home: '', practice: 'Practice', dict: 'Dictionary', flash: 'Flashcards', lessons: 'Lessons', reading: 'Reading', speak: 'Speaking', psych: 'Psychiatry', placement: 'Placement', progress: 'Progress', settings: 'Settings', new: "What's New", about: 'About', verbs: 'Verb trainer', cloze: 'Fill the blank', transform: 'Transform the sentence', build: 'Sentence builder', listen: 'Listening practice', test: 'Level review test', vocab: 'Vocabulary quiz', numbers: 'Numbers, dates and time', pictures: 'Picture words', pairs: 'Word pairs' };
 
   /* ---------- Navigation: one grouped list for the desktop rail, the phone drawer (More) and the #/more page ----------
      [key, href, label, icon]. Group labels are shell strings (data/strings.js); item labels are the app's own. */
@@ -88,7 +88,7 @@
   const NAV = [
     ['', [['home', '#/', 'Home', icons.home], ['practice', '#/practice', 'Practice', icons.target]]],
     ['nav.learn', [['lessons', '#/lessons', 'Lessons', icons.lesson], ['reading', '#/reading', 'Reading', icons.read], ['speak', '#/speak', 'Speaking', icons.speak], ['dict', '#/dict', 'Dictionary', icons.book]]],
-    ['nav.drill', [['flash', '#/flash', 'Flashcards', icons.cards], ['vocab', '#/vocab', 'Vocabulary quiz', icons.book], ['pairs', '#/pairs', 'Word pairs', icons.cards], ['verbs', '#/verbs', 'Verb trainer', icons.verb], ['cloze', '#/cloze', 'Fill the blank', icons.verb], ['transform', '#/transform', 'Transform the sentence', icons.verb], ['build', '#/build', 'Sentence builder', icons.verb], ['numbers', '#/numbers', 'Numbers, dates and time', icons.chart], ['pictures', '#/pictures', 'Picture words', icons.eye], ['placement', '#/placement', 'Placement test', icons.target]]],
+    ['nav.drill', [['flash', '#/flash', 'Flashcards', icons.cards], ['vocab', '#/vocab', 'Vocabulary quiz', icons.book], ['pairs', '#/pairs', 'Word pairs', icons.cards], ['listen', '#/listen', 'Listening practice', icons.ear], ['verbs', '#/verbs', 'Verb trainer', icons.verb], ['cloze', '#/cloze', 'Fill the blank', icons.verb], ['transform', '#/transform', 'Transform the sentence', icons.verb], ['build', '#/build', 'Sentence builder', icons.verb], ['numbers', '#/numbers', 'Numbers, dates and time', icons.chart], ['pictures', '#/pictures', 'Picture words', icons.eye], ['test', '#/test', 'Level review test', icons.check], ['placement', '#/placement', 'Placement test', icons.target]]],
     ['nav.interview', [['psych', '#/psych', 'Psychiatry ' + LANG.name, icons.brain]].concat(PSY_PRACTICE)],
     ['nav.tools', PSY_TOOLS],
     ['nav.app', [['progress', '#/progress', 'Progress', icons.chart], ['settings', '#/settings', 'Settings', icons.gear], ['new', '#/new', "What's New", icons.spark], ['about', '#/about', 'About', icons.info]]]
@@ -179,7 +179,7 @@
     dict: HAS.dict ? App.DICT.length + ' entries, both directions, root-word search' : later, flash: 'Spaced repetition across every deck',
     lessons: HAS.lessons ? 'Grammar, culture and interpreter use' : later, reading: HAS.reading ? 'Graded passages' : later, speak: HAS.speak ? 'Dialogues with listening and recording' : later,
     practice: 'Every drill on one page', psych: (window.PSYCH_SECTIONS || []).length + ' interview sections and the ward tools',
-    placement: HAS.placement ? '20 questions to find your level' : later, verbs: 'Conjugation tables and three drills', cloze: 'Choose the word that completes the sentence', transform: 'Rewrite a sentence: negative, past, command', build: 'Put the words in order', vocab: 'Meaning, recall, in context, type it; topic matching', numbers: 'Ages, doses, dates, clock times', pairs: 'Opposites, similar words and words that go together', pictures: 'Words from pictures, and a printable body map', progress: 'Streak, stats, backup', settings: 'Register, voice, theme', new: 'What changed in each version', about: 'Credits and disclaimers'
+    placement: HAS.placement ? (window.PLACEMENT || []).length + ' questions to find your level' : later, verbs: 'Conjugation tables and three drills', cloze: 'Choose the word that completes the sentence', transform: 'Rewrite a sentence: negative, past, command', build: 'Put the words in order', listen: 'Hear words and sentences, dictation, sound pairs, dialogue questions', test: 'A mixed test of one level, scored by area', vocab: 'Meaning, recall, in context, type it; topic matching', numbers: 'Ages, doses, dates, clock times', pairs: 'Opposites, similar words and words that go together', pictures: 'Words from pictures, and a printable body map', progress: 'Streak, stats, backup', settings: 'Register, voice, theme', new: 'What changed in each version', about: 'Credits and disclaimers'
   };
   V.practice = (el) => {
     const s = App.state, due = App.decks().find((d) => d.id === 'due').ids.length;
@@ -195,6 +195,8 @@
       ((window.GRAMMAR_CLOZE || []).length ? T('#/cloze', 'Grammar', 'Fill the blank', 'Choose the word that completes the sentence, by level or by lesson.') : '') +
       ((window.GRAMMAR_TRANSFORM || []).length ? T('#/transform', 'Grammar', 'Transform the sentence', 'Make it negative, past, a command: choose or type.') : '') +
       T('#/build', 'Grammar', 'Sentence builder', 'Put the Spanish words back in order.') +
+      T('#/listen', 'Listen', 'Listening practice', 'Hear, dictation, sound pairs, and questions on dialogues and readings.') +
+      ((window.LESSONS || []).length ? T('#/test', 'Test', 'Level review test', 'A mixed review of one level: grammar, verbs, vocabulary, listening, reading.') : '') +
       (HAS.dict ? T('#/vocab', 'Vocabulary', 'Vocabulary quiz', 'Dictionary decks four ways: meaning, recall, in context, type it.') : '') +
       ((window.TOPIC_SETS || []).length ? T('#/vocab?tab=match', 'Vocabulary', 'Topic matching', 'Match the word to the meaning: body, symptoms, feelings, medicines and more.') : '') +
       ((window.PICTURE_SETS || []).length ? T('#/pictures', 'Picture', 'Picture words', 'Learn words from pictures: the body, home, town, animals and more.') : '') +

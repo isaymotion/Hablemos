@@ -1,7 +1,7 @@
-/* Placement test (EMPTY SHELL).
+/* Placement test. DRAFT FOR REVIEW by a native Spanish-speaking clinician.
    Hablemos (Spanish). Field names stay `tl`, `f`, `c` for engine compatibility: `tl` = the Spanish text; registers are
-   f = usted (formal), c = tú (informal). Shell: no content yet. Once populated, mark this file
-   "Draft for review by a native Spanish-speaking clinician" until it has been reviewed.
+   f = usted (formal), c = tú (informal). Append only: the review workbook names items by their position (placement:<i>).
+   The page sorts the items by level, so new items go at the END of the list whatever their level (0.9.0 added the last ten).
    Shape: window.PLACEMENT = [ [level, question, options, correctIndex], ... ]
    Example element:
      ['A1', '"¿Cómo se siente hoy?" means:', ['How old are you?', 'How do you feel today?', 'Where does it hurt?'], 1]
@@ -26,5 +26,15 @@ window.PLACEMENT = [
 ['B1', 'A patient says "Tengo nervios." Most likely she means:', ['She is anxious or distressed', 'She has a nerve injury', 'She is angry at the nurse'], 0],
 ['B2', '"Estoy embarazada" means:', ['I am embarrassed', 'I am pregnant', 'I am nauseous'], 1],
 ['B2', 'A patient says "Estoy constipado." What do you do?', ['Document constipation', 'Ask what they mean: in many regions it means a head cold, not constipation', 'Document a fever'], 1],
-['B2', 'A patient says "Me quiero ir con Dios." What should you do?', ['Ask about suicidal thoughts directly', 'Assume it is only a religious wish', 'Change the subject'], 0]
+['B2', 'A patient says "Me quiero ir con Dios." What should you do?', ['Ask about suicidal thoughts directly', 'Assume it is only a religious wish', 'Change the subject'], 0],
+['A1', 'Choose the correct word: "¿Dónde ___ el baño?"', ['es', 'está', 'hay'], 1],
+['A2', '"¿Desde cuándo oye las voces?" asks:', ['How often you hear the voices', 'Where the voices come from', 'Since when you have heard the voices'], 2],
+['A2', 'Choose the correct form: "Ayer no ___ nada en todo el día."', ['como', 'comí', 'comeré'], 1],
+['B1', '"Se me olvidó tomar la pastilla" means:', ['I forgot to take the pill', 'I decided not to take the pill', 'Someone forgot to give me the pill'], 0],
+['B1', 'Choose the correct form: "Llámenos cuando ___ a casa."', ['llega', 'llegará', 'llegue'], 2],
+['B1', '"Dejé de tomar la medicina hace un mes" means:', ['I have been taking the medicine for a month', 'I stopped taking the medicine a month ago', 'I left the medicine at home for a month'], 1],
+['B2', 'Choose the correct form: "Si ___ mejor, no estaría aquí."', ['duermo', 'dormiría', 'durmiera'], 2],
+['B2', '"Ya se habrá tomado la medicina" most likely means:', ['He will take the medicine later', 'He has probably taken the medicine already', 'He must take the medicine now'], 1],
+['B2', '"Aunque le duela, tiene que caminar" means:', ['Even if it hurts, you have to walk', 'Since it hurts, you must walk', 'It hurts although you walk'], 0],
+['B2', 'A relative says "Anda bien malilla." In northern Mexican slang this most likely means:', ['She is behaving badly', 'She is a little better', 'She is in withdrawal and feeling sick'], 2]
 ];
