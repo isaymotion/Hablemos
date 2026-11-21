@@ -1164,3 +1164,7 @@ mark.vf { background: var(--warn-bg); color: var(--gold-ink); font-weight: 700; 
 .dict-ex b { font-weight: 600; }
 .dict-ex .spread { align-items: flex-start; gap: 8px; }
 .fc-ex { margin-top: 10px; }
+
+/* Ko-fi support link under the attribution line */
+.support-line{margin:0 0 10px}
+.support-line a{display:inline-flex;align-items:center;min-height:44px;color:inherit;font-weight:600;text-underline-offset:3px}

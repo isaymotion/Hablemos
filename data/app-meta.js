@@ -3,7 +3,8 @@ window.APP_META = {
   name: 'Hablemos',
   short: 'Hablemos',
   tagline: 'Spanish for the psychiatric interview',
-  version: '0.9.0',
+  version: '0.9.1',
+  kofi: 'https://ko-fi.com/isaymotion',   // support link shown in the footer
   repo: 'Hablemos',
   updated: 'November 2026',
   author: 'Isabella Navarro, MD',

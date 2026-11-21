@@ -3,6 +3,12 @@
    For every release: add an entry here, then bump APP_META.version (data/app-meta.js) and VERSION in sw.js. */
 window.APP_CHANGELOG = [
   {
+    version: '0.9.1', date: '2026-11-21', title: 'Support this app',
+    items: [
+      { type: 'update', text: 'This app stays free. If it helps you, there is now a “Support this app on Ko-fi” link at the bottom of every page.' }
+    ]
+  },
+  {
     version: '0.9.0', date: '2026-11-19', title: 'Listening practice, a level review test and example sentences',
     items: [
       { type: 'feature', text: 'Listening practice: hear a word or a sentence and choose what it means, write what you hear (dictation, with accent keys), tell apart 70 sound pairs such as pero and perro or hablo and habló, and answer questions after hearing a whole dialogue or reading. Slower, natural and fast speeds. Find it under Practice.' },
