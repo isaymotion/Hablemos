@@ -3,7 +3,7 @@ window.APP_META = {
   name: 'Hablemos',
   short: 'Hablemos',
   tagline: 'Spanish for the psychiatric interview',
-  version: '0.9.1',
+  version: '0.9.2',
   kofi: 'https://ko-fi.com/isaymotion',   // support link shown in the footer
   repo: 'Hablemos',
   updated: 'November 2026',
